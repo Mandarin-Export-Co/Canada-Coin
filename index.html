@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canada Coin - Plataforma de Inversión Legal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Importar solo una vez desde CDN
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getDatabase, 
+            ref, 
+            set, 
+            get, 
+            update, 
+            push, 
+            child, 
+            onValue 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+          apiKey: "AIzaSyBI4O0d_Mec38FDiuhirujCnX99PFKiXW4",
+          authDomain: "projekt-pc.firebaseapp.com",
+          databaseURL: "https://projekt-pc-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "projekt-pc",
+          storageBucket: "projekt-pc.appspot.com",
+          messagingSenderId: "90098431634",
+          appId: "1:90098431634:web:7cb61800d03533c2a6984b"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        const analytics = getAnalytics(app);
+
+        // Función para registrar usuario
+        function registerUser(email, password, username) {
+            return createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+
+                    // Guardar información adicional en Realtime Database
+                    return set(ref(database, 'users/' + user.uid), {
+                        email: email,
+                        username: username,
+                        balance: 0,
+                        totalContributions: 0
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error al crear usuario:", error.code, error.message);
+                    throw error;
+                });
+        }
+
+        // Hacer accesibles globalmente
+        window.firebaseAuth = auth;
+        window.firebaseDatabase = database;
+        window.firebaseRef = ref;
+        window.firebaseSet = set;
+        window.firebaseGet = get;
+        window.firebaseUpdate = update;
+        window.firebasePush = push;
+        window.firebaseChild = child;
+        window.firebaseOnValue = onValue;
+        window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+        window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.signOut = signOut;
+        window.registerUser = registerUser;
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        .main-content {
+            transition: all 0.3s ease;
+        }
+        .main-content.expanded {
+            margin-left: 70px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white p-4 flex justify-between items-center">
+        <div class="flex items-center">
+            <h1 class="text-xl font-bold">Canada Coin</h1>
+            <span class="ml-2 text-xs bg-blue-800 px-2 py-1 rounded">Beta</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button id="loginBtn" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition">Iniciar Sesión</button>
+            <button id="registerBtn" class="border border-white text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition">Registrarse</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="flex">
+        <!-- Sidebar (visible when logged in) -->
+        <div id="sidebar" class="sidebar gradient-bg text-white h-screen w-64 fixed hidden">
+            <div class="p-4 flex justify-between items-center">
+                <h2 class="font-bold text-lg sidebar-text">Panel de Control</h2>
+                <button id="toggleSidebar" class="text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+            <ul class="mt-6">
+                <li class="px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                    </svg>
+                    <span class="sidebar-text">Dashboard</span>
+                </li>
+                <li class="px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="sidebar-text">Mis Aportes</span>
+                </li>
+                <li class="px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="sidebar-text">Rendimientos</span>
+                </li>
+                <li class="px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="sidebar-text">Referidos</span>
+                </li>
+                <li class="px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="sidebar-text">Ayuda</span>
+                </li>
+            </ul>
+            <div class="absolute bottom-0 w-full p-4">
+                <button id="logoutBtn" class="w-full bg-blue-800 text-white py-2 rounded-lg font-medium hover:bg-blue-900 transition flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="sidebar-text">Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="mainContent" class="main-content w-full">
+            <!-- Hero Section -->
+            <section id="heroSection" class="gradient-bg text-white py-16 px-4">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-6">Inversión Transparente y Regulada</h1>
+                    <p class="text-xl mb-8 max-w-2xl mx-auto">Canada Coin ofrece una plataforma segura y legal para gestionar tus inversiones con total transparencia y seguimiento en tiempo real.</p>
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button id="heroRegisterBtn" class="bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-blue-50 transition">Comenzar Ahora</button>
+                        <button id="learnMoreBtn" class="border border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition">Más Información</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section id="featuresSection" class="py-16 px-4 bg-white">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Características Principales</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="bg-gray-50 p-6 rounded-xl card-shadow">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">Seguridad Garantizada</h3>
+                            <p class="text-gray-600">Cumplimos con todos los requisitos KYC/AML y utilizamos las mejores prácticas de seguridad para proteger tus fondos.</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-xl card-shadow">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">Rendimientos Claros</h3>
+                            <p class="text-gray-600">Sistema de reparto de beneficios transparente con reglas claras y sin sorpresas.</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-xl card-shadow">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">Sistema de Referidos</h3>
+                            <p class="text-gray-600">Programa de referidos no piramidal con bonos fijos por registro y verificación.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dashboard Section (visible when logged in) -->
+            <section id="dashboardSection" class="py-8 px-4 hidden">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Panel de Control</h2>
+                    
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-xl card-shadow">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Saldo Actual</p>
+                                    <h3 class="text-2xl font-bold text-gray-800 mt-1">$<span id="currentBalance">0.00</span></h3>
+                                </div>
+                                <div class="bg-green-100 p-2 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="text-gray-500 text-sm mt-4">Última actualización: <span id="lastUpdate">--</span></p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl card-shadow">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Aportes Totales</p>
+                                    <h3 class="text-2xl font-bold text-gray-800 mt-1">$<span id="totalContributions">0.00</span></h3>
+                                </div>
+                                <div class="bg-blue-100 p-2 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="text-gray-500 text-sm mt-4">Número de aportes: <span id="numberOfContributions">0</span></p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl card-shadow">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Rendimiento</p>
+                                    <h3 class="text-2xl font-bold text-gray-800 mt-1"><span id="performancePercentage">0.00</span>%</h3>
+                                </div>
+                                <div class="bg-purple-100 p-2 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="text-gray-500 text-sm mt-4">Desde el inicio: <span id="performanceSince">--</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Actions and Transactions -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Quick Actions -->
+                        <div class="bg-white p-6 rounded-xl card-shadow">
+                            <h3 class="text-xl font-bold mb-4 text-gray-800">Acciones Rápidas</h3>
+                            <div class="space-y-4">
+                                <button id="makeContributionBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                                    </svg>
+                                    Realizar Aporte
+                                </button>
+                                <button id="withdrawFundsBtn" class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                                    </svg>
+                                    Retirar Fondos
+                                </button>
+                                <button id="referralBtn" class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                                    </svg>
+                                    Invitar Amigos
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Recent Transactions -->
+                        <div class="bg-white p-6 rounded-xl card-shadow">
+                            <h3 class="text-xl font-bold mb-4 text-gray-800">Transacciones Recientes</h3>
+                            <div id="transactionsList" class="space-y-4">
+                                <div class="text-center py-4 text-gray-500">
+                                    No hay transacciones recientes
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Referral Section -->
+                    <div class="mt-8 bg-white p-6 rounded-xl card-shadow">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Tu Código de Referido</h3>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                            <div class="bg-gray-100 p-4 rounded-lg flex-grow">
+                                <code id="referralCode" class="text-lg font-mono">CARGANDO...</code>
+                            </div>
+                            <button id="copyReferralBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
+                                Copiar Enlace
+                            </button>
+                        </div>
+                        <p class="text-gray-600 mt-4">Comparte este código con amigos y recibe un bono de <span class="font-bold">$25</span> por cada referido que se registre y complete la verificación.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Legal Section -->
+            <section id="legalSection" class="py-12 px-4 bg-gray-100">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Información Legal y de Riesgos</h2>
+                    <div class="bg-white p-6 rounded-xl card-shadow">
+                        <div class="prose max-w-none">
+                            <p class="text-gray-700 mb-4">
+                                <strong>Advertencia:</strong> Las inversiones conllevan riesgos, incluida la posible pérdida del capital invertido. 
+                                El rendimiento pasado no es garantía de resultados futuros.
+                            </p>
+                            <p class="text-gray-700 mb-4">
+                                Canada Coin opera bajo estrictos protocolos de cumplimiento normativo, incluyendo KYC (Conozca a su Cliente) 
+                                y AML (Anti-Lavado de Dinero). Todos los usuarios deben completar el proceso de verificación antes de poder realizar aportes.
+                            </p>
+                            <p class="text-gray-700 mb-4">
+                                Las tarifas y comisiones están claramente detalladas en nuestros términos y condiciones. 
+                                No cobramos tarifas ocultas y todos los costos son transparentes desde el inicio.
+                            </p>
+                            <p class="text-gray-700">
+                                Consulte con un asesor financiero independiente antes de realizar cualquier inversión. 
+                                Este servicio puede no estar disponible en todas las jurisdicciones.
+                            </p>
+                        </div>
+                        <div class="mt-6 flex items-center">
+                            <input type="checkbox" id="agreeTerms" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                            <label for="agreeTerms" class="ml-2 text-gray-700">He leído y acepto los <a href="#" class="text-blue-600 hover:underline">términos y condiciones</a></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="bg-gray-800 text-white py-8 px-4">
+                <div class="max-w-6xl mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">Canada Coin</h3>
+                            <p class="text-gray-400">Plataforma de inversión legal y transparente con seguimiento en tiempo real.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">Enlaces Rápidos</h3>
+                            <ul class="space-y-2">
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Inicio</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Acerca de</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Preguntas Frecuentes</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Contacto</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">Legal</h3>
+                            <ul class="space-y-2">
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Términos y Condiciones</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Política de Privacidad</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Advertencia de Riesgos</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Información Regulatoria</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
+                        <p>&copy; 2023 Canada Coin. Todos los derechos reservados.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">Iniciar Sesión</h3>
+                <button id="closeLoginModal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label for="loginEmail" class="block text-gray-700 mb-2">Correo Electrónico</label>
+                    <input type="email" id="loginEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-6">
+                    <label for="loginPassword" class="block text-gray-700 mb-2">Contraseña</label>
+                    <input type="password" id="loginPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition">Iniciar Sesión</button>
+            </form>
+            <p class="text-center mt-4 text-gray-600">
+                ¿No tienes cuenta? <button id="switchToRegister" class="text-blue-600 hover:underline">Regístrate</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">Crear Cuenta</h3>
+                <button id="closeRegisterModal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="registerForm">
+                <div class="mb-4">
+                    <label for="registerName" class="block text-gray-700 mb-2">Nombre Completo</label>
+                    <input type="text" id="registerName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="registerEmail" class="block text-gray-700 mb-2">Correo Electrónico</label>
+                    <input type="email" id="registerEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="registerPassword" class="block text-gray-700 mb-2">Contraseña</label>
+                    <input type="password" id="registerPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-6">
+                    <label for="registerReferral" class="block text-gray-700 mb-2">Código de Referido (opcional)</label>
+                    <input type="text" id="registerReferral" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-4 flex items-start">
+                    <input type="checkbox" id="registerAgree" class="h-4 w-4 text-blue-600 border-gray-300 rounded mt-1" required>
+                    <label for="registerAgree" class="ml-2 text-gray-700 text-sm">Acepto los <a href="#" class="text-blue-600 hover:underline">términos y condiciones</a> y la <a href="#" class="text-blue-600 hover:underline">política de privacidad</a></label>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition">Crear Cuenta</button>
+            </form>
+            <p class="text-center mt-4 text-gray-600">
+                ¿Ya tienes cuenta? <button id="switchToLogin" class="text-blue-600 hover:underline">Inicia Sesión</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- Contribution Modal -->
+    <div id="contributionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">Realizar Aporte</h3>
+                <button id="closeContributionModal" class="text-gray-500 hover:text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="contributionForm">
+                <div class="mb-4">
+                    <label for="contributionAmount" class="block text-gray-700 mb-2">Monto del Aporte</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-500">$</span>
+                        <input type="number" id="contributionAmount" min="10" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" required>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label for="contributionMethod" class="block text-gray-700 mb-2">Método de Pago</label>
+                    <select id="contributionMethod" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <option value="">Selecciona un método</option>
+                        <option value="stripe">Tarjeta de Crédito/Débito</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="bank">Transferencia Bancaria</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition">Continuar al Pago</button>
+            </form>
+            <p class="text-center mt-4 text-gray-600 text-sm">
+                Al realizar un aporte, aceptas nuestros <a href="#" class="text-blue-600 hover:underline">términos y condiciones</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 hidden">
+        <div class="flex items-center">
+            <svg id="notificationIcon" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span id="notificationText"></span>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const heroRegisterBtn = document.getElementById('heroRegisterBtn');
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const closeRegisterModal = document.getElementById('closeRegisterModal');
+        const switchToRegister = document.getElementById('switchToRegister');
+        const switchToLogin = document.getElementById('switchToLogin');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const mainContent = document.getElementById('mainContent');
+        const dashboardSection = document.getElementById('dashboardSection');
+        const heroSection = document.getElementById('heroSection');
+        const featuresSection = document.getElementById('featuresSection');
+        const legalSection = document.getElementById('legalSection');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const makeContributionBtn = document.getElementById('makeContributionBtn');
+        const contributionModal = document.getElementById('contributionModal');
+        const closeContributionModal = document.getElementById('closeContributionModal');
+        const contributionForm = document.getElementById('contributionForm');
+        const referralBtn = document.getElementById('referralBtn');
+        const copyReferralBtn = document.getElementById('copyReferralBtn');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        const notificationIcon = document.getElementById('notificationIcon');
+
+        // State
+        let currentUser = null;
+        let userData = null;
+
+        // Event Listeners
+        loginBtn.addEventListener('click', () => loginModal.classList.remove('hidden'));
+        registerBtn.addEventListener('click', () => registerModal.classList.remove('hidden'));
+        heroRegisterBtn.addEventListener('click', () => registerModal.classList.remove('hidden'));
+        closeLoginModal.addEventListener('click', () => loginModal.classList.add('hidden'));
+        closeRegisterModal.addEventListener('click', () => registerModal.classList.add('hidden'));
+        switchToRegister.addEventListener('click', () => {
+            loginModal.classList.add('hidden');
+            registerModal.classList.remove('hidden');
+        });
+        switchToLogin.addEventListener('click', () => {
+            registerModal.classList.add('hidden');
+            loginModal.classList.remove('hidden');
+        });
+        toggleSidebar.addEventListener('click', toggleSidebarView);
+        logoutBtn.addEventListener('click', handleLogout);
+        makeContributionBtn.addEventListener('click', () => contributionModal.classList.remove('hidden'));
+        closeContributionModal.addEventListener('click', () => contributionModal.classList.add('hidden'));
+        copyReferralBtn.addEventListener('click', copyReferralCode);
+        loginForm.addEventListener('submit', handleLogin);
+        registerForm.addEventListener('submit', handleRegister);
+        contributionForm.addEventListener('submit', handleContribution);
+
+        // Firebase Auth State Observer
+        onAuthStateChanged(window.firebaseAuth, (user) => {
+            if (user) {
+                currentUser = user;
+                loadUserData(user.uid);
+                showDashboard();
+            } else {
+                currentUser = null;
+                userData = null;
+                showPublicContent();
+            }
+        });
+
+        // Functions
+        function toggleSidebarView() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
+
+        function showDashboard() {
+            sidebar.classList.remove('hidden');
+            dashboardSection.classList.remove('hidden');
+            heroSection.classList.add('hidden');
+            featuresSection.classList.add('hidden');
+            loginBtn.classList.add('hidden');
+            registerBtn.classList.add('hidden');
+        }
+
+        function showPublicContent() {
+            sidebar.classList.add('hidden');
+            dashboardSection.classList.add('hidden');
+            heroSection.classList.remove('hidden');
+            featuresSection.classList.remove('hidden');
+            loginBtn.classList.remove('hidden');
+            registerBtn.classList.remove('hidden');
+            loginModal.classList.add('hidden');
+            registerModal.classList.add('hidden');
+            contributionModal.classList.add('hidden');
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(window.firebaseAuth, email, password);
+                showNotification('Inicio de sesión exitoso', 'success');
+                loginModal.classList.add('hidden');
+                loginForm.reset();
+            } catch (error) {
+                console.error('Error al iniciar sesión:', error);
+                showNotification('Error al iniciar sesión: ' + error.message, 'error');
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const referralCode = document.getElementById('registerReferral').value;
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+                const user = userCredential.user;
+                
+                // Generate a unique referral code for the new user
+                const userReferralCode = generateReferralCode();
+                
+                // Save user data to Firebase
+                await window.firebaseSet(window.firebaseRef(window.firebaseDatabase, 'users/' + user.uid), {
+                    name: name,
+                    email: email,
+                    referralCode: userReferralCode,
+                    referredBy: referralCode || null,
+                    balance: 0,
+                    totalContributions: 0,
+                    createdAt: new Date().toISOString(),
+                    status: 'pending' // pending, verified, blocked
+                });
+
+                // If referred by someone, add bonus to referrer
+                if (referralCode) {
+                    await applyReferralBonus(referralCode, user.uid);
+                }
+
+                showNotification('Cuenta creada exitosamente', 'success');
+                registerModal.classList.add('hidden');
+                registerForm.reset();
+            } catch (error) {
+                console.error('Error al registrar usuario:', error);
+                showNotification('Error al crear cuenta: ' + error.message, 'error');
+            }
+        }
+
+        async function loadUserData(uid) {
+            try {
+                const snapshot = await window.firebaseGet(window.firebaseRef(window.firebaseDatabase, 'users/' + uid));
+                if (snapshot.exists()) {
+                    userData = snapshot.val();
+                    updateDashboard(userData);
+                } else {
+                    console.log("No se encontraron datos del usuario");
+                }
+            } catch (error) {
+                console.error('Error al cargar datos del usuario:', error);
+            }
+        }
+
+        function updateDashboard(data) {
+            document.getElementById('currentBalance').textContent = data.balance ? data.balance.toFixed(2) : '0.00';
+            document.getElementById('totalContributions').textContent = data.totalContributions ? data.totalContributions.toFixed(2) : '0.00';
+            document.getElementById('numberOfContributions').textContent = data.contributions ? Object.keys(data.contributions).length : '0';
+            document.getElementById('performancePercentage').textContent = calculatePerformance(data);
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleDateString();
+            document.getElementById('performanceSince').textContent = data.createdAt ? new Date(data.createdAt).toLocaleDateString() : '--';
+            document.getElementById('referralCode').textContent = data.referralCode || 'No disponible';
+            
+            // Update transactions list
+            updateTransactionsList(data.transactions);
+        }
+
+        function calculatePerformance(data) {
+            // Simple performance calculation based on balance and contributions
+            if (!data.balance || !data.totalContributions || data.totalContributions === 0) {
+                return '0.00';
+            }
+            return ((data.balance - data.totalContributions) / data.totalContributions * 100).toFixed(2);
+        }
+
+        function updateTransactionsList(transactions) {
+            const transactionsList = document.getElementById('transactionsList');
+            
+            if (!transactions || Object.keys(transactions).length === 0) {
+                transactionsList.innerHTML = '<div class="text-center py-4 text-gray-500">No hay transacciones recientes</div>';
+                return;
+            }
+            
+            // Sort transactions by date (newest first) and take the last 5
+            const sortedTransactions = Object.values(transactions)
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 5);
+            
+            transactionsList.innerHTML = sortedTransactions.map(transaction => `
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <div>
+                        <p class="font-medium ${transaction.type === 'contribution' ? 'text-green-600' : 'text-red-600'}">
+                            ${transaction.type === 'contribution' ? 'Aporte' : 'Retiro'}
+                        </p>
+                        <p class="text-sm text-gray-500">${new Date(transaction.date).toLocaleDateString()}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold ${transaction.type === 'contribution' ? 'text-green-600' : 'text-red-600'}">
+                            ${transaction.type === 'contribution' ? '+' : '-'}$${transaction.amount.toFixed(2)}
+                        </p>
+                        <p class="text-sm text-gray-500">${transaction.status || 'Completado'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function handleContribution(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('contributionAmount').value);
+            const method = document.getElementById('contributionMethod').value;
+
+            if (!currentUser) {
+                showNotification('Debes iniciar sesión para realizar un aporte', 'error');
+                return;
+            }
+
+            try {
+                // In a real application, this would integrate with a payment gateway
+                // For this prototype, we'll simulate a successful payment
+                
+                // Create transaction record
+                const transactionId = 'txn_' + Math.random().toString(36).substr(2, 9);
+                const transactionData = {
+                    id: transactionId,
+                    type: 'contribution',
+                    amount: amount,
+                    method: method,
+                    date: new Date().toISOString(),
+                    status: 'completed'
+                };
+
+                // Update user balance and transactions
+                const newBalance = (userData.balance || 0) + amount;
+                const newTotalContributions = (userData.totalContributions || 0) + amount;
+                
+                await window.firebaseUpdate(window.firebaseRef(window.firebaseDatabase, 'users/' + currentUser.uid), {
+                    balance: newBalance,
+                    totalContributions: newTotalContributions,
+                    [`transactions/${transactionId}`]: transactionData
+                });
+
+                showNotification(`Aporte de $${amount.toFixed(2)} realizado exitosamente`, 'success');
+                contributionModal.classList.add('hidden');
+                contributionForm.reset();
+                
+                // Reload user data to update dashboard
+                loadUserData(currentUser.uid);
+            } catch (error) {
+                console.error('Error al procesar aporte:', error);
+                showNotification('Error al procesar el aporte: ' + error.message, 'error');
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await signOut(window.firebaseAuth);
+                showNotification('Sesión cerrada exitosamente', 'success');
+            } catch (error) {
+                console.error('Error al cerrar sesión:', error);
+                showNotification('Error al cerrar sesión: ' + error.message, 'error');
+            }
+        }
+
+        function generateReferralCode() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        async function applyReferralBonus(referralCode, newUserId) {
+            try {
+                // Find user with this referral code
+                const usersRef = window.firebaseRef(window.firebaseDatabase, 'users');
+                const snapshot = await window.firebaseGet(usersRef);
+                
+                if (snapshot.exists()) {
+                    const users = snapshot.val();
+                    let referrerId = null;
+                    
+                    for (const userId in users) {
+                        if (users[userId].referralCode === referralCode) {
+                            referrerId = userId;
+                            break;
+                        }
+                    }
+                    
+                    if (referrerId) {
+                        // Apply fixed bonus to referrer
+                        const referrerData = users[referrerId];
+                        const newBalance = (referrerData.balance || 0) + 25; // $25 fixed bonus
+                        
+                        await window.firebaseUpdate(window.firebaseRef(window.firebaseDatabase, 'users/' + referrerId), {
+                            balance: newBalance,
+                            [`referrals/${newUserId}`]: {
+                                userId: newUserId,
+                                date: new Date().toISOString(),
+                                bonusApplied: true
+                            }
+                        });
+                        
+                        // Record bonus transaction for referrer
+                        const transactionId = 'ref_' + Math.random().toString(36).substr(2, 9);
+                        await window.firebaseSet(
+                            window.firebaseRef(window.firebaseDatabase, `users/${referrerId}/transactions/${transactionId}`),
+                            {
+                                id: transactionId,
+                                type: 'referral_bonus',
+                                amount: 25,
+                                date: new Date().toISOString(),
+                                status: 'completed',
+                                description: `Bono por referido: ${userData.name}`
+                            }
+                        );
+                    }
+                }
+            } catch (error) {
+                console.error('Error al aplicar bono de referido:', error);
+            }
+        }
+
+        function copyReferralCode() {
+            const referralCode = document.getElementById('referralCode').textContent;
+            const referralLink = `${window.location.origin}?ref=${referralCode}`;
+            
+            navigator.clipboard.writeText(referralLink).then(() => {
+                showNotification('Enlace de referido copiado al portapapeles', 'success');
+            }).catch(err => {
+                console.error('Error al copiar enlace: ', err);
+                showNotification('Error al copiar enlace', 'error');
+            });
+        }
+
+        function showNotification(message, type) {
+            notificationText.textContent = message;
+            
+            // Set notification color based on type
+            if (type === 'success') {
+                notification.classList.remove('bg-red-500', 'text-red-100');
+                notification.classList.add('bg-green-500', 'text-green-100');
+                notificationIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />';
+            } else if (type === 'error') {
+                notification.classList.remove('bg-green-500', 'text-green-100');
+                notification.classList.add('bg-red-500', 'text-red-100');
+                notificationIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />';
+            }
+            
+            notification.classList.remove('hidden');
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Check for referral code in URL parameters
+        function checkReferralCode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            
+            if (refCode) {
+                document.getElementById('registerReferral').value = refCode;
+            }
+        }
+
+        // Initialize
+        checkReferralCode();
+    </script>
+</body>
+</html>

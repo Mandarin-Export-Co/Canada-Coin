@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inversión Legal - Gestión de Aportes</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Canada Coin - Plataforma de Inversión Legal</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary-dark: #1E2A3A;
@@ -19,6 +21,10 @@
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
             min-height: 100vh;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #2D3748 100%);
         }
         
         .dashboard-card {
@@ -99,17 +105,6 @@
             color: var(--success-green);
         }
         
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background-color: var(--success-green);
-            border-radius: 3px;
-        }
-        
         .progress-bar {
             height: 8px;
             background-color: #E5E7EB;
@@ -184,9 +179,37 @@
             box-shadow: 0 10px 25px rgba(30, 42, 58, 0.3);
         }
         
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        
+        .sidebar.collapsed .sidebar-text {
+            display: none;
+        }
+        
+        .main-content {
+            transition: all 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            margin-left: 70px;
+        }
+        
+        .mobile-menu {
+            display: none;
+        }
+        
         @media (max-width: 768px) {
-            .nav-links {
+            .sidebar {
                 display: none;
+            }
+            
+            .main-content.expanded {
+                margin-left: 0;
             }
             
             .mobile-menu {
@@ -197,38 +220,56 @@
 </head>
 <body class="min-h-screen">
     <!-- Header Navigation -->
-    <nav class="bg-[#1E2A3A] text-white p-4 shadow-lg">
+    <nav class="gradient-bg text-white p-4 shadow-lg">
         <div class="container mx-auto flex justify-between items-center">
             <div class="logo flex items-center">
                 <div class="w-10 h-10 bg-[#10B981] rounded-lg flex items-center justify-center mr-3">
                     <i class="fas fa-chart-line text-white"></i>
                 </div>
-                <h1 class="text-xl font-bold">InversiónLegal</h1>
+                <h1 class="text-xl font-bold">Canada Coin</h1>
+                <span class="ml-2 text-xs bg-blue-800 px-2 py-1 rounded">Beta</span>
             </div>
+            
+            <!-- Desktop Navigation -->
             <div class="nav-links hidden md:flex space-x-2">
                 <a href="#" class="nav-link active" data-section="dashboard">
                     <i class="fas fa-home mr-2"></i>Dashboard
                 </a>
-                <a href="#" class="nav-link" data-section="historial">
-                    <i class="fas fa-history mr-2"></i>Historial
+                <a href="#" class="nav-link" data-section="contributions">
+                    <i class="fas fa-history mr-2"></i>Mis Aportes
                 </a>
-                <a href="#" class="nav-link" data-section="referidos">
+                <a href="#" class="nav-link" data-section="performance">
+                    <i class="fas fa-chart-pie mr-2"></i>Rendimientos
+                </a>
+                <a href="#" class="nav-link" data-section="referrals">
                     <i class="fas fa-user-friends mr-2"></i>Referidos
                 </a>
-                <a href="#" class="nav-link" data-section="reglas">
-                    <i class="fas fa-file-contract mr-2"></i>Reglas
+                <a href="#" class="nav-link" data-section="profile">
+                    <i class="fas fa-user mr-2"></i>Mi Perfil
                 </a>
             </div>
+            
+            <!-- User Menu -->
             <div class="user-menu flex items-center space-x-4">
-                <div class="hidden md:flex items-center space-x-2">
+                <div id="userInfo" class="hidden md:flex items-center space-x-2">
                     <div class="w-8 h-8 bg-[#10B981] rounded-full flex items-center justify-center">
-                        <span class="text-white font-bold">U</span>
+                        <span class="text-white font-bold" id="userInitial">U</span>
                     </div>
                     <span id="userName" class="font-medium">Usuario Ejemplo</span>
                 </div>
-                <button id="logoutBtn" class="bg-transparent border border-white/30 rounded-lg px-3 py-1 hover:bg-white/10 transition">
+                
+                <!-- Login/Register Buttons (when not logged in) -->
+                <div id="authButtons" class="flex items-center space-x-4">
+                    <button id="loginBtn" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition">Iniciar Sesión</button>
+                    <button id="registerBtn" class="border border-white text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition">Registrarse</button>
+                </div>
+                
+                <!-- Logout Button (when logged in) -->
+                <button id="logoutBtn" class="hidden bg-transparent border border-white/30 rounded-lg px-3 py-1 hover:bg-white/10 transition">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
+                
+                <!-- Mobile Menu Button -->
                 <button id="mobileMenuBtn" class="md:hidden text-xl">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -237,13 +278,13 @@
     </nav>
 
     <!-- Mobile Menu -->
-    <div id="mobileMenu" class="fixed inset-0 bg-[#1E2A3A] z-50 hidden flex-col p-6">
+    <div id="mobileMenu" class="mobile-menu fixed inset-0 bg-[#1E2A3A] z-50 hidden flex-col p-6">
         <div class="flex justify-between items-center mb-8">
             <div class="logo flex items-center">
                 <div class="w-10 h-10 bg-[#10B981] rounded-lg flex items-center justify-center mr-3">
                     <i class="fas fa-chart-line text-white"></i>
                 </div>
-                <h1 class="text-xl font-bold text-white">InversiónLegal</h1>
+                <h1 class="text-xl font-bold text-white">Canada Coin</h1>
             </div>
             <button id="closeMobileMenu" class="text-white text-2xl">
                 <i class="fas fa-times"></i>
@@ -253,648 +294,658 @@
             <a href="#" class="nav-link-mobile text-white text-xl py-3 flex items-center" data-section="dashboard">
                 <i class="fas fa-home mr-4 w-6 text-center"></i>Dashboard
             </a>
-            <a href="#" class="nav-link-mobile text-white text-xl py-3 flex items-center" data-section="historial">
-                <i class="fas fa-history mr-4 w-6 text-center"></i>Historial
+            <a href="#" class="nav-link-mobile text-white text-xl py-3 flex items-center" data-section="contributions">
+                <i class="fas fa-history mr-4 w-6 text-center"></i>Mis Aportes
             </a>
-            <a href="#" class="nav-link-mobile text-white text-xl py-3 flex items-center" data-section="referidos">
+            <a href="#" class="nav-link-mobile text-white text-xl py-3 flex items-center" data-section="performance">
+                <i class="fas fa-chart-pie mr-4 w-6 text-center"></i>Rendimientos
+            </a>
+            <a href="#" class="nav-link-mobile text-white text-xl py-3 flex items-center" data-section="referrals">
                 <i class="fas fa-user-friends mr-4 w-6 text-center"></i>Referidos
             </a>
-            <a href="#" class="nav-link-mobile text-white text-xl py-3 flex items-center" data-section="reglas">
-                <i class="fas fa-file-contract mr-4 w-6 text-center"></i>Reglas
+            <a href="#" class="nav-link-mobile text-white text-xl py-3 flex items-center" data-section="profile">
+                <i class="fas fa-user mr-4 w-6 text-center"></i>Mi Perfil
             </a>
         </div>
         <div class="mt-auto pt-8 border-t border-white/20">
-            <div class="flex items-center space-x-3 mb-4">
+            <div id="mobileUserInfo" class="hidden flex items-center space-x-3 mb-4">
                 <div class="w-10 h-10 bg-[#10B981] rounded-full flex items-center justify-center">
                     <span class="text-white font-bold">U</span>
                 </div>
                 <span class="text-white font-medium">Usuario Ejemplo</span>
             </div>
-            <button class="w-full bg-white/10 text-white rounded-lg py-3 flex items-center justify-center space-x-2">
+            <button id="mobileLogoutBtn" class="hidden w-full bg-white/10 text-white rounded-lg py-3 flex items-center justify-center space-x-2">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Cerrar Sesión</span>
             </button>
+            <div id="mobileAuthButtons" class="flex flex-col space-y-4">
+                <button id="mobileLoginBtn" class="w-full bg-white text-blue-700 rounded-lg py-3 flex items-center justify-center space-x-2 font-medium">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Iniciar Sesión</span>
+                </button>
+                <button id="mobileRegisterBtn" class="w-full border border-white text-white rounded-lg py-3 flex items-center justify-center space-x-2 font-medium">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Registrarse</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Main Content -->
-    <main class="container mx-auto mt-8 p-4 pb-16">
-        <!-- Dashboard Section -->
-        <section id="dashboard" class="section active">
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-800">Dashboard de Inversiones</h2>
-                <p class="text-gray-600">Resumen de tu cartera y actividades recientes</p>
+    <div class="flex">
+        <!-- Sidebar (visible when logged in) -->
+        <div id="sidebar" class="sidebar gradient-bg text-white h-screen w-64 fixed hidden">
+            <div class="p-4 flex justify-between items-center">
+                <h2 class="font-bold text-lg sidebar-text">Panel de Control</h2>
+                <button id="toggleSidebar" class="text-white">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="dashboard-card p-6 fade-in">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-600">Saldo Total</h3>
-                            <div class="amount text-3xl font-bold mt-2 text-gray-800">€12,450.00</div>
-                            <div class="trend positive text-sm mt-1 flex items-center">
-                                <i class="fas fa-arrow-up mr-1"></i>
-                                <span>+5.2% este mes</span>
-                            </div>
-                        </div>
-                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-euro-sign text-green-600"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="dashboard-card p-6 fade-in">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-600">Beneficios Acumulados</h3>
-                            <div class="amount text-3xl font-bold mt-2 text-gray-800">€2,150.00</div>
-                            <div class="trend positive text-sm mt-1 flex items-center">
-                                <i class="fas fa-chart-line mr-1"></i>
-                                <span>+12.8% desde el inicio</span>
-                            </div>
-                        </div>
-                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-chart-pie text-blue-600"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="dashboard-card p-6 fade-in">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-600">Bonos de Referidos</h3>
-                            <div class="amount text-3xl font-bold mt-2 text-gray-800">€150.00</div>
-                            <div class="text-sm mt-1 text-gray-500">15 referidos verificados</div>
-                        </div>
-                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-user-friends text-purple-600"></i>
-                        </div>
-                    </div>
-                </div>
+            <ul class="mt-6">
+                <li class="sidebar-item px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center" data-section="dashboard">
+                    <i class="fas fa-home mr-3 w-5 text-center"></i>
+                    <span class="sidebar-text">Dashboard</span>
+                </li>
+                <li class="sidebar-item px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center" data-section="contributions">
+                    <i class="fas fa-history mr-3 w-5 text-center"></i>
+                    <span class="sidebar-text">Mis Aportes</span>
+                </li>
+                <li class="sidebar-item px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center" data-section="performance">
+                    <i class="fas fa-chart-pie mr-3 w-5 text-center"></i>
+                    <span class="sidebar-text">Rendimientos</span>
+                </li>
+                <li class="sidebar-item px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center" data-section="referrals">
+                    <i class="fas fa-user-friends mr-3 w-5 text-center"></i>
+                    <span class="sidebar-text">Referidos</span>
+                </li>
+                <li class="sidebar-item px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center" data-section="profile">
+                    <i class="fas fa-user mr-3 w-5 text-center"></i>
+                    <span class="sidebar-text">Mi Perfil</span>
+                </li>
+                <li class="sidebar-item px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center" data-section="help">
+                    <i class="fas fa-question-circle mr-3 w-5 text-center"></i>
+                    <span class="sidebar-text">Ayuda</span>
+                </li>
+            </ul>
+            <div class="absolute bottom-0 w-full p-4">
+                <button id="sidebarLogoutBtn" class="w-full bg-blue-800 text-white py-2 rounded-lg font-medium hover:bg-blue-900 transition flex items-center justify-center">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    <span class="sidebar-text">Cerrar Sesión</span>
+                </button>
             </div>
+        </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <div class="lg:col-span-2">
-                    <div class="dashboard-card p-6 h-full">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Movimientos Recientes</h3>
-                        <div class="transaction-list">
-                            <div class="transaction-item">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                                        <i class="fas fa-arrow-down text-green-600"></i>
-                                    </div>
-                                    <div class="transaction-info">
-                                        <div class="transaction-type font-medium">Depósito</div>
-                                        <div class="transaction-date text-sm text-gray-500">15 Nov 2023, 10:30</div>
-                                    </div>
-                                </div>
-                                <div class="transaction-amount positive">+€1,000.00</div>
-                            </div>
-                            
-                            <div class="transaction-item">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                        <i class="fas fa-gift text-blue-600"></i>
-                                    </div>
-                                    <div class="transaction-info">
-                                        <div class="transaction-type font-medium">Bono de Referido</div>
-                                        <div class="transaction-date text-sm text-gray-500">14 Nov 2023, 16:45</div>
-                                    </div>
-                                </div>
-                                <div class="transaction-amount positive">+€10.00</div>
-                            </div>
-                            
-                            <div class="transaction-item">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
-                                        <i class="fas fa-coins text-yellow-600"></i>
-                                    </div>
-                                    <div class="transaction-info">
-                                        <div class="transaction-type font-medium">Beneficios</div>
-                                        <div class="transaction-date text-sm text-gray-500">10 Nov 2023, 09:15</div>
-                                    </div>
-                                </div>
-                                <div class="transaction-amount positive">+€245.50</div>
-                            </div>
-                            
-                            <div class="transaction-item">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                                        <i class="fas fa-arrow-up text-red-600"></i>
-                                    </div>
-                                    <div class="transaction-info">
-                                        <div class="transaction-type font-medium">Retiro</div>
-                                        <div class="transaction-date text-sm text-gray-500">5 Nov 2023, 14:20</div>
-                                    </div>
-                                </div>
-                                <div class="transaction-amount negative">-€500.00</div>
-                            </div>
-                        </div>
-                        <button class="w-full mt-4 btn-secondary">
-                            <i class="fas fa-history mr-2"></i>Ver Historial Completo
-                        </button>
+        <!-- Main Content Area -->
+        <div id="mainContent" class="main-content w-full">
+            <!-- Hero Section -->
+            <section id="heroSection" class="gradient-bg text-white py-16 px-4">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-6">Inversión Transparente y Regulada</h1>
+                    <p class="text-xl mb-8 max-w-2xl mx-auto">Canada Coin ofrece una plataforma segura y legal para gestionar tus inversiones con total transparencia y seguimiento en tiempo real.</p>
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button id="heroRegisterBtn" class="bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-blue-50 transition">Comenzar Ahora</button>
+                        <button id="learnMoreBtn" class="border border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition">Más Información</button>
                     </div>
                 </div>
+            </section>
 
-                <div class="space-y-6">
-                    <div class="dashboard-card p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Acciones Rápidas</h3>
-                        <div class="space-y-3">
-                            <button class="w-full btn-primary flex items-center justify-center" id="depositBtn">
-                                <i class="fas fa-plus-circle mr-2"></i>Realizar Aporte
-                            </button>
-                            <button class="w-full btn-secondary flex items-center justify-center" id="withdrawBtn">
-                                <i class="fas fa-minus-circle mr-2"></i>Retirar Fondos
-                            </button>
-                        </div>
-                        
-                        <div class="mt-6 pt-4 border-t border-gray-200">
-                            <h4 class="font-medium text-gray-700 mb-2">Estado de Verificación</h4>
-                            <div class="flex items-center">
-                                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-2">
-                                    <i class="fas fa-check text-white text-xs"></i>
-                                </div>
-                                <span class="text-green-600 font-medium">Verificación completada</span>
+            <!-- Features Section -->
+            <section id="featuresSection" class="py-16 px-4 bg-white">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Características Principales</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="dashboard-card p-6 fade-in">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                                <i class="fas fa-shield-alt text-blue-600"></i>
                             </div>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">Seguridad Garantizada</h3>
+                            <p class="text-gray-600">Cumplimos con todos los requisitos KYC/AML y utilizamos las mejores prácticas de seguridad para proteger tus fondos.</p>
+                        </div>
+                        <div class="dashboard-card p-6 fade-in">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                                <i class="fas fa-chart-line text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">Rendimientos Claros</h3>
+                            <p class="text-gray-600">Sistema de reparto de beneficios transparente con reglas claras y sin sorpresas.</p>
+                        </div>
+                        <div class="dashboard-card p-6 fade-in">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                                <i class="fas fa-user-friends text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-gray-800">Sistema de Referidos</h3>
+                            <p class="text-gray-600">Programa de referidos no piramidal con bonos fijos por registro y verificación.</p>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <!-- Dashboard Section (visible when logged in) -->
+            <section id="dashboardSection" class="py-8 px-4 hidden">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Panel de Control</h2>
                     
-                    <div class="floating-card">
-                        <h3 class="text-lg font-semibold mb-2">Próximo Reparto de Beneficios</h3>
-                        <div class="text-2xl font-bold mb-2">15 Días</div>
-                        <div class="text-sm opacity-80">Estimado: €320.00</div>
-                        <div class="mt-4">
-                            <div class="flex justify-between text-sm mb-1">
-                                <span>Progreso del ciclo</span>
-                                <span>65%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 65%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Historial Section -->
-        <section id="historial" class="section hidden">
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-800">Historial de Transacciones</h2>
-                <p class="text-gray-600">Todas tus operaciones en la plataforma</p>
-            </div>
-            
-            <div class="dashboard-card p-6">
-                <div class="flex flex-col md:flex-row justify-between mb-6">
-                    <div class="flex space-x-2 mb-4 md:mb-0">
-                        <button class="px-4 py-2 bg-[#10B981] text-white rounded-lg">Todos</button>
-                        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg">Depósitos</button>
-                        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg">Retiros</button>
-                        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg">Beneficios</button>
-                    </div>
-                    <div class="flex space-x-2">
-                        <div class="relative">
-                            <input type="text" placeholder="Buscar..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981] focus:border-transparent">
-                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                        </div>
-                        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg flex items-center">
-                            <i class="fas fa-filter mr-2"></i>Filtrar
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="border-b border-gray-200">
-                                <th class="text-left py-3 px-4 font-medium text-gray-600">Fecha</th>
-                                <th class="text-left py-3 px-4 font-medium text-gray-600">Tipo</th>
-                                <th class="text-left py-3 px-4 font-medium text-gray-600">Descripción</th>
-                                <th class="text-right py-3 px-4 font-medium text-gray-600">Monto</th>
-                                <th class="text-right py-3 px-4 font-medium text-gray-600">Saldo</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-b border-gray-100 hover:bg-gray-50">
-                                <td class="py-3 px-4">15/11/2023</td>
-                                <td class="py-3 px-4">
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Depósito</span>
-                                </td>
-                                <td class="py-3 px-4">Transferencia bancaria</td>
-                                <td class="py-3 px-4 text-right text-green-600 font-medium">+€1,000.00</td>
-                                <td class="py-3 px-4 text-right">€12,450.00</td>
-                            </tr>
-                            <tr class="border-b border-gray-100 hover:bg-gray-50">
-                                <td class="py-3 px-4">14/11/2023</td>
-                                <td class="py-3 px-4">
-                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">Bono</span>
-                                </td>
-                                <td class="py-3 px-4">Bono por referido - Maria Lopez</td>
-                                <td class="py-3 px-4 text-right text-green-600 font-medium">+€10.00</td>
-                                <td class="py-3 px-4 text-right">€11,450.00</td>
-                            </tr>
-                            <tr class="border-b border-gray-100 hover:bg-gray-50">
-                                <td class="py-3 px-4">10/11/2023</td>
-                                <td class="py-3 px-4">
-                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">Beneficio</span>
-                                </td>
-                                <td class="py-3 px-4">Reparto de beneficios mensual</td>
-                                <td class="py-3 px-4 text-right text-green-600 font-medium">+€245.50</td>
-                                <td class="py-3 px-4 text-right">€11,440.00</td>
-                            </tr>
-                            <tr class="border-b border-gray-100 hover:bg-gray-50">
-                                <td class="py-3 px-4">05/11/2023</td>
-                                <td class="py-3 px-4">
-                                    <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">Retiro</span>
-                                </td>
-                                <td class="py-3 px-4">Transferencia a cuenta personal</td>
-                                <td class="py-3 px-4 text-right text-red-600 font-medium">-€500.00</td>
-                                <td class="py-3 px-4 text-right">€11,194.50</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="mt-6 flex justify-between items-center">
-                    <div class="text-gray-600">Mostrando 4 de 42 transacciones</div>
-                    <div class="flex space-x-2">
-                        <button class="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button class="w-8 h-8 flex items-center justify-center bg-[#10B981] text-white rounded-lg">1</button>
-                        <button class="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg">2</button>
-                        <button class="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg">3</button>
-                        <button class="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Referidos Section -->
-        <section id="referidos" class="section hidden">
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-800">Sistema de Referidos</h2>
-                <p class="text-gray-600">Invita amigos y gana bonos por cada verificación</p>
-            </div>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <div class="lg:col-span-2">
-                    <div class="dashboard-card p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Tus Referidos</h3>
-                        
-                        <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                            <div class="flex items-start">
-                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3 mt-1">
-                                    <i class="fas fa-info-circle text-blue-600"></i>
-                                </div>
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="dashboard-card p-6 fade-in">
+                            <div class="flex justify-between items-start">
                                 <div>
-                                    <h4 class="font-medium text-blue-800">Cómo funciona el sistema</h4>
-                                    <p class="text-blue-700 text-sm mt-1">Gana <span class="font-bold">€10.00</span> por cada amigo que se registre usando tu enlace y complete la verificación de identidad. El bono se acredita automáticamente una vez verificado.</p>
+                                    <h3 class="text-lg font-semibold text-gray-600">Saldo Total</h3>
+                                    <div class="amount text-3xl font-bold mt-2 text-gray-800">$<span id="currentBalance">0.00</span></div>
+                                    <div class="trend positive text-sm mt-1 flex items-center">
+                                        <i class="fas fa-arrow-up mr-1"></i>
+                                        <span>+5.2% este mes</span>
+                                    </div>
+                                </div>
+                                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-dollar-sign text-green-600"></i>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="referral-stats grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            <div class="stat-card text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                <div class="stat-number text-2xl font-bold text-[#1E2A3A]">15</div>
-                                <div class="stat-label text-gray-600">Referidos Registrados</div>
-                            </div>
-                            <div class="stat-card text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                <div class="stat-number text-2xl font-bold text-[#10B981]">12</div>
-                                <div class="stat-label text-gray-600">Verificados</div>
-                            </div>
-                            <div class="stat-card text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                <div class="stat-number text-2xl font-bold text-[#3B82F6]">€150</div>
-                                <div class="stat-label text-gray-600">Bonos Obtenidos</div>
+
+                        <div class="dashboard-card p-6 fade-in">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-600">Aportes Totales</h3>
+                                    <div class="amount text-3xl font-bold mt-2 text-gray-800">$<span id="totalContributions">0.00</span></div>
+                                    <div class="text-sm mt-1 text-gray-500"><span id="numberOfContributions">0</span> aportes realizados</div>
+                                </div>
+                                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-chart-bar text-blue-600"></i>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="referral-link mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Tu enlace único de referido:</label>
-                            <div class="flex flex-col md:flex-row items-stretch md:items-center space-y-2 md:space-y-0 md:space-x-2">
-                                <div class="flex-1 p-3 bg-gray-100 rounded-lg border border-gray-300 text-gray-800 font-mono overflow-x-auto">
-                                    https://inversionlegal.com/registro?ref=usuario123abc
+
+                        <div class="dashboard-card p-6 fade-in">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-600">Rendimiento</h3>
+                                    <div class="amount text-3xl font-bold mt-2 text-gray-800"><span id="performancePercentage">0.00</span>%</div>
+                                    <div class="text-sm mt-1 text-gray-500">Desde <span id="performanceSince">--</span></div>
                                 </div>
-                                <button id="copyReferralLink" class="btn-primary px-4 py-3 flex items-center justify-center">
-                                    <i class="fas fa-copy mr-2"></i>Copiar
+                                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-chart-line text-purple-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions and Transactions -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Quick Actions -->
+                        <div class="dashboard-card p-6 fade-in">
+                            <h3 class="text-xl font-bold mb-4 text-gray-800">Acciones Rápidas</h3>
+                            <div class="space-y-4">
+                                <button id="makeContributionBtn" class="w-full btn-primary flex items-center justify-center">
+                                    <i class="fas fa-plus-circle mr-2"></i>
+                                    Realizar Aporte
+                                </button>
+                                <button id="withdrawFundsBtn" class="w-full btn-secondary flex items-center justify-center">
+                                    <i class="fas fa-minus-circle mr-2"></i>
+                                    Retirar Fondos
+                                </button>
+                                <button id="referralBtn" class="w-full btn-secondary flex items-center justify-center">
+                                    <i class="fas fa-user-friends mr-2"></i>
+                                    Invitar Amigos
+                                </button>
+                            </div>
+                            
+                            <div class="mt-6 pt-4 border-t border-gray-200">
+                                <h4 class="font-medium text-gray-700 mb-2">Estado de Verificación</h4>
+                                <div class="flex items-center">
+                                    <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-2">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <span class="text-green-600 font-medium">Verificación completada</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Transactions -->
+                        <div class="dashboard-card p-6 fade-in">
+                            <h3 class="text-xl font-bold mb-4 text-gray-800">Transacciones Recientes</h3>
+                            <div id="transactionsList">
+                                <div class="text-center py-4 text-gray-500">
+                                    No hay transacciones recientes
+                                </div>
+                            </div>
+                            <button class="w-full mt-4 btn-secondary">
+                                <i class="fas fa-history mr-2"></i>Ver Historial Completo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Referral Section -->
+                    <div class="mt-8 dashboard-card p-6 fade-in">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Tu Código de Referido</h3>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                            <div class="bg-gray-100 p-4 rounded-lg flex-grow">
+                                <code id="referralCode" class="text-lg font-mono">CARGANDO...</code>
+                            </div>
+                            <button id="copyReferralBtn" class="btn-primary">
+                                Copiar Enlace
+                            </button>
+                        </div>
+                        <p class="text-gray-600 mt-4">Comparte este código con amigos y recibe un bono de <span class="font-bold">$25</span> por cada referido que se registre y complete la verificación.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contributions Section -->
+            <section id="contributionsSection" class="py-8 px-4 hidden">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Mis Aportes</h2>
+                    <div class="dashboard-card p-6 fade-in">
+                        <div class="mb-6">
+                            <h3 class="text-xl font-bold mb-4 text-gray-800">Historial de Aportes</h3>
+                            <div id="contributionsList">
+                                <div class="text-center py-4 text-gray-500">
+                                    No has realizado aportes todavía
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Section -->
+            <section id="performanceSection" class="py-8 px-4 hidden">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Rendimientos</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="dashboard-card p-6 fade-in">
+                            <h3 class="text-xl font-bold mb-4 text-gray-800">Resumen de Rendimientos</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Rendimiento Total</span>
+                                    <span class="font-bold text-green-600">+<span id="totalEarnings">0.00</span>%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Ganancias Acumuladas</span>
+                                    <span class="font-bold text-green-600">$<span id="totalEarningsAmount">0.00</span></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Período de Inversión</span>
+                                    <span id="investmentPeriod" class="font-bold">--</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dashboard-card p-6 fade-in">
+                            <h3 class="text-xl font-bold mb-4 text-gray-800">Proyección de Crecimiento</h3>
+                            <div class="bg-gray-100 p-4 rounded-lg">
+                                <div class="h-40 flex items-center justify-center text-gray-500">
+                                    Gráfico de rendimientos (próximamente)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Referrals Section -->
+            <section id="referralsSection" class="py-8 px-4 hidden">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Sistema de Referidos</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="dashboard-card p-6 fade-in">
+                            <h3 class="text-xl font-bold mb-4 text-gray-800">Tu Red de Referidos</h3>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Referidos Directos</span>
+                                    <span class="font-bold"><span id="directReferrals">0</span> personas</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Bonos Ganados</span>
+                                    <span class="font-bold text-green-600">$<span id="referralBonuses">0.00</span></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Estado del Programa</span>
+                                    <span class="font-bold text-green-600">Activo</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dashboard-card p-6 fade-in">
+                            <h3 class="text-xl font-bold mb-4 text-gray-800">Comparte tu Enlace</h3>
+                            <div class="space-y-4">
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <p class="text-sm text-gray-600 mb-2">Tu enlace personalizado:</p>
+                                    <code id="referralLink" class="text-sm break-all">Cargando...</code>
+                                </div>
+                                <button id="shareReferralBtn" class="w-full btn-primary">
+                                    Compartir en Redes Sociales
                                 </button>
                             </div>
                         </div>
-                        
-                        <div class="share-buttons flex flex-wrap gap-2">
-                            <button class="px-4 py-2 bg-[#1877F2] text-white rounded-lg flex items-center">
-                                <i class="fab fa-facebook-f mr-2"></i>Compartir
-                            </button>
-                            <button class="px-4 py-2 bg-[#1DA1F2] text-white rounded-lg flex items-center">
-                                <i class="fab fa-twitter mr-2"></i>Twittear
-                            </button>
-                            <button class="px-4 py-2 bg-[#25D366] text-white rounded-lg flex items-center">
-                                <i class="fab fa-whatsapp mr-2"></i>WhatsApp
-                            </button>
-                            <button class="px-4 py-2 bg-gray-700 text-white rounded-lg flex items-center">
-                                <i class="fas fa-envelope mr-2"></i>Email
-                            </button>
-                        </div>
                     </div>
                 </div>
-                
-                <div class="space-y-6">
-                    <div class="dashboard-card p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Referidos Recientes</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                                        <i class="fas fa-user-check text-green-600"></i>
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Carlos Mendoza</div>
-                                        <div class="text-xs text-gray-500">Verificado - 12 Nov</div>
-                                    </div>
-                                </div>
-                                <div class="text-green-600 font-bold">€10.00</div>
-                            </div>
-                            
-                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
-                                        <i class="fas fa-user-clock text-yellow-600"></i>
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Ana Silva</div>
-                                        <div class="text-xs text-gray-500">Pendiente verificación</div>
-                                    </div>
-                                </div>
-                                <div class="text-gray-400 font-bold">€0.00</div>
-                            </div>
-                            
-                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                                        <i class="fas fa-user-check text-green-600"></i>
-                                    </div>
-                                    <div>
-                                        <div class="font-medium">Roberto Paz</div>
-                                        <div class="text-xs text-gray-500">Verificado - 8 Nov</div>
-                                    </div>
-                                </div>
-                                <div class="text-green-600 font-bold">€10.00</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="dashboard-card p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Reglas del Programa</h3>
-                        <ul class="space-y-3 text-sm text-gray-700">
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
-                                <span>El bono es de <span class="font-bold">€10.00</span> por referido verificado</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
-                                <span>El referido debe completar el registro y verificación KYC</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
-                                <span>No hay límite de referidos, pero deben ser personas reales</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
-                                <span>El programa no es piramidal, solo bonifica registros directos</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Reglas Section -->
-        <section id="reglas" class="section hidden">
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-800">Reglas de Inversión</h2>
-                <p class="text-gray-600">Transparencia total en el reparto de beneficios</p>
-            </div>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2">
-                    <div class="dashboard-card p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Distribución de Beneficios</h3>
-                        
-                        <div class="mb-6">
-                            <div class="flex justify-between mb-2">
-                                <span class="font-medium">Inversores</span>
-                                <span class="font-bold text-[#10B981]">70%</span>
-                            </div>
-                            <div class="progress-bar mb-4">
-                                <div class="progress-fill" style="width: 70%"></div>
-                            </div>
-                            
-                            <div class="flex justify-between mb-2">
-                                <span class="font-medium">Fondo de Reserva</span>
-                                <span class="font-bold text-[#3B82F6]">15%</span>
-                            </div>
-                            <div class="progress-bar mb-4">
-                                <div class="progress-fill" style="width: 15%"></div>
-                            </div>
-                            
-                            <div class="flex justify-between mb-2">
-                                <span class="font-medium">Gastos Operativos</span>
-                                <span class="font-bold text-[#F59E0B]">10%</span>
-                            </div>
-                            <div class="progress-bar mb-4">
-                                <div class="progress-fill" style="width: 10%"></div>
-                            </div>
-                            
-                            <div class="flex justify-between mb-2">
-                                <span class="font-medium">Reinversión</span>
-                                <span class="font-bold text-[#8B5CF6]">5%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 5%"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                            <h4 class="font-medium text-blue-800 mb-2">Cómo se calculan tus beneficios</h4>
-                            <p class="text-blue-700 text-sm">Los beneficios se distribuyen mensualmente en proporción a tu aporte al capital total. Por ejemplo, si has invertido €5,000 de un total de €100,000, recibirás el 5% de la distribución mensual a inversores.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="dashboard-card p-6 mt-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Preguntas Frecuentes</h3>
-                        
-                        <div class="space-y-4">
-                            <div class="border-b border-gray-200 pb-4">
-                                <h4 class="font-medium text-gray-800 mb-2">¿Cuándo se reparten los beneficios?</h4>
-                                <p class="text-gray-600 text-sm">Los beneficios se calculan y distribuyen el primer lunes de cada mes. Los fondos estarán disponibles en tu cuenta dentro de las 24 horas siguientes.</p>
-                            </div>
-                            
-                            <div class="border-b border-gray-200 pb-4">
-                                <h4 class="font-medium text-gray-800 mb-2">¿Puedo retirar mi inversión inicial?</h4>
-                                <p class="text-gray-600 text-sm">Sí, puedes solicitar el retiro de tu inversión inicial con un preaviso de 30 días. Los beneficios generados hasta la fecha de retiro se incluirán en el pago.</p>
-                            </div>
-                            
-                            <div class="border-b border-gray-200 pb-4">
-                                <h4 class="font-medium text-gray-800 mb-2">¿Qué garantías ofrece la plataforma?</h4>
-                                <p class="text-gray-600 text-sm">Cumplimos con todas las regulaciones financieras locales. Todas las transacciones están auditadas y los fondos están separados en cuentas específicas para inversores.</p>
-                            </div>
-                            
+            <!-- Profile Section -->
+            <section id="profileSection" class="py-8 px-4 hidden">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Mi Perfil</h2>
+                    <div class="dashboard-card p-6 fade-in">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Información Personal</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <h4 class="font-medium text-gray-800 mb-2">¿Cómo se verifica mi identidad?</h4>
-                                <p class="text-gray-600 text-sm">Utilizamos un proceso KYC (Conoce a tu Cliente) automatizado que verifica tu identidad mediante documento oficial y confirmación de datos. El proceso suele completarse en menos de 24 horas.</p>
+                                <label class="block text-gray-700 mb-2">Nombre Completo</label>
+                                <input type="text" id="profileName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="space-y-6">
-                    <div class="dashboard-card p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Documentación Legal</h3>
-                        <div class="space-y-3">
-                            <a href="#" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                                    <i class="fas fa-file-contract text-blue-600"></i>
-                                </div>
-                                <div>
-                                    <div class="font-medium">Contrato de Inversión</div>
-                                    <div class="text-xs text-gray-500">PDF, 245 KB</div>
-                                </div>
-                            </a>
-                            
-                            <a href="#" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                                    <i class="fas fa-shield-alt text-green-600"></i>
-                                </div>
-                                <div>
-                                    <div class="font-medium">Términos y Condiciones</div>
-                                    <div class="text-xs text-gray-500">PDF, 180 KB</div>
-                                </div>
-                            </a>
-                            
-                            <a href="#" class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                                    <i class="fas fa-lock text-purple-600"></i>
-                                </div>
-                                <div>
-                                    <div class="font-medium">Política de Privacidad</div>
-                                    <div class="text-xs text-gray-500">PDF, 156 KB</div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="dashboard-card p-6">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Soporte y Contacto</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-envelope text-blue-600"></i>
-                                </div>
-                                <div>
-                                    <div class="text-sm text-gray-500">Email</div>
-                                    <div class="font-medium">soporte@inversionlegal.com</div>
-                                </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Correo Electrónico</label>
+                                <input type="email" id="profileEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
                             </div>
-                            
-                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-phone text-green-600"></i>
-                                </div>
-                                <div>
-                                    <div class="text-sm text-gray-500">Teléfono</div>
-                                    <div class="font-medium">+34 910 123 456</div>
-                                </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Teléfono</label>
+                                <input type="tel" id="profilePhone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
-                            
-                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                                <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-clock text-purple-600"></i>
-                                </div>
-                                <div>
-                                    <div class="text-sm text-gray-500">Horario</div>
-                                    <div class="font-medium">Lun-Vie: 9:00-18:00</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+                            <div>
+                                <label class="block text-gray-700 mb-2">País</label>
+							<select id="profileCountry" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+								<option value="">Selecciona tu país</option>
 
-    <!-- Deposit Modal -->
-    <div id="depositModal" class="modal">
+								<!-- Sudamérica -->
+								<option value="AR">Argentina</option>
+								<option value="BO">Bolivia</option>
+								<option value="BR">Brasil</option>
+								<option value="CL">Chile</option>
+								<option value="CO">Colombia</option>
+								<option value="EC">Ecuador</option>
+								<option value="GY">Guyana</option>
+								<option value="PY">Paraguay</option>
+								<option value="PE">Perú</option>
+								<option value="SR">Surinam</option>
+								<option value="UY">Uruguay</option>
+								<option value="VE">Venezuela</option>
+
+								<!-- Centroamérica -->
+								<option value="BZ">Belice</option>
+								<option value="CR">Costa Rica</option>
+								<option value="SV">El Salvador</option>
+								<option value="GT">Guatemala</option>
+								<option value="HN">Honduras</option>
+								<option value="NI">Nicaragua</option>
+								<option value="PA">Panamá</option>
+
+								<!-- Norteamérica -->
+								<option value="MX">México</option>
+								<option value="US">Estados Unidos</option>
+								<option value="CA">Canadá</option>
+
+								<!-- Europa relevante -->
+								<option value="ES">España</option>
+							</select>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <button id="saveProfileBtn" class="btn-primary">
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Help Section -->
+            <section id="helpSection" class="py-8 px-4 hidden">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Centro de Ayuda</h2>
+                    <div class="dashboard-card p-6 fade-in">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">Preguntas Frecuentes</h3>
+                        <div class="space-y-4">
+                            <div class="border-b border-gray-200 pb-4">
+                                <h4 class="font-bold text-gray-800 mb-2">¿Cómo puedo realizar mi primer aporte?</h4>
+                                <p class="text-gray-600">Para realizar tu primer aporte, dirígete a la sección "Dashboard" y haz clic en el botón "Realizar Aporte". Sigue las instrucciones para completar el proceso de pago.</p>
+                            </div>
+                            <div class="border-b border-gray-200 pb-4">
+                                <h4 class="font-bold text-gray-800 mb-2">¿Cómo funciona el sistema de referidos?</h4>
+                                <p class="text-gray-600">Cada usuario tiene un código único de referido. Al compartirlo con amigos, recibirás un bono de $25 cuando se registren y completen su verificación KYC.</p>
+                            </div>
+                            <div class="border-b border-gray-200 pb-4">
+                                <h4 class="font-bold text-gray-800 mb-2">¿Cuándo puedo retirar mis fondos?</h4>
+                                <p class="text-gray-600">Puedes solicitar retiros en cualquier momento. Los retiros se procesan dentro de 3-5 días hábiles, sujetos a verificación de seguridad.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Legal Section -->
+            <section id="legalSection" class="py-12 px-4 bg-gray-100">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Información Legal y de Riesgos</h2>
+                    <div class="dashboard-card p-6">
+                        <div class="prose max-w-none">
+                            <p class="text-gray-700 mb-4">
+                                <strong>Advertencia:</strong> Las inversiones conllevan riesgos, incluida la posible pérdida del capital invertido. 
+                                El rendimiento pasado no es garantía de resultados futuros.
+                            </p>
+                            <p class="text-gray-700 mb-4">
+                                Canada Coin opera bajo estrictos protocolos de cumplimiento normativo, incluyendo KYC (Conozca a su Cliente) 
+                                y AML (Anti-Lavado de Dinero). Todos los usuarios deben completar el proceso de verificación antes de poder realizar aportes.
+                            </p>
+                            <p class="text-gray-700 mb-4">
+                                Las tarifas y comisiones están claramente detalladas en nuestros términos y condiciones. 
+                                No cobramos tarifas ocultas y todos los costos son transparentes desde el inicio.
+                            </p>
+                            <p class="text-gray-700">
+                                Consulte con un asesor financiero independiente antes de realizar cualquier inversión. 
+                                Este servicio puede no estar disponible en todas las jurisdicciones.
+                            </p>
+                        </div>
+                        <div class="mt-6 flex items-center">
+                            <input type="checkbox" id="agreeTerms" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                            <label for="agreeTerms" class="ml-2 text-gray-700">He leído y acepto los <a href="#" class="text-blue-600 hover:underline">términos y condiciones</a></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="bg-gray-800 text-white py-8 px-4">
+                <div class="max-w-6xl mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">Canada Coin</h3>
+                            <p class="text-gray-400">Plataforma de inversión legal y transparente con seguimiento en tiempo real.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">Enlaces Rápidos</h3>
+                            <ul class="space-y-2">
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Inicio</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Acerca de</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Preguntas Frecuentes</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Contacto</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">Legal</h3>
+                            <ul class="space-y-2">
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Términos y Condiciones</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Política de Privacidad</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Advertencia de Riesgos</a></li>
+                                <li><a href="#" class="text-gray-400 hover:text-white transition">Información Regulatoria</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
+                        <p>&copy; 2023 Canada Coin. Todos los derechos reservados.</p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
         <div class="modal-content p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-gray-800">Realizar Aporte</h3>
-                <button id="closeDepositModal" class="text-gray-500 hover:text-gray-700">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">Iniciar Sesión</h3>
+                <button id="closeLoginModal" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Monto a depositar (€)</label>
-                <input type="number" id="depositAmount" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981] focus:border-transparent" placeholder="0.00" min="10" step="0.01">
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label for="loginEmail" class="block text-gray-700 mb-2">Correo Electrónico</label>
+                    <input type="email" id="loginEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-6">
+                    <label for="loginPassword" class="block text-gray-700 mb-2">Contraseña</label>
+                    <input type="password" id="loginPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <button type="submit" class="w-full btn-primary">Iniciar Sesión</button>
+            </form>
+            <p class="text-center mt-4 text-gray-600">
+                ¿No tienes cuenta? <button id="switchToRegister" class="text-blue-600 hover:underline">Regístrate</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">Crear Cuenta</h3>
+                <button id="closeRegisterModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Método de pago</label>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="border border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-[#10B981] transition">
-                        <i class="fas fa-university text-gray-600 text-xl mb-2"></i>
-                        <div class="font-medium">Transferencia</div>
-                    </div>
-                    <div class="border border-gray-300 rounded-lg p-3 text-center cursor-pointer hover:border-[#10B981] transition">
-                        <i class="fab fa-cc-visa text-blue-600 text-xl mb-2"></i>
-                        <div class="font-medium">Tarjeta</div>
+            <form id="registerForm">
+                <div class="mb-4">
+                    <label for="registerName" class="block text-gray-700 mb-2">Nombre Completo</label>
+                    <input type="text" id="registerName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="registerEmail" class="block text-gray-700 mb-2">Correo Electrónico</label>
+                    <input type="email" id="registerEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="registerPhone" class="block text-gray-700 mb-2">Teléfono</label>
+                    <input type="tel" id="registerPhone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="registerCountry" class="block text-gray-700 mb-2">País</label>
+                    <select id="registerCountry" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+						<option value="">Selecciona tu país</option>
+
+						<!-- Sudamérica -->
+						<option value="AR">Argentina</option>
+						<option value="BO">Bolivia</option>
+						<option value="BR">Brasil</option>
+						<option value="CL">Chile</option>
+						<option value="CO">Colombia</option>
+						<option value="EC">Ecuador</option>
+						<option value="GY">Guyana</option>
+						<option value="PY">Paraguay</option>
+						<option value="PE">Perú</option>
+						<option value="SR">Surinam</option>
+						<option value="UY">Uruguay</option>
+						<option value="VE">Venezuela</option>
+
+						<!-- Centroamérica -->
+						<option value="BZ">Belice</option>
+						<option value="CR">Costa Rica</option>
+						<option value="SV">El Salvador</option>
+						<option value="GT">Guatemala</option>
+						<option value="HN">Honduras</option>
+						<option value="NI">Nicaragua</option>
+						<option value="PA">Panamá</option>
+
+						<!-- Norteamérica -->
+						<option value="MX">México</option>
+						<option value="US">Estados Unidos</option>
+						<option value="CA">Canadá</option>
+
+						<!-- Europa relevante -->
+						<option value="ES">España</option>
+					</select>
+                </div>
+                <div class="mb-4">
+                    <label for="registerPassword" class="block text-gray-700 mb-2">Contraseña</label>
+                    <input type="password" id="registerPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div class="mb-6">
+                    <label for="registerReferral" class="block text-gray-700 mb-2">Código de Referido (opcional)</label>
+                    <input type="text" id="registerReferral" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-4 flex items-start">
+                    <input type="checkbox" id="registerAgree" class="h-4 w-4 text-blue-600 border-gray-300 rounded mt-1" required>
+                    <label for="registerAgree" class="ml-2 text-gray-700 text-sm">Acepto los <a href="#" class="text-blue-600 hover:underline">términos y condiciones</a> y la <a href="#" class="text-blue-600 hover:underline">política de privacidad</a></label>
+                </div>
+                <button type="submit" class="w-full btn-primary">Crear Cuenta</button>
+            </form>
+            <p class="text-center mt-4 text-gray-600">
+                ¿Ya tienes cuenta? <button id="switchToLogin" class="text-blue-600 hover:underline">Inicia Sesión</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- Contribution Modal -->
+    <div id="contributionModal" class="modal">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-800">Realizar Aporte</h3>
+                <button id="closeContributionModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="contributionForm">
+                <div class="mb-4">
+                    <label for="contributionAmount" class="block text-gray-700 mb-2">Monto del Aporte</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-500">$</span>
+                        <input type="number" id="contributionAmount" min="10" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" required>
                     </div>
                 </div>
-            </div>
-            
-            <div class="flex space-x-3">
-                <button class="flex-1 btn-secondary" id="cancelDeposit">Cancelar</button>
-                <button class="flex-1 btn-primary" id="confirmDeposit">Continuar</button>
-            </div>
+                <div class="mb-6">
+                    <label for="contributionMethod" class="block text-gray-700 mb-2">Método de Pago</label>
+                    <select id="contributionMethod" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <option value="">Selecciona un método</option>
+                        <option value="stripe">Tarjeta de Crédito/Débito</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="bank">Transferencia Bancaria</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full btn-primary">Continuar al Pago</button>
+            </form>
+            <p class="text-center mt-4 text-gray-600 text-sm">
+                Al realizar un aporte, aceptas nuestros <a href="#" class="text-blue-600 hover:underline">términos y condiciones</a>
+            </p>
         </div>
     </div>
 
     <!-- Withdrawal Modal -->
     <div id="withdrawalModal" class="modal">
         <div class="modal-content p-6">
-            <div class="flex justify-between items-center mb-4">
+            <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-gray-800">Retirar Fondos</h3>
                 <button id="closeWithdrawalModal" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            
-            <div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div class="flex items-start">
-                    <i class="fas fa-info-circle text-blue-500 mr-2 mt-0.5"></i>
-                    <p class="text-blue-700 text-sm">Los retiros se procesan en un plazo de 3-5 días hábiles. El monto mínimo de retiro es €50.</p>
+            <form id="withdrawalForm">
+                <div class="mb-4">
+                    <label for="withdrawalAmount" class="block text-gray-700 mb-2">Monto a Retirar</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-500">$</span>
+                        <input type="number" id="withdrawalAmount" min="10" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" required>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">Saldo disponible: $<span id="availableBalance">0.00</span></p>
                 </div>
-            </div>
-            
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Monto a retirar (€)</label>
-                <input type="number" id="withdrawalAmount" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981] focus:border-transparent" placeholder="0.00" min="50" step="0.01">
-                <div class="text-xs text-gray-500 mt-1">Saldo disponible: €12,450.00</div>
-            </div>
-            
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Cuenta de destino</label>
-                <select class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10B981] focus:border-transparent">
-                    <option>ES12 3456 7890 1234 5678 9012 (Cuenta principal)</option>
-                    <option>Agregar nueva cuenta...</option>
-                </select>
-            </div>
-            
-            <div class="flex space-x-3">
-                <button class="flex-1 btn-secondary" id="cancelWithdrawal">Cancelar</button>
-                <button class="flex-1 btn-primary" id="confirmWithdrawal">Solicitar Retiro</button>
-            </div>
+                <div class="mb-6">
+                    <label for="withdrawalMethod" class="block text-gray-700 mb-2">Método de Retiro</label>
+                    <select id="withdrawalMethod" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <option value="">Selecciona un método</option>
+                        <option value="bank">Transferencia Bancaria</option>
+                        <option value="paypal">PayPal</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full btn-primary">Solicitar Retiro</button>
+            </form>
+            <p class="text-center mt-4 text-gray-600 text-sm">
+                Los retiros pueden tardar 3-5 días hábiles en procesarse
+            </p>
         </div>
     </div>
 
@@ -907,79 +958,146 @@
     </div>
 
     <script>
-        // App State
+        // Estado de la aplicación
         const appState = {
-            currentSection: 'dashboard',
-            balance: 12450.00,
+            currentUser: null,
+            userData: null,
+            currentSection: 'dashboard'
+        };
+
+        // Datos de ejemplo para usuarios registrados
+        const sampleUserData = {
+            name: "Juan Pérez",
+            email: "juan@example.com",
+            balance: 1250.00,
+            totalContributions: 1000.00,
+            performancePercentage: 25.00,
+            referralCode: "CANADA25",
             transactions: [
-                { type: 'Depósito', date: '15 Nov 2023, 10:30', amount: 1000.00, category: 'deposit' },
-                { type: 'Bono de Referido', date: '14 Nov 2023, 16:45', amount: 10.00, category: 'bonus' },
-                { type: 'Beneficios', date: '10 Nov 2023, 09:15', amount: 245.50, category: 'profit' },
-                { type: 'Retiro', date: '5 Nov 2023, 14:20', amount: -500.00, category: 'withdrawal' }
+                { type: 'Depósito', date: '15 Nov 2023, 10:30', amount: 500.00 },
+                { type: 'Bono de Referido', date: '14 Nov 2023, 16:45', amount: 25.00 },
+                { type: 'Aporte', date: '10 Nov 2023, 09:15', amount: 500.00 },
+                { type: 'Retiro', date: '5 Nov 2023, 14:20', amount: -250.00 }
             ],
-            referrals: [
-                { name: 'Carlos Mendoza', status: 'verified', date: '12 Nov', bonus: 10.00 },
-                { name: 'Ana Silva', status: 'pending', date: '10 Nov', bonus: 0.00 },
-                { name: 'Roberto Paz', status: 'verified', date: '8 Nov', bonus: 10.00 }
+            contributions: [
+                { date: '10 Nov 2023, 09:15', amount: 500.00, method: 'Transferencia Bancaria' },
+                { date: '1 Nov 2023, 11:30', amount: 500.00, method: 'Tarjeta de Crédito' }
             ]
         };
 
         // DOM Elements
-        const sections = document.querySelectorAll('.section');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const heroRegisterBtn = document.getElementById('heroRegisterBtn');
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const closeRegisterModal = document.getElementById('closeRegisterModal');
+        const switchToRegister = document.getElementById('switchToRegister');
+        const switchToLogin = document.getElementById('switchToLogin');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const mainContent = document.getElementById('mainContent');
+        const dashboardSection = document.getElementById('dashboardSection');
+        const contributionsSection = document.getElementById('contributionsSection');
+        const performanceSection = document.getElementById('performanceSection');
+        const referralsSection = document.getElementById('referralsSection');
+        const profileSection = document.getElementById('profileSection');
+        const helpSection = document.getElementById('helpSection');
+        const heroSection = document.getElementById('heroSection');
+        const featuresSection = document.getElementById('featuresSection');
+        const legalSection = document.getElementById('legalSection');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
+        const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+        const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+        const mobileRegisterBtn = document.getElementById('mobileRegisterBtn');
+        const makeContributionBtn = document.getElementById('makeContributionBtn');
+        const withdrawFundsBtn = document.getElementById('withdrawFundsBtn');
+        const contributionModal = document.getElementById('contributionModal');
+        const withdrawalModal = document.getElementById('withdrawalModal');
+        const closeContributionModal = document.getElementById('closeContributionModal');
+        const closeWithdrawalModal = document.getElementById('closeWithdrawalModal');
+        const contributionForm = document.getElementById('contributionForm');
+        const withdrawalForm = document.getElementById('withdrawalForm');
+        const referralBtn = document.getElementById('referralBtn');
+        const copyReferralBtn = document.getElementById('copyReferralBtn');
+        const shareReferralBtn = document.getElementById('shareReferralBtn');
+        const saveProfileBtn = document.getElementById('saveProfileBtn');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
         const navLinks = document.querySelectorAll('.nav-link');
         const mobileNavLinks = document.querySelectorAll('.nav-link-mobile');
         const mobileMenu = document.getElementById('mobileMenu');
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const closeMobileMenu = document.getElementById('closeMobileMenu');
-        const depositBtn = document.getElementById('depositBtn');
-        const withdrawBtn = document.getElementById('withdrawBtn');
-        const depositModal = document.getElementById('depositModal');
-        const withdrawalModal = document.getElementById('withdrawalModal');
-        const closeDepositModal = document.getElementById('closeDepositModal');
-        const closeWithdrawalModal = document.getElementById('closeWithdrawalModal');
-        const cancelDeposit = document.getElementById('cancelDeposit');
-        const cancelWithdrawal = document.getElementById('cancelWithdrawal');
-        const confirmDeposit = document.getElementById('confirmDeposit');
-        const confirmWithdrawal = document.getElementById('confirmWithdrawal');
-        const copyReferralLink = document.getElementById('copyReferralLink');
-        const notification = document.getElementById('notification');
-        const notificationText = document.getElementById('notificationText');
+        const userInfo = document.getElementById('userInfo');
+        const mobileUserInfo = document.getElementById('mobileUserInfo');
+        const authButtons = document.getElementById('authButtons');
+        const mobileAuthButtons = document.getElementById('mobileAuthButtons');
 
-        // Navigation Functions
-        function showSection(sectionId) {
-            sections.forEach(section => {
-                section.classList.add('hidden');
-                section.classList.remove('active');
+        // Event Listeners
+        loginBtn.addEventListener('click', () => openModal(loginModal));
+        registerBtn.addEventListener('click', () => openModal(registerModal));
+        heroRegisterBtn.addEventListener('click', () => openModal(registerModal));
+        mobileLoginBtn.addEventListener('click', () => openModal(loginModal));
+        mobileRegisterBtn.addEventListener('click', () => openModal(registerModal));
+        closeLoginModal.addEventListener('click', () => closeModal(loginModal));
+        closeRegisterModal.addEventListener('click', () => closeModal(registerModal));
+        switchToRegister.addEventListener('click', () => {
+            closeModal(loginModal);
+            openModal(registerModal);
+        });
+        switchToLogin.addEventListener('click', () => {
+            closeModal(registerModal);
+            openModal(loginModal);
+        });
+        toggleSidebar.addEventListener('click', toggleSidebarView);
+        logoutBtn.addEventListener('click', handleLogout);
+        sidebarLogoutBtn.addEventListener('click', handleLogout);
+        mobileLogoutBtn.addEventListener('click', handleLogout);
+        makeContributionBtn.addEventListener('click', () => openModal(contributionModal));
+        withdrawFundsBtn.addEventListener('click', () => openModal(withdrawalModal));
+        closeContributionModal.addEventListener('click', () => closeModal(contributionModal));
+        closeWithdrawalModal.addEventListener('click', () => closeModal(withdrawalModal));
+        copyReferralBtn.addEventListener('click', copyReferralCode);
+        shareReferralBtn.addEventListener('click', shareReferralLink);
+        saveProfileBtn.addEventListener('click', saveProfile);
+        loginForm.addEventListener('submit', handleLogin);
+        registerForm.addEventListener('submit', handleRegister);
+        contributionForm.addEventListener('submit', handleContribution);
+        withdrawalForm.addEventListener('submit', handleWithdrawal);
+
+        // Navigation
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = link.getAttribute('data-section');
+                showSection(section);
             });
-            
-            navLinks.forEach(link => {
-                link.classList.remove('active');
+        });
+
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = link.getAttribute('data-section');
+                showSection(section);
+                closeMobileMenuFunc();
             });
-            
-            document.getElementById(sectionId).classList.remove('hidden');
-            document.getElementById(sectionId).classList.add('active');
-            
-            const activeNavLink = document.querySelector(`.nav-link[data-section="${sectionId}"]`);
-            if (activeNavLink) {
-                activeNavLink.classList.add('active');
-            }
-            
-            appState.currentSection = sectionId;
-            closeMobileMenuFunc();
-        }
+        });
 
         // Mobile Menu Functions
-        function openMobileMenu() {
-            mobileMenu.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+        mobileMenuBtn.addEventListener('click', openMobileMenu);
+        closeMobileMenu.addEventListener('click', closeMobileMenuFunc);
+
+        // Functions
+        function toggleSidebarView() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
         }
 
-        function closeMobileMenuFunc() {
-            mobileMenu.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-
-        // Modal Functions
         function openModal(modal) {
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -990,7 +1108,441 @@
             document.body.style.overflow = 'auto';
         }
 
-        // Notification Functions
+        function openMobileMenu() {
+            mobileMenu.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileMenuFunc() {
+            mobileMenu.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showSection(section) {
+            // Hide all sections
+            dashboardSection.classList.add('hidden');
+            contributionsSection.classList.add('hidden');
+            performanceSection.classList.add('hidden');
+            referralsSection.classList.add('hidden');
+            profileSection.classList.add('hidden');
+            helpSection.classList.add('hidden');
+            
+            // Show selected section
+            switch(section) {
+                case 'dashboard':
+                    dashboardSection.classList.remove('hidden');
+                    break;
+                case 'contributions':
+                    contributionsSection.classList.remove('hidden');
+                    updateContributionsList();
+                    break;
+                case 'performance':
+                    performanceSection.classList.remove('hidden');
+                    updatePerformanceData();
+                    break;
+                case 'referrals':
+                    referralsSection.classList.remove('hidden');
+                    updateReferralsData();
+                    break;
+                case 'profile':
+                    profileSection.classList.remove('hidden');
+                    loadProfileData();
+                    break;
+                case 'help':
+                    helpSection.classList.remove('hidden');
+                    break;
+            }
+
+            // Update active nav link
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('data-section') === section) {
+                    link.classList.add('active');
+                }
+            });
+            
+            appState.currentSection = section;
+        }
+
+        function showDashboard() {
+            // Hide public content
+            heroSection.classList.add('hidden');
+            featuresSection.classList.add('hidden');
+            legalSection.classList.add('hidden');
+            
+            // Show private content
+            sidebar.classList.remove('hidden');
+            dashboardSection.classList.remove('hidden');
+            
+            // Hide other private sections
+            contributionsSection.classList.add('hidden');
+            performanceSection.classList.add('hidden');
+            referralsSection.classList.add('hidden');
+            profileSection.classList.add('hidden');
+            helpSection.classList.add('hidden');
+            
+            // Update navigation
+            authButtons.classList.add('hidden');
+            userInfo.classList.remove('hidden');
+            logoutBtn.classList.remove('hidden');
+            mobileUserInfo.classList.remove('hidden');
+            mobileLogoutBtn.classList.remove('hidden');
+            mobileAuthButtons.classList.add('hidden');
+            
+            // Update dashboard with user data
+            updateDashboard();
+        }
+
+        function showPublicContent() {
+            // Show public content
+            heroSection.classList.remove('hidden');
+            featuresSection.classList.remove('hidden');
+            legalSection.classList.remove('hidden');
+            
+            // Hide private content
+            sidebar.classList.add('hidden');
+            dashboardSection.classList.add('hidden');
+            contributionsSection.classList.add('hidden');
+            performanceSection.classList.add('hidden');
+            referralsSection.classList.add('hidden');
+            profileSection.classList.add('hidden');
+            helpSection.classList.add('hidden');
+            
+            // Update navigation
+            authButtons.classList.remove('hidden');
+            userInfo.classList.add('hidden');
+            logoutBtn.classList.add('hidden');
+            mobileUserInfo.classList.add('hidden');
+            mobileLogoutBtn.classList.add('hidden');
+            mobileAuthButtons.classList.remove('hidden');
+            
+            // Close modals
+            closeModal(loginModal);
+            closeModal(registerModal);
+            closeModal(contributionModal);
+            closeModal(withdrawalModal);
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Simulate login - In a real app, this would connect to a backend
+            if (email && password) {
+                appState.currentUser = { email: email };
+                appState.userData = { ...sampleUserData, email: email };
+                
+                showNotification('Inicio de sesión exitoso', 'success');
+                closeModal(loginModal);
+                loginForm.reset();
+                showDashboard();
+                updateUserInfo();
+            } else {
+                showNotification('Por favor, completa todos los campos', 'error');
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const phone = document.getElementById('registerPhone').value;
+            const country = document.getElementById('registerCountry').value;
+            const password = document.getElementById('registerPassword').value;
+            const referralCode = document.getElementById('registerReferral').value;
+
+            // Simulate registration - In a real app, this would connect to a backend
+            if (name && email && phone && country && password) {
+                appState.currentUser = { email: email };
+                appState.userData = { 
+                    ...sampleUserData, 
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    country: country
+                };
+                
+                showNotification('Cuenta creada exitosamente', 'success');
+                closeModal(registerModal);
+                registerForm.reset();
+                showDashboard();
+                updateUserInfo();
+            } else {
+                showNotification('Por favor, completa todos los campos obligatorios', 'error');
+            }
+        }
+
+        function updateDashboard() {
+            if (!appState.userData) return;
+            
+            const data = appState.userData;
+            
+            document.getElementById('currentBalance').textContent = data.balance.toFixed(2);
+            document.getElementById('totalContributions').textContent = data.totalContributions.toFixed(2);
+            document.getElementById('numberOfContributions').textContent = data.contributions.length;
+            document.getElementById('performancePercentage').textContent = data.performancePercentage.toFixed(2);
+            document.getElementById('performanceSince').textContent = 'el inicio';
+            document.getElementById('referralCode').textContent = data.referralCode;
+            document.getElementById('referralLink').textContent = `${window.location.origin}?ref=${data.referralCode}`;
+            document.getElementById('availableBalance').textContent = data.balance.toFixed(2);
+            
+            // Update transactions list
+            updateTransactionsList();
+        }
+
+        function updateUserInfo() {
+            if (!appState.userData) return;
+            
+            const userName = appState.userData.name;
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userInitial').textContent = userName.charAt(0).toUpperCase();
+            
+            const mobileUserName = document.querySelector('#mobileUserInfo span');
+            if (mobileUserName) {
+                mobileUserName.textContent = userName;
+            }
+            
+            const mobileInitial = document.querySelector('#mobileUserInfo .rounded-full span');
+            if (mobileInitial) {
+                mobileInitial.textContent = userName.charAt(0).toUpperCase();
+            }
+        }
+
+        function updateTransactionsList() {
+            if (!appState.userData) return;
+            
+            const transactionsList = document.getElementById('transactionsList');
+            const transactions = appState.userData.transactions;
+            
+            if (transactions.length === 0) {
+                transactionsList.innerHTML = '<div class="text-center py-4 text-gray-500">No hay transacciones recientes</div>';
+                return;
+            }
+            
+            // Take the last 4 transactions
+            const recentTransactions = transactions.slice(-4);
+            
+            transactionsList.innerHTML = recentTransactions.map(transaction => `
+                <div class="transaction-item">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 ${transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'} rounded-full flex items-center justify-center mr-3">
+                            <i class="fas ${transaction.amount > 0 ? 'fa-arrow-down text-green-600' : 'fa-arrow-up text-red-600'}"></i>
+                        </div>
+                        <div class="transaction-info">
+                            <div class="transaction-type font-medium">${transaction.type}</div>
+                            <div class="transaction-date text-sm text-gray-500">${transaction.date}</div>
+                        </div>
+                    </div>
+                    <div class="transaction-amount ${transaction.amount > 0 ? 'positive' : 'negative'}">
+                        ${transaction.amount > 0 ? '+' : ''}$${transaction.amount.toFixed(2)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateContributionsList() {
+            if (!appState.userData) return;
+            
+            const contributionsList = document.getElementById('contributionsList');
+            const contributions = appState.userData.contributions;
+            
+            if (contributions.length === 0) {
+                contributionsList.innerHTML = '<div class="text-center py-4 text-gray-500">No has realizado aportes todavía</div>';
+                return;
+            }
+            
+            contributionsList.innerHTML = contributions.map(contribution => `
+                <div class="transaction-item">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-arrow-down text-green-600"></i>
+                        </div>
+                        <div class="transaction-info">
+                            <div class="transaction-type font-medium">Aporte</div>
+                            <div class="transaction-date text-sm text-gray-500">${contribution.date} - ${contribution.method}</div>
+                        </div>
+                    </div>
+                    <div class="transaction-amount positive">
+                        +$${contribution.amount.toFixed(2)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updatePerformanceData() {
+            if (!appState.userData) return;
+            
+            const data = appState.userData;
+            
+            document.getElementById('totalEarnings').textContent = data.performancePercentage.toFixed(2);
+            document.getElementById('totalEarningsAmount').textContent = (data.balance - data.totalContributions).toFixed(2);
+            document.getElementById('investmentPeriod').textContent = '30 días';
+        }
+
+        function updateReferralsData() {
+            if (!appState.userData) return;
+            
+            document.getElementById('directReferrals').textContent = '3';
+            document.getElementById('referralBonuses').textContent = '75.00';
+        }
+
+        function handleContribution(e) {
+            e.preventDefault();
+            const amountInput = document.getElementById('contributionAmount');
+            const amount = parseFloat(amountInput.value);
+            const method = document.getElementById('contributionMethod').value;
+
+            if (!appState.currentUser) {
+                showNotification('Debes iniciar sesión para realizar un aporte', 'error');
+                return;
+            }
+
+            if (isNaN(amount) || amount < 10) {
+                showNotification('Por favor, ingresa un monto válido (mínimo $10)', 'error');
+                return;
+            }
+
+            if (!method) {
+                showNotification('Por favor, selecciona un método de pago', 'error');
+                return;
+            }
+
+            // Simulate contribution processing
+            const newTransaction = {
+                type: 'Aporte',
+                date: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                amount: amount
+            };
+            
+            const newContribution = {
+                date: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                amount: amount,
+                method: method
+            };
+            
+            // Update user data
+            appState.userData.balance += amount;
+            appState.userData.totalContributions += amount;
+            appState.userData.transactions.push(newTransaction);
+            appState.userData.contributions.push(newContribution);
+            
+            showNotification(`Aporte de $${amount.toFixed(2)} realizado exitosamente`, 'success');
+            closeModal(contributionModal);
+            contributionForm.reset();
+            
+            // Update dashboard
+            updateDashboard();
+        }
+
+        function handleWithdrawal(e) {
+            e.preventDefault();
+            const amountInput = document.getElementById('withdrawalAmount');
+            const amount = parseFloat(amountInput.value);
+            const method = document.getElementById('withdrawalMethod').value;
+
+            if (!appState.currentUser) {
+                showNotification('Debes iniciar sesión para realizar un retiro', 'error');
+                return;
+            }
+
+            if (isNaN(amount) || amount < 10) {
+                showNotification('Por favor, ingresa un monto válido (mínimo $10)', 'error');
+                return;
+            }
+
+            if (amount > appState.userData.balance) {
+                showNotification('No tienes suficiente saldo para realizar este retiro', 'error');
+                return;
+            }
+
+            if (!method) {
+                showNotification('Por favor, selecciona un método de retiro', 'error');
+                return;
+            }
+
+            // Simulate withdrawal processing
+            const newTransaction = {
+                type: 'Retiro',
+                date: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                amount: -amount
+            };
+            
+            // Update user data
+            appState.userData.balance -= amount;
+            appState.userData.transactions.push(newTransaction);
+            
+            showNotification(`Retiro de $${amount.toFixed(2)} solicitado exitosamente`, 'success');
+            closeModal(withdrawalModal);
+            withdrawalForm.reset();
+            
+            // Update dashboard
+            updateDashboard();
+        }
+
+        function handleLogout() {
+            appState.currentUser = null;
+            appState.userData = null;
+            showNotification('Sesión cerrada exitosamente', 'success');
+            showPublicContent();
+        }
+
+        function loadProfileData() {
+            if (!appState.userData) return;
+            
+            document.getElementById('profileName').value = appState.userData.name || '';
+            document.getElementById('profileEmail').value = appState.userData.email || '';
+            document.getElementById('profilePhone').value = appState.userData.phone || '';
+            document.getElementById('profileCountry').value = appState.userData.country || '';
+        }
+
+        function saveProfile() {
+            if (!appState.currentUser) return;
+
+            const name = document.getElementById('profileName').value;
+            const phone = document.getElementById('profilePhone').value;
+            const country = document.getElementById('profileCountry').value;
+
+            // Update user data
+            appState.userData.name = name;
+            appState.userData.phone = phone;
+            appState.userData.country = country;
+            
+            showNotification('Perfil actualizado exitosamente', 'success');
+            updateUserInfo();
+        }
+
+        function copyReferralCode() {
+            const referralCode = document.getElementById('referralCode').textContent;
+            const referralLink = `${window.location.origin}?ref=${referralCode}`;
+            
+            navigator.clipboard.writeText(referralLink).then(() => {
+                showNotification('Enlace de referido copiado al portapapeles', 'success');
+            }).catch(err => {
+                console.error('Error al copiar enlace: ', err);
+                showNotification('Error al copiar enlace', 'error');
+            });
+        }
+
+        function shareReferralLink() {
+            const referralLink = document.getElementById('referralLink').textContent;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Únete a Canada Coin',
+                    text: 'Regístrate en Canada Coin usando mi enlace de referido y obtén beneficios exclusivos',
+                    url: referralLink,
+                })
+                .then(() => showNotification('Enlace compartido exitosamente', 'success'))
+                .catch((error) => {
+                    console.error('Error al compartir:', error);
+                    copyReferralCode();
+                });
+            } else {
+                copyReferralCode();
+            }
+        }
+
         function showNotification(message, type = 'success') {
             notificationText.textContent = message;
             
@@ -1016,73 +1568,22 @@
             
             setTimeout(() => {
                 notification.classList.add('hidden');
-            }, 3000);
+            }, 5000);
         }
 
-        // Event Listeners
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const sectionId = link.getAttribute('data-section');
-                showSection(sectionId);
-            });
-        });
-
-        mobileNavLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const sectionId = link.getAttribute('data-section');
-                showSection(sectionId);
-            });
-        });
-
-        mobileMenuBtn.addEventListener('click', openMobileMenu);
-        closeMobileMenu.addEventListener('click', closeMobileMenuFunc);
-
-        depositBtn.addEventListener('click', () => openModal(depositModal));
-        withdrawBtn.addEventListener('click', () => openModal(withdrawalModal));
-
-        closeDepositModal.addEventListener('click', () => closeModal(depositModal));
-        closeWithdrawalModal.addEventListener('click', () => closeModal(withdrawalModal));
-        cancelDeposit.addEventListener('click', () => closeModal(depositModal));
-        cancelWithdrawal.addEventListener('click', () => closeModal(withdrawalModal));
-
-        confirmDeposit.addEventListener('click', () => {
-            const amount = document.getElementById('depositAmount').value;
-            if (amount && parseFloat(amount) >= 10) {
-                closeModal(depositModal);
-                showNotification(`Depósito de €${amount} solicitado correctamente. Se procesará en 24-48 horas.`);
-                document.getElementById('depositAmount').value = '';
-            } else {
-                showNotification('Por favor, introduce un monto válido (mínimo €10)', 'error');
+        // Check for referral code in URL parameters
+        function checkReferralCode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            
+            if (refCode) {
+                document.getElementById('registerReferral').value = refCode;
             }
-        });
+        }
 
-        confirmWithdrawal.addEventListener('click', () => {
-            const amount = document.getElementById('withdrawalAmount').value;
-            if (amount && parseFloat(amount) >= 50 && parseFloat(amount) <= appState.balance) {
-                closeModal(withdrawalModal);
-                showNotification(`Retiro de €${amount} solicitado correctamente. Se procesará en 3-5 días hábiles.`);
-                document.getElementById('withdrawalAmount').value = '';
-            } else {
-                showNotification('Por favor, introduce un monto válido (mínimo €50, máximo tu saldo disponible)', 'error');
-            }
-        });
-
-        copyReferralLink.addEventListener('click', () => {
-            navigator.clipboard.writeText('https://inversionlegal.com/registro?ref=usuario123abc')
-                .then(() => {
-                    showNotification('Enlace copiado al portapapeles');
-                })
-                .catch(err => {
-                    showNotification('Error al copiar el enlace', 'error');
-                });
-        });
-
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', () => {
-            showSection('dashboard');
-        });
+        // Initialize
+        checkReferralCode();
+        showPublicContent();
     </script>
 </body>
 </html>

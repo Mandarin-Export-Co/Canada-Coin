@@ -1,0 +1,158 @@
+<!-- components/modal.html -->
+<div id="modalBackdrop" class="modal-backdrop hidden">
+  <div class="modal-content bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+    <!-- Header del Modal -->
+    <div class="modal-header flex justify-between items-center p-6 border-b border-gray-200">
+      <h3 id="modalTitle" class="text-xl font-semibold text-gray-900">Título del Modal</h3>
+      <button id="modalClose" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    
+    <!-- Body del Modal -->
+    <div id="modalBody" class="modal-body p-6">
+      <!-- Contenido dinámico se insertará aquí -->
+    </div>
+    
+    <!-- Footer del Modal -->
+    <div id="modalFooter" class="modal-footer flex justify-end space-x-3 p-6 border-t border-gray-200">
+      <button id="modalCancel" class="btn-secondary px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
+        Cancelar
+      </button>
+      <button id="modalConfirm" class="btn-primary px-4 py-2 rounded-lg text-white font-semibold">
+        Confirmar
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Sistema de modales para Canada Coin
+class ModalSystem {
+  constructor() {
+    this.currentModal = null;
+    this.init();
+  }
+
+  init() {
+    // Crear estructura del modal si no existe
+    if (!document.getElementById('modalBackdrop')) {
+      this.createModalStructure();
+    }
+    
+    this.setupEventListeners();
+  }
+
+  createModalStructure() {
+    const modalHTML = `
+      <div id="modalBackdrop" class="modal-backdrop hidden">
+        <div class="modal-content bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+          <div class="modal-header flex justify-between items-center p-6 border-b border-gray-200">
+            <h3 id="modalTitle" class="text-xl font-semibold text-gray-900"></h3>
+            <button id="modalClose" class="text-gray-400 hover:text-gray-600 transition-colors">
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+          <div id="modalBody" class="modal-body p-6"></div>
+          <div id="modalFooter" class="modal-footer flex justify-end space-x-3 p-6 border-t border-gray-200">
+            <button id="modalCancel" class="btn-secondary px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
+              Cancelar
+            </button>
+            <button id="modalConfirm" class="btn-primary px-4 py-2 rounded-lg text-white font-semibold">
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+  }
+
+  setupEventListeners() {
+    document.addEventListener('click', (e) => {
+      if (e.target.id === 'modalClose' || e.target.id === 'modalCancel') {
+        this.close();
+      }
+    });
+
+    document.getElementById('modalBackdrop')?.addEventListener('click', (e) => {
+      if (e.target.id === 'modalBackdrop') {
+        this.close();
+      }
+    });
+
+    // Cerrar con ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.currentModal) {
+        this.close();
+      }
+    });
+  }
+
+  open(options = {}) {
+    const {
+      title = 'Modal Title',
+      body = 'Modal content',
+      showCancel = true,
+      confirmText = 'Confirmar',
+      cancelText = 'Cancelar',
+      onConfirm = () => {},
+      onCancel = () => {}
+    } = options;
+
+    this.currentModal = { onConfirm, onCancel };
+
+    // Actualizar contenido
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalBody').innerHTML = body;
+    document.getElementById('modalConfirm').textContent = confirmText;
+    document.getElementById('modalCancel').textContent = cancelText;
+
+    // Mostrar/ocultar botón cancelar
+    document.getElementById('modalCancel').style.display = showCancel ? 'block' : 'none';
+
+    // Configurar eventos de botones
+    this.setupButtonEvents();
+
+    // Mostrar modal
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  setupButtonEvents() {
+    const confirmBtn = document.getElementById('modalConfirm');
+    const cancelBtn = document.getElementById('modalCancel');
+
+    // Remover eventos anteriores
+    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+
+    // Agregar nuevos eventos
+    document.getElementById('modalConfirm').addEventListener('click', () => {
+      if (this.currentModal?.onConfirm) {
+        this.currentModal.onConfirm();
+      }
+      this.close();
+    });
+
+    document.getElementById('modalCancel').addEventListener('click', () => {
+      if (this.currentModal?.onCancel) {
+        this.currentModal.onCancel();
+      }
+      this.close();
+    });
+  }
+
+  close() {
+    document.getElementById('modalBackdrop').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    this.currentModal = null;
+  }
+}
+
+// Inicializar sistema de modales
+const modalSystem = new ModalSystem();
+
+// Función global para usar modales
+window.showModal = (options) => modalSystem.open(options);
+</script>

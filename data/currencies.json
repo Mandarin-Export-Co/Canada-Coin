@@ -1,0 +1,100 @@
+{
+  "currencies": [
+    {
+      "country": "Estados Unidos",
+      "currency": "Dólar estadounidense",
+      "code": "USD",
+      "symbol": "$"
+    },
+    {
+      "country": "Canadá",
+      "currency": "Dólar canadiense",
+      "code": "CAD",
+      "symbol": "C$"
+    },
+    {
+      "country": "México",
+      "currency": "Peso mexicano",
+      "code": "MXN",
+      "symbol": "$"
+    },
+    {
+      "country": "España",
+      "currency": "Euro",
+      "code": "EUR",
+      "symbol": "€"
+    },
+    {
+      "country": "Reino Unido",
+      "currency": "Libra esterlina",
+      "code": "GBP",
+      "symbol": "£"
+    },
+    {
+      "country": "Japón",
+      "currency": "Yen japonés",
+      "code": "JPY",
+      "symbol": "¥"
+    },
+    {
+      "country": "Australia",
+      "currency": "Dólar australiano",
+      "code": "AUD",
+      "symbol": "A$"
+    },
+    {
+      "country": "Brasil",
+      "currency": "Real brasileño",
+      "code": "BRL",
+      "symbol": "R$"
+    },
+    {
+      "country": "Argentina",
+      "currency": "Peso argentino",
+      "code": "ARS",
+      "symbol": "$"
+    },
+    {
+      "country": "Chile",
+      "currency": "Peso chileno",
+      "code": "CLP",
+      "symbol": "$"
+    },
+    {
+      "country": "Colombia",
+      "currency": "Peso colombiano",
+      "code": "COP",
+      "symbol": "$"
+    },
+    {
+      "country": "Perú",
+      "currency": "Sol peruano",
+      "code": "PEN",
+      "symbol": "S/."
+    },
+    {
+      "country": "Venezuela",
+      "currency": "Bolívar soberano",
+      "code": "VES",
+      "symbol": "Bs."
+    },
+    {
+      "country": "Egipto",
+      "currency": "Libra egipcia",
+      "code": "EGP",
+      "symbol": "E£"
+    },
+    {
+      "country": "Nigeria",
+      "currency": "Naira",
+      "code": "NGN",
+      "symbol": "₦"
+    },
+    {
+      "country": "Sudáfrica",
+      "currency": "Rand",
+      "code": "ZAR",
+      "symbol": "R"
+    }
+  ]
+}

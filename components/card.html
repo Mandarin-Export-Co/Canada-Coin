@@ -1,0 +1,22 @@
+<!-- components/card.html -->
+<div class="card bg-white rounded-lg shadow-md p-4 mb-4">
+  <h3 class="card-title text-xl font-semibold mb-2">{title}</h3>
+  <div class="card-body">
+    {content}
+  </div>
+</div>
+
+<script>
+  // Función para crear una tarjeta dinámicamente
+  function createCard(title, content) {
+    const card = document.createElement('div');
+    card.className = 'card bg-white rounded-lg shadow-md p-4 mb-4';
+    card.innerHTML = `
+      <h3 class="card-title text-xl font-semibold mb-2">${title}</h3>
+      <div class="card-body">
+        ${content}
+      </div>
+    `;
+    return card;
+  }
+</script>

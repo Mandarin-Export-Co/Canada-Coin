@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Libro Mayor - Canada Coin</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-center mb-8">Libro Mayor</h1>
+    <div class="card">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Debe</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Haber</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200" id="ledgerTableBody">
+          <!-- Las filas se cargarán dinámicamente -->
+        </tbody>
+      </table>
+    </div>
+    <div class="text-center mt-8">
+      <a href="../index.html" class="btn btn-primary">Volver al Dashboard</a>
+    </div>
+  </div>
+
+  <script>
+    // Ejemplo de datos para el libro mayor
+    const ledgerData = [
+      { date: '2023-10-01', description: 'Depósito inicial', debit: 1000, credit: 0, balance: 1000 },
+      { date: '2023-10-02', description: 'Inversión en proyecto A', debit: 0, credit: 500, balance: 500 },
+      { date: '2023-10-03', description: 'Retorno de inversión', debit: 100, credit: 0, balance: 600 },
+    ];
+
+    const tableBody = document.getElementById('ledgerTableBody');
+    ledgerData.forEach(entry => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td class="px-6 py-4 whitespace-nowrap">${entry.date}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${entry.description}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${entry.debit}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${entry.credit}</td>
+        <td class="px-6 py-4 whitespace-nowrap">${entry.balance}</td>
+      `;
+      tableBody.appendChild(row);
+    });
+  </script>
+</body>
+</html>

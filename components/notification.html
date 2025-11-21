@@ -1,0 +1,32 @@
+<!-- components/notification.html -->
+<div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+<script>
+  function showNotification(message, type = 'info') {
+    const container = document.getElementById('notificationContainer');
+    const notification = document.createElement('div');
+    notification.className = `notification ${type} p-4 rounded shadow-lg text-white max-w-sm transition-opacity duration-500`;
+    notification.textContent = message;
+
+    // Estilos según el tipo
+    const typeStyles = {
+      success: 'bg-green-500',
+      error: 'bg-red-500',
+      warning: 'bg-yellow-500',
+      info: 'bg-blue-500'
+    };
+    notification.classList.add(typeStyles[type] || typeStyles.info);
+
+    container.appendChild(notification);
+
+    // Auto-eliminar después de 5 segundos
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      setTimeout(() => {
+        container.removeChild(notification);
+      }, 500);
+    }, 5000);
+  }
+
+  // Ejemplo de uso: showNotification('Depósito realizado con éxito', 'success');
+</script>

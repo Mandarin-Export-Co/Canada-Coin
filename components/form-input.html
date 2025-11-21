@@ -1,0 +1,49 @@
+<!-- components/form-input.html -->
+<div class="form-group mb-4">
+  <label for="{id}" class="block text-sm font-medium text-gray-700">{label}</label>
+  <input type="{type}" id="{id}" name="{name}" class="input mt-1" placeholder="{placeholder}" {required}>
+  <div class="error-message text-red-500 text-sm mt-1 hidden"></div>
+</div>
+
+<script>
+  // Función para inicializar la validación de un input
+  function initInputValidation(inputId, rules) {
+    const input = document.getElementById(inputId);
+    const errorDiv = input.parentNode.querySelector('.error-message');
+
+    input.addEventListener('blur', () => {
+      validateInput(input, rules, errorDiv);
+    });
+
+    input.addEventListener('input', () => {
+      if (errorDiv.classList.contains('hidden')) return;
+      errorDiv.classList.add('hidden');
+      input.classList.remove('border-red-500');
+    });
+  }
+
+  function validateInput(input, rules, errorDiv) {
+    const value = input.value.trim();
+    for (let rule of rules) {
+      if (rule.required && !value) {
+        showError(errorDiv, 'Este campo es requerido');
+        return false;
+      }
+      if (rule.minLength && value.length < rule.minLength) {
+        showError(errorDiv, `Mínimo ${rule.minLength} caracteres`);
+        return false;
+      }
+      if (rule.pattern && !rule.pattern.test(value)) {
+        showError(errorDiv, rule.message);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function showError(errorDiv, message) {
+    errorDiv.textContent = message;
+    errorDiv.classList.remove('hidden');
+    errorDiv.previousElementSibling.classList.add('border-red-500');
+  }
+</script>

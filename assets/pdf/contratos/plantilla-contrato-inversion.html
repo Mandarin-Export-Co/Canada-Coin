@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrato de Inversión - Canada Coin</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #3B82F6;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .section-title {
+            color: #1E40AF;
+            border-bottom: 1px solid #E5E7EB;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        .clause {
+            margin-bottom: 15px;
+        }
+        .signature-area {
+            margin-top: 50px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 0.8em;
+            color: #6B7280;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CONTRATO DE INVERSIÓN</h1>
+        <h2>Canada Coin Platform</h2>
+        <p><strong>Fecha:</strong> <span id="contractDate"></span></p>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">1. PARTES CONTRATANTES</h3>
+        <div class="clause">
+            <p><strong>INVERSOR:</strong></p>
+            <p>Nombre: <span id="investorName"></span></p>
+            <p>Email: <span id="investorEmail"></span></p>
+            <p>Identificación: <span id="investorId"></span></p>
+        </div>
+        <div class="clause">
+            <p><strong>CANADA COIN PLATFORM:</strong></p>
+            <p>Representante legal: Administración Canada Coin</p>
+            <p>Registro: Plataforma de gestión de inversiones registrada</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">2. OBJETO DEL CONTRATO</h3>
+        <div class="clause">
+            <p>El presente contrato tiene por objeto establecer los términos y condiciones bajo los cuales el INVERSOR realiza aportaciones de capital a través de la plataforma Canada Coin, y CANADA COIN PLATFORM gestiona dichas inversiones.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">3. MONTO DE INVERSIÓN</h3>
+        <div class="clause">
+            <p>Monto inicial: $<span id="investmentAmount"></span> USD</p>
+            <p>Moneda de inversión: Dólar estadounidense (USD)</p>
+            <p>Fecha de inversión inicial: <span id="investmentDate"></span></p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">4. TÉRMINOS Y CONDICIONES</h3>
+        <div class="clause">
+            <h4>4.1. Gestión de Inversiones</h4>
+            <p>Canada Coin Platform actuará como gestor de las inversiones realizadas por el INVERSOR, aplicando estrategias de inversión diversificadas y gestionando el riesgo de acuerdo a los parámetros establecidos.</p>
+        </div>
+        <div class="clause">
+            <h4>4.2. Rendimientos</h4>
+            <p>Los rendimientos estarán sujetos al desempeño del mercado y las estrategias de inversión aplicadas. No se garantizan rendimientos específicos.</p>
+        </div>
+        <div class="clause">
+            <h4>4.3. Retiros</h4>
+            <p>El INVERSOR podrá solicitar retiros parciales o totales de su inversión, sujetos a los términos de procesamiento establecidos en la plataforma.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3 class="section-title">5. ACEPTACIÓN DE RIESGOS</h3>
+        <div class="clause">
+            <p>El INVERSOR reconoce y acepta que toda inversión conlleva riesgos, incluyendo la posible pérdida del capital invertido. Canada Coin Platform implementará medidas de gestión de riesgo, pero no puede eliminar completamente el riesgo de inversión.</p>
+        </div>
+    </div>
+
+    <div class="signature-area">
+        <div style="float: left; width: 45%;">
+            <p>_________________________</p>
+            <p><strong>INVERSOR</strong></p>
+            <p>Nombre: <span id="signatureName"></span></p>
+            <p>Fecha: ___________________</p>
+        </div>
+        <div style="float: right; width: 45%;">
+            <p>_________________________</p>
+            <p><strong>CANADA COIN PLATFORM</strong></p>
+            <p>Representante Legal</p>
+            <p>Fecha: ___________________</p>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+
+    <div class="footer">
+        <p>Este documento es generado automáticamente por Canada Coin Platform y tiene validez legal.</p>
+        <p>Contrato ID: <span id="contractId"></span></p>
+    </div>
+
+    <script>
+        // Script para llenar dinámicamente el contrato
+        document.getElementById('contractDate').textContent = new Date().toLocaleDateString();
+        // Estos valores se llenarían desde la base de datos
+        document.getElementById('investorName').textContent = 'Nombre del Inversor';
+        document.getElementById('investorEmail').textContent = 'email@inversor.com';
+        document.getElementById('investorId').textContent = 'ID-Usuario';
+        document.getElementById('investmentAmount').textContent = '1000';
+        document.getElementById('investmentDate').textContent = new Date().toLocaleDateString();
+        document.getElementById('signatureName').textContent = 'Nombre del Inversor';
+        document.getElementById('contractId').textContent = 'CC-' + Date.now();
+    </script>
+</body>
+</html>

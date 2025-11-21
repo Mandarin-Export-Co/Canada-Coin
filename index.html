@@ -3,1587 +3,2056 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canada Coin - Plataforma de Inversión Legal</title>
+    <title>Canada Coin - Plataforma de Gestión de Inversiones</title>
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
     <style>
         :root {
-            --primary-dark: #1E2A3A;
-            --success-green: #10B981;
-            --warning-orange: #F59E0B;
-            --error-red: #EF4444;
-            --accent-blue: #3B82F6;
+            --primary-color: #1e40af;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
         }
         
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
         }
         
-        .gradient-bg {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #2D3748 100%);
-        }
-        
-        .dashboard-card {
+        .card {
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.7);
         }
         
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--success-green) 0%, #0D966C 100%);
+            background-color: var(--primary-color);
             color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
         }
         
         .btn-primary:hover {
+            background-color: #1e3a8a;
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
         }
         
         .btn-secondary {
-            background: white;
-            color: var(--primary-dark);
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
             font-weight: 600;
             transition: all 0.3s ease;
-            border: 1px solid #E5E7EB;
         }
         
         .btn-secondary:hover {
-            background: #F9FAFB;
+            background-color: #2563eb;
             transform: translateY(-2px);
         }
         
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid #F3F4F6;
-            transition: background-color 0.2s;
-        }
-        
-        .transaction-item:hover {
-            background-color: #F9FAFB;
-        }
-        
-        .amount.positive {
-            color: var(--success-green);
-            font-weight: 600;
-        }
-        
-        .amount.negative {
-            color: var(--error-red);
-            font-weight: 600;
-        }
-        
-        .nav-link {
-            position: relative;
-            padding: 0.5rem 1rem;
+        .btn-success {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 10px 20px;
             border-radius: 8px;
+            font-weight: 600;
             transition: all 0.3s ease;
         }
         
-        .nav-link.active {
-            background-color: rgba(16, 185, 129, 0.1);
-            color: var(--success-green);
+        .btn-success:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
         }
         
-        .progress-bar {
-            height: 8px;
-            background-color: #E5E7EB;
-            border-radius: 4px;
-            overflow: hidden;
+        .drop-zone {
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
         }
         
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--success-green) 0%, #0D966C 100%);
-            border-radius: 4px;
-            transition: width 0.5s ease;
+        .drop-zone.active {
+            border-color: var(--primary-color);
+            background-color: #eff6ff;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: var(--accent-color);
+        }
+        
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+        
+        .notification.warning {
+            background-color: var(--warning-color);
         }
         
         .modal {
-            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
+            display: flex;
             justify-content: center;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            width: 90%;
-            max-width: 500px;
-            transform: translateY(20px);
+            align-items: center;
+            z-index: 100;
             opacity: 0;
+            visibility: hidden;
             transition: all 0.3s ease;
         }
         
         .modal.active {
-            display: flex;
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
         }
         
         .modal.active .modal-content {
-            transform: translateY(0);
-            opacity: 1;
+            transform: scale(1);
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .progress-bar {
+            height: 6px;
+            background-color: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
         }
         
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
+        .progress {
+            height: 100%;
+            background-color: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
         }
         
-        .pulse {
-            animation: pulse 2s infinite;
+        .kyc-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .kyc-pending {
+            background-color: #fef3c7;
+            color: #92400e;
         }
         
-        .floating-card {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #2D3748 100%);
-            color: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 25px rgba(30, 42, 58, 0.3);
+        .kyc-verified {
+            background-color: #d1fae5;
+            color: #065f46;
         }
         
-        .sidebar {
+        .kyc-rejected {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .transaction-item {
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-amount.positive {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        .transaction-amount.negative {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+        
+        .stat-card {
+            padding: 24px;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+        
+        .stat-card.primary::before {
+            background-color: var(--primary-color);
+        }
+        
+        .stat-card.success::before {
+            background-color: var(--accent-color);
+        }
+        
+        .stat-card.warning::before {
+            background-color: var(--warning-color);
+        }
+        
+        .stat-card.info::before {
+            background-color: var(--secondary-color);
+        }
+        
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 8px;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #6b7280;
+            font-weight: 500;
+            cursor: pointer;
         }
         
-        .sidebar.collapsed {
-            width: 70px;
+        .nav-item.active {
+            background-color: #eff6ff;
+            color: var(--primary-color);
         }
         
-        .sidebar.collapsed .sidebar-text {
+        .nav-item:hover:not(.active) {
+            background-color: #f9fafb;
+            color: #374151;
+        }
+        
+        .section {
             display: none;
         }
         
-        .main-content {
-            transition: all 0.3s ease;
-        }
-        
-        .main-content.expanded {
-            margin-left: 70px;
-        }
-        
-        .mobile-menu {
-            display: none;
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                display: none;
-            }
-            
-            .main-content.expanded {
-                margin-left: 0;
-            }
-            
-            .mobile-menu {
-                display: block;
-            }
+        .section.active {
+            display: block;
         }
     </style>
 </head>
-<body class="min-h-screen">
-    <!-- Header Navigation -->
-    <nav class="gradient-bg text-white p-4 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="logo flex items-center">
-                <div class="w-10 h-10 bg-[#10B981] rounded-lg flex items-center justify-center mr-3">
-                    <i class="fas fa-chart-line text-white"></i>
-                </div>
-                <h1 class="text-xl font-bold">Canada Coin</h1>
-                <span class="ml-2 text-xs bg-blue-800 px-2 py-1 rounded">Beta</span>
+<body>
+    <!-- Notifications Container -->
+    <div id="notifications-container"></div>
+    
+    <!-- Authentication Section (Login/Register) -->
+    <section id="auth-section" class="min-h-screen flex items-center justify-center p-4">
+        <div class="card w-full max-w-md p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">Canada Coin</h1>
+                <p class="text-gray-600 mt-2">Plataforma de Gestión de Inversiones</p>
             </div>
             
-            <!-- Desktop Navigation -->
-            <div class="nav-links hidden md:flex space-x-2">
-                <a href="#" class="nav-link active" data-section="dashboard">
-                    <i class="fas fa-home mr-2"></i>Dashboard
-                </a>
-                <a href="#" class="nav-link" data-section="contributions">
-                    <i class="fas fa-history mr-2"></i>Mis Aportes
-                </a>
-                <a href="#" class="nav-link" data-section="performance">
-                    <i class="fas fa-chart-pie mr-2"></i>Rendimientos
-                </a>
-                <a href="#" class="nav-link" data-section="referrals">
-                    <i class="fas fa-user-friends mr-2"></i>Referidos
-                </a>
-                <a href="#" class="nav-link" data-section="profile">
-                    <i class="fas fa-user mr-2"></i>Mi Perfil
-                </a>
+            <div id="login-form">
+                <h2 class="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label for="login-email" class="block text-gray-700 mb-2">Correo Electrónico</label>
+                        <input type="email" id="login-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="login-password" class="block text-gray-700 mb-2">Contraseña</label>
+                        <input type="password" id="login-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <button type="submit" class="btn-primary w-full mb-4">Iniciar Sesión</button>
+                </form>
+                <p class="text-center text-gray-600">
+                    ¿No tienes una cuenta? 
+                    <a href="#" id="show-register" class="text-blue-600 font-medium hover:underline">Regístrate aquí</a>
+                </p>
             </div>
             
-            <!-- User Menu -->
-            <div class="user-menu flex items-center space-x-4">
-                <div id="userInfo" class="hidden md:flex items-center space-x-2">
-                    <div class="w-8 h-8 bg-[#10B981] rounded-full flex items-center justify-center">
-                        <span class="text-white font-bold" id="userInitial">U</span>
+            <div id="register-form" class="hidden">
+                <h2 class="text-2xl font-bold mb-6 text-center">Crear Cuenta</h2>
+                <form id="registerForm">
+                    <div class="mb-4">
+                        <label for="register-name" class="block text-gray-700 mb-2">Nombre Completo</label>
+                        <input type="text" id="register-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
-                    <span id="userName" class="font-medium">Usuario Ejemplo</span>
-                </div>
-                
-                <!-- Login/Register Buttons (when not logged in) -->
-                <div id="authButtons" class="flex items-center space-x-4">
-                    <button id="loginBtn" class="bg-white text-blue-700 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition">Iniciar Sesión</button>
-                    <button id="registerBtn" class="border border-white text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition">Registrarse</button>
-                </div>
-                
-                <!-- Logout Button (when logged in) -->
-                <button id="logoutBtn" class="hidden bg-transparent border border-white/30 rounded-lg px-3 py-1 hover:bg-white/10 transition">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-                
-                <!-- Mobile Menu Button -->
-                <button id="mobileMenuBtn" class="md:hidden text-xl">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Mobile Menu -->
-    <div id="mobileMenu" class="mobile-menu fixed inset-0 bg-[#1E2A3A] z-50 hidden flex-col p-6">
-        <div class="flex justify-between items-center mb-8">
-            <div class="logo flex items-center">
-                <div class="w-10 h-10 bg-[#10B981] rounded-lg flex items-center justify-center mr-3">
-                    <i class="fas fa-chart-line text-white"></i>
-                </div>
-                <h1 class="text-xl font-bold text-white">Canada Coin</h1>
-            </div>
-            <button id="closeMobileMenu" class="text-white text-2xl">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="flex flex-col space-y-6">
-            <a href="#" class="nav-link-mobile text-white text-xl py-3 flex items-center" data-section="dashboard">
-                <i class="fas fa-home mr-4 w-6 text-center"></i>Dashboard
-            </a>
-            <a href="#" class="nav-link-mobile text-white text-xl py-3 flex items-center" data-section="contributions">
-                <i class="fas fa-history mr-4 w-6 text-center"></i>Mis Aportes
-            </a>
-            <a href="#" class="nav-link-mobile text-white text-xl py-3 flex items-center" data-section="performance">
-                <i class="fas fa-chart-pie mr-4 w-6 text-center"></i>Rendimientos
-            </a>
-            <a href="#" class="nav-link-mobile text-white text-xl py-3 flex items-center" data-section="referrals">
-                <i class="fas fa-user-friends mr-4 w-6 text-center"></i>Referidos
-            </a>
-            <a href="#" class="nav-link-mobile text-white text-xl py-3 flex items-center" data-section="profile">
-                <i class="fas fa-user mr-4 w-6 text-center"></i>Mi Perfil
-            </a>
-        </div>
-        <div class="mt-auto pt-8 border-t border-white/20">
-            <div id="mobileUserInfo" class="hidden flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 bg-[#10B981] rounded-full flex items-center justify-center">
-                    <span class="text-white font-bold">U</span>
-                </div>
-                <span class="text-white font-medium">Usuario Ejemplo</span>
-            </div>
-            <button id="mobileLogoutBtn" class="hidden w-full bg-white/10 text-white rounded-lg py-3 flex items-center justify-center space-x-2">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Cerrar Sesión</span>
-            </button>
-            <div id="mobileAuthButtons" class="flex flex-col space-y-4">
-                <button id="mobileLoginBtn" class="w-full bg-white text-blue-700 rounded-lg py-3 flex items-center justify-center space-x-2 font-medium">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>Iniciar Sesión</span>
-                </button>
-                <button id="mobileRegisterBtn" class="w-full border border-white text-white rounded-lg py-3 flex items-center justify-center space-x-2 font-medium">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Registrarse</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="flex">
-        <!-- Sidebar (visible when logged in) -->
-        <div id="sidebar" class="sidebar gradient-bg text-white h-screen w-64 fixed hidden">
-            <div class="p-4 flex justify-between items-center">
-                <h2 class="font-bold text-lg sidebar-text">Panel de Control</h2>
-                <button id="toggleSidebar" class="text-white">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-            </div>
-            <ul class="mt-6">
-                <li class="sidebar-item px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center" data-section="dashboard">
-                    <i class="fas fa-home mr-3 w-5 text-center"></i>
-                    <span class="sidebar-text">Dashboard</span>
-                </li>
-                <li class="sidebar-item px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center" data-section="contributions">
-                    <i class="fas fa-history mr-3 w-5 text-center"></i>
-                    <span class="sidebar-text">Mis Aportes</span>
-                </li>
-                <li class="sidebar-item px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center" data-section="performance">
-                    <i class="fas fa-chart-pie mr-3 w-5 text-center"></i>
-                    <span class="sidebar-text">Rendimientos</span>
-                </li>
-                <li class="sidebar-item px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center" data-section="referrals">
-                    <i class="fas fa-user-friends mr-3 w-5 text-center"></i>
-                    <span class="sidebar-text">Referidos</span>
-                </li>
-                <li class="sidebar-item px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center" data-section="profile">
-                    <i class="fas fa-user mr-3 w-5 text-center"></i>
-                    <span class="sidebar-text">Mi Perfil</span>
-                </li>
-                <li class="sidebar-item px-4 py-3 hover:bg-blue-700 cursor-pointer flex items-center" data-section="help">
-                    <i class="fas fa-question-circle mr-3 w-5 text-center"></i>
-                    <span class="sidebar-text">Ayuda</span>
-                </li>
-            </ul>
-            <div class="absolute bottom-0 w-full p-4">
-                <button id="sidebarLogoutBtn" class="w-full bg-blue-800 text-white py-2 rounded-lg font-medium hover:bg-blue-900 transition flex items-center justify-center">
-                    <i class="fas fa-sign-out-alt mr-2"></i>
-                    <span class="sidebar-text">Cerrar Sesión</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Main Content Area -->
-        <div id="mainContent" class="main-content w-full">
-            <!-- Hero Section -->
-            <section id="heroSection" class="gradient-bg text-white py-16 px-4">
-                <div class="max-w-4xl mx-auto text-center">
-                    <h1 class="text-4xl md:text-5xl font-bold mb-6">Inversión Transparente y Regulada</h1>
-                    <p class="text-xl mb-8 max-w-2xl mx-auto">Canada Coin ofrece una plataforma segura y legal para gestionar tus inversiones con total transparencia y seguimiento en tiempo real.</p>
-                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                        <button id="heroRegisterBtn" class="bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-blue-50 transition">Comenzar Ahora</button>
-                        <button id="learnMoreBtn" class="border border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition">Más Información</button>
+                    <div class="mb-4">
+                        <label for="register-email" class="block text-gray-700 mb-2">Correo Electrónico</label>
+                        <input type="email" id="register-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
-                </div>
-            </section>
-
-            <!-- Features Section -->
-            <section id="featuresSection" class="py-16 px-4 bg-white">
-                <div class="max-w-6xl mx-auto">
-                    <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Características Principales</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <div class="dashboard-card p-6 fade-in">
-                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                                <i class="fas fa-shield-alt text-blue-600"></i>
+                    <div class="mb-4">
+                        <label for="register-phone" class="block text-gray-700 mb-2">Teléfono</label>
+                        <input type="tel" id="register-phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="register-country" class="block text-gray-700 mb-2">País</label>
+                        <select id="register-country" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="">Selecciona un país</option>
+                            <option value="AR">Argentina</option>
+                            <option value="BR">Brasil</option>
+                            <option value="CA">Canadá</option>
+                            <option value="CL">Chile</option>
+                            <option value="CO">Colombia</option>
+                            <option value="MX">México</option>
+                            <option value="ES">España</option>
+                            <option value="US">Estados Unidos</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="register-password" class="block text-gray-700 mb-2">Contraseña</label>
+                        <input type="password" id="register-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="register-confirm-password" class="block text-gray-700 mb-2">Confirmar Contraseña</label>
+                        <input type="password" id="register-confirm-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="register-terms" class="mr-2" required>
+                            <span class="text-gray-700">Acepto los <a href="#" class="text-blue-600 hover:underline">Términos y Condiciones</a> y la <a href="#" class="text-blue-600 hover:underline">Política de Privacidad</a></span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-primary w-full mb-4">Crear Cuenta</button>
+                </form>
+                <p class="text-center text-gray-600">
+                    ¿Ya tienes una cuenta? 
+                    <a href="#" id="show-login" class="text-blue-600 font-medium hover:underline">Inicia sesión aquí</a>
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Main Dashboard Section (Hidden by default) -->
+    <section id="dashboard-section" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center">
+                        <h1 class="text-2xl font-bold text-gray-900">Canada Coin</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button id="user-menu-button" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
+                                <span id="user-name" class="font-medium">Usuario</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-10">
+                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100"><i class="fas fa-user mr-2"></i>Mi Perfil</a>
+                                <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100"><i class="fas fa-cog mr-2"></i>Configuración</a>
+                                <a href="#" id="logout-button" class="block px-4 py-2 text-gray-700 hover:bg-gray-100"><i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión</a>
                             </div>
-                            <h3 class="text-xl font-bold mb-2 text-gray-800">Seguridad Garantizada</h3>
-                            <p class="text-gray-600">Cumplimos con todos los requisitos KYC/AML y utilizamos las mejores prácticas de seguridad para proteger tus fondos.</p>
-                        </div>
-                        <div class="dashboard-card p-6 fade-in">
-                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                                <i class="fas fa-chart-line text-blue-600"></i>
-                            </div>
-                            <h3 class="text-xl font-bold mb-2 text-gray-800">Rendimientos Claros</h3>
-                            <p class="text-gray-600">Sistema de reparto de beneficios transparente con reglas claras y sin sorpresas.</p>
-                        </div>
-                        <div class="dashboard-card p-6 fade-in">
-                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                                <i class="fas fa-user-friends text-blue-600"></i>
-                            </div>
-                            <h3 class="text-xl font-bold mb-2 text-gray-800">Sistema de Referidos</h3>
-                            <p class="text-gray-600">Programa de referidos no piramidal con bonos fijos por registro y verificación.</p>
                         </div>
                     </div>
                 </div>
-            </section>
-
-            <!-- Dashboard Section (visible when logged in) -->
-            <section id="dashboardSection" class="py-8 px-4 hidden">
-                <div class="max-w-6xl mx-auto">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Panel de Control</h2>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Sidebar Navigation -->
+                <div class="lg:w-1/4">
+                    <div class="card p-6 mb-6">
+                        <div class="flex items-center mb-6">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-user text-blue-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h2 id="dashboard-user-name" class="font-bold text-lg">Usuario</h2>
+                                <div class="flex items-center mt-1">
+                                    <span id="kyc-status" class="kyc-status kyc-pending">KYC Pendiente</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <nav class="space-y-2">
+                            <a href="#" class="nav-item active" data-section="dashboard">
+                                <i class="fas fa-home w-5"></i>
+                                <span>Dashboard</span>
+                            </a>
+                            <a href="#" class="nav-item" data-section="performance">
+                                <i class="fas fa-chart-line w-5"></i>
+                                <span>Rendimientos</span>
+                            </a>
+                            <a href="#" class="nav-item" data-section="deposits">
+                                <i class="fas fa-wallet w-5"></i>
+                                <span>Depósitos</span>
+                            </a>
+                            <a href="#" class="nav-item" data-section="withdrawals">
+                                <i class="fas fa-money-bill-wave w-5"></i>
+                                <span>Retiros</span>
+                            </a>
+                            <a href="#" class="nav-item" data-section="referrals">
+                                <i class="fas fa-users w-5"></i>
+                                <span>Referidos</span>
+                            </a>
+                            <a href="#" class="nav-item" data-section="settings">
+                                <i class="fas fa-cog w-5"></i>
+                                <span>Configuración</span>
+                            </a>
+                            <a href="#" class="nav-item" data-section="help">
+                                <i class="fas fa-question-circle w-5"></i>
+                                <span>Ayuda</span>
+                            </a>
+                        </nav>
+                    </div>
                     
-                    <!-- Stats Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div class="dashboard-card p-6 fade-in">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-600">Saldo Total</h3>
-                                    <div class="amount text-3xl font-bold mt-2 text-gray-800">$<span id="currentBalance">0.00</span></div>
-                                    <div class="trend positive text-sm mt-1 flex items-center">
-                                        <i class="fas fa-arrow-up mr-1"></i>
-                                        <span>+5.2% este mes</span>
+                    <!-- Quick Actions -->
+                    <div class="card p-6">
+                        <h3 class="font-bold text-lg mb-4">Acciones Rápidas</h3>
+                        <div class="space-y-3">
+                            <button id="open-deposit-modal" class="btn-primary w-full flex items-center justify-center">
+                                <i class="fas fa-plus mr-2"></i> Realizar Depósito
+                            </button>
+                            <button id="open-withdrawal-modal" class="btn-secondary w-full flex items-center justify-center">
+                                <i class="fas fa-download mr-2"></i> Solicitar Retiro
+                            </button>
+                            <button id="open-referral-modal" class="btn-success w-full flex items-center justify-center">
+                                <i class="fas fa-share-alt mr-2"></i> Invitar Amigos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Dashboard Content -->
+                <div class="lg:w-3/4">
+                    <!-- Dashboard Section -->
+                    <div id="dashboard" class="section active">
+                        <!-- Financial Summary -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <div class="stat-card primary card">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-gray-600">Saldo Total</p>
+                                        <h3 id="total-balance" class="text-2xl font-bold mt-1">$0.00</h3>
+                                    </div>
+                                    <div class="p-3 bg-blue-100 rounded-lg">
+                                        <i class="fas fa-wallet text-blue-600 text-xl"></i>
                                     </div>
                                 </div>
-                                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-dollar-sign text-green-600"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="dashboard-card p-6 fade-in">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-600">Aportes Totales</h3>
-                                    <div class="amount text-3xl font-bold mt-2 text-gray-800">$<span id="totalContributions">0.00</span></div>
-                                    <div class="text-sm mt-1 text-gray-500"><span id="numberOfContributions">0</span> aportes realizados</div>
-                                </div>
-                                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-chart-bar text-blue-600"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="dashboard-card p-6 fade-in">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-600">Rendimiento</h3>
-                                    <div class="amount text-3xl font-bold mt-2 text-gray-800"><span id="performancePercentage">0.00</span>%</div>
-                                    <div class="text-sm mt-1 text-gray-500">Desde <span id="performanceSince">--</span></div>
-                                </div>
-                                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-chart-line text-purple-600"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Actions and Transactions -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Quick Actions -->
-                        <div class="dashboard-card p-6 fade-in">
-                            <h3 class="text-xl font-bold mb-4 text-gray-800">Acciones Rápidas</h3>
-                            <div class="space-y-4">
-                                <button id="makeContributionBtn" class="w-full btn-primary flex items-center justify-center">
-                                    <i class="fas fa-plus-circle mr-2"></i>
-                                    Realizar Aporte
-                                </button>
-                                <button id="withdrawFundsBtn" class="w-full btn-secondary flex items-center justify-center">
-                                    <i class="fas fa-minus-circle mr-2"></i>
-                                    Retirar Fondos
-                                </button>
-                                <button id="referralBtn" class="w-full btn-secondary flex items-center justify-center">
-                                    <i class="fas fa-user-friends mr-2"></i>
-                                    Invitar Amigos
-                                </button>
+                                <p class="text-sm text-gray-500 mt-2">+0% desde el inicio</p>
                             </div>
                             
-                            <div class="mt-6 pt-4 border-t border-gray-200">
-                                <h4 class="font-medium text-gray-700 mb-2">Estado de Verificación</h4>
-                                <div class="flex items-center">
-                                    <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-2">
-                                        <i class="fas fa-check text-white text-xs"></i>
+                            <div class="stat-card success card">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-gray-600">Depósitos</p>
+                                        <h3 id="total-deposits" class="text-2xl font-bold mt-1">$0.00</h3>
                                     </div>
-                                    <span class="text-green-600 font-medium">Verificación completada</span>
+                                    <div class="p-3 bg-green-100 rounded-lg">
+                                        <i class="fas fa-arrow-up text-green-600 text-xl"></i>
+                                    </div>
                                 </div>
+                                <p class="text-sm text-gray-500 mt-2">Total invertido</p>
+                            </div>
+                            
+                            <div class="stat-card warning card">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-gray-600">Rendimientos</p>
+                                        <h3 id="total-earnings" class="text-2xl font-bold mt-1">$0.00</h3>
+                                    </div>
+                                    <div class="p-3 bg-yellow-100 rounded-lg">
+                                        <i class="fas fa-chart-line text-yellow-600 text-xl"></i>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-2">Ganancias acumuladas</p>
+                            </div>
+                            
+                            <div class="stat-card info card">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-gray-600">Referidos</p>
+                                        <h3 id="total-referrals" class="text-2xl font-bold mt-1">0</h3>
+                                    </div>
+                                    <div class="p-3 bg-blue-100 rounded-lg">
+                                        <i class="fas fa-users text-blue-600 text-xl"></i>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-2">+$0 en bonos</p>
                             </div>
                         </div>
-
+                        
+                        <!-- Performance Chart -->
+                        <div class="card p-6 mb-8">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold">Rendimiento de Inversión</h2>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 text-sm bg-gray-100 rounded-lg">1M</button>
+                                    <button class="px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded-lg">3M</button>
+                                    <button class="px-3 py-1 text-sm bg-gray-100 rounded-lg">1A</button>
+                                    <button class="px-3 py-1 text-sm bg-gray-100 rounded-lg">Todo</button>
+                                </div>
+                            </div>
+                            <div id="performance-chart" class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                                <p class="text-gray-500">Gráfico de rendimiento se cargará aquí</p>
+                            </div>
+                        </div>
+                        
                         <!-- Recent Transactions -->
-                        <div class="dashboard-card p-6 fade-in">
-                            <h3 class="text-xl font-bold mb-4 text-gray-800">Transacciones Recientes</h3>
-                            <div id="transactionsList">
-                                <div class="text-center py-4 text-gray-500">
-                                    No hay transacciones recientes
-                                </div>
+                        <div class="card p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold">Transacciones Recientes</h2>
+                                <button class="text-blue-600 font-medium hover:underline">Ver todas</button>
                             </div>
-                            <button class="w-full mt-4 btn-secondary">
-                                <i class="fas fa-history mr-2"></i>Ver Historial Completo
-                            </button>
+                            <div id="transactions-list">
+                                <!-- Transactions will be loaded here -->
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Referral Section -->
-                    <div class="mt-8 dashboard-card p-6 fade-in">
-                        <h3 class="text-xl font-bold mb-4 text-gray-800">Tu Código de Referido</h3>
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
-                            <div class="bg-gray-100 p-4 rounded-lg flex-grow">
-                                <code id="referralCode" class="text-lg font-mono">CARGANDO...</code>
+                    
+                    <!-- Performance Section -->
+                    <div id="performance" class="section">
+                        <div class="card p-6">
+                            <h2 class="text-xl font-bold mb-6">Seguimiento de Rendimientos</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-xl">
+                                    <h3 class="text-lg font-bold mb-2">Rendimiento Total</h3>
+                                    <p class="text-3xl font-bold">+12.5%</p>
+                                    <p class="mt-2">Desde el inicio de tu inversión</p>
+                                </div>
+                                <div class="bg-gradient-to-r from-green-500 to-teal-600 text-white p-6 rounded-xl">
+                                    <h3 class="text-lg font-bold mb-2">Ganancias Acumuladas</h3>
+                                    <p class="text-3xl font-bold" id="performance-earnings">$0.00</p>
+                                    <p class="mt-2">Total de rendimientos generados</p>
+                                </div>
                             </div>
-                            <button id="copyReferralBtn" class="btn-primary">
-                                Copiar Enlace
-                            </button>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <h3 class="text-lg font-bold mb-4">Proyección de Crecimiento</h3>
+                                <div class="h-64 flex items-center justify-center">
+                                    <p class="text-gray-500">Gráfico de proyección se cargará aquí</p>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-gray-600 mt-4">Comparte este código con amigos y recibe un bono de <span class="font-bold">$25</span> por cada referido que se registre y complete la verificación.</p>
+                    </div>
+                    
+                    <!-- Deposits Section -->
+                    <div id="deposits" class="section">
+                        <div class="card p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold">Historial de Depósitos</h2>
+                                <button id="open-deposit-modal-from-section" class="btn-primary flex items-center">
+                                    <i class="fas fa-plus mr-2"></i> Nuevo Depósito
+                                </button>
+                            </div>
+                            <div id="deposits-list">
+                                <!-- Deposits will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Withdrawals Section -->
+                    <div id="withdrawals" class="section">
+                        <div class="card p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold">Solicitudes de Retiro</h2>
+                                <button id="open-withdrawal-modal-from-section" class="btn-secondary flex items-center">
+                                    <i class="fas fa-download mr-2"></i> Solicitar Retiro
+                                </button>
+                            </div>
+                            <div id="withdrawals-list">
+                                <!-- Withdrawals will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Referrals Section -->
+                    <div id="referrals" class="section">
+                        <div class="card p-6">
+                            <h2 class="text-xl font-bold mb-6">Programa de Referidos</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                <div class="bg-gradient-to-r from-purple-500 to-pink-600 text-white p-6 rounded-xl">
+                                    <h3 class="text-lg font-bold mb-2">Tu Código de Referido</h3>
+                                    <div class="flex items-center mt-4">
+                                        <code id="referral-code" class="bg-white text-purple-600 px-4 py-2 rounded-lg text-lg font-bold mr-4">CARGANDO...</code>
+                                        <button id="copy-referral-code" class="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100">
+                                            <i class="fas fa-copy mr-2"></i> Copiar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="bg-gradient-to-r from-orange-500 to-red-600 text-white p-6 rounded-xl">
+                                    <h3 class="text-lg font-bold mb-2">Tus Referidos</h3>
+                                    <p class="text-3xl font-bold" id="referrals-count">0</p>
+                                    <p class="mt-2">Personas que se han unido con tu código</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-6 rounded-lg">
+                                <h3 class="text-lg font-bold mb-4">Tus Bonos por Referidos</h3>
+                                <div id="referrals-bonus-list">
+                                    <!-- Referral bonuses will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Settings Section -->
+                    <div id="settings" class="section">
+                        <div class="card p-6">
+                            <h2 class="text-xl font-bold mb-6">Configuración de Cuenta</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-lg font-bold mb-4">Información Personal</h3>
+                                    <form id="profile-form">
+                                        <div class="mb-4">
+                                            <label for="profile-name" class="block text-gray-700 mb-2">Nombre Completo</label>
+                                            <input type="text" id="profile-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="profile-email" class="block text-gray-700 mb-2">Correo Electrónico</label>
+                                            <input type="email" id="profile-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="profile-phone" class="block text-gray-700 mb-2">Teléfono</label>
+                                            <input type="tel" id="profile-phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="profile-country" class="block text-gray-700 mb-2">País</label>
+                                            <select id="profile-country" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                <option value="">Selecciona un país</option>
+                                                <option value="AR">Argentina</option>
+                                                <option value="BR">Brasil</option>
+                                                <option value="CA">Canadá</option>
+                                                <option value="CL">Chile</option>
+                                                <option value="CO">Colombia</option>
+                                                <option value="MX">México</option>
+                                                <option value="ES">España</option>
+                                                <option value="US">Estados Unidos</option>
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn-primary">Guardar Cambios</button>
+                                    </form>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold mb-4">Seguridad</h3>
+                                    <div class="mb-6">
+                                        <label for="current-password" class="block text-gray-700 mb-2">Contraseña Actual</label>
+                                        <input type="password" id="current-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="new-password" class="block text-gray-700 mb-2">Nueva Contraseña</label>
+                                        <input type="password" id="new-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <div class="mb-6">
+                                        <label for="confirm-new-password" class="block text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
+                                        <input type="password" id="confirm-new-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    </div>
+                                    <button class="btn-secondary">Cambiar Contraseña</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Help Section -->
+                    <div id="help" class="section">
+                        <div class="card p-6">
+                            <h2 class="text-xl font-bold mb-6">Centro de Ayuda</h2>
+                            <div class="space-y-4">
+                                <div class="border border-gray-200 rounded-lg">
+                                    <button class="faq-question w-full text-left p-4 font-medium bg-gray-50 hover:bg-gray-100 rounded-t-lg">
+                                        ¿Cómo realizar un depósito?
+                                    </button>
+                                    <div class="faq-answer p-4 hidden">
+                                        <p>Para realizar un depósito, sigue estos pasos:</p>
+                                        <ol class="list-decimal list-inside mt-2 space-y-1">
+                                            <li>Haz clic en "Realizar Depósito" en el panel principal</li>
+                                            <li>Selecciona el monto y método de pago</li>
+                                            <li>Sube el comprobante de pago</li>
+                                            <li>Confirma el depósito</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                <div class="border border-gray-200 rounded-lg">
+                                    <button class="faq-question w-full text-left p-4 font-medium bg-gray-50 hover:bg-gray-100 rounded-t-lg">
+                                        ¿Cuánto tiempo tarda en procesarse un retiro?
+                                    </button>
+                                    <div class="faq-answer p-4 hidden">
+                                        <p>Los retiros generalmente se procesan en 3-5 días hábiles. El tiempo exacto puede variar dependiendo del método de retiro seleccionado y de la verificación de seguridad.</p>
+                                    </div>
+                                </div>
+                                <div class="border border-gray-200 rounded-lg">
+                                    <button class="faq-question w-full text-left p-4 font-medium bg-gray-50 hover:bg-gray-100 rounded-t-lg">
+                                        ¿Cómo funciona el programa de referidos?
+                                    </button>
+                                    <div class="faq-answer p-4 hidden">
+                                        <p>Al compartir tu código único de referido, recibirás $25 por cada persona que se registre y realice su primer depósito. Tus referidos también recibirán un bono de bienvenida.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </section>
-
-            <!-- Contributions Section -->
-            <section id="contributionsSection" class="py-8 px-4 hidden">
-                <div class="max-w-6xl mx-auto">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Mis Aportes</h2>
-                    <div class="dashboard-card p-6 fade-in">
-                        <div class="mb-6">
-                            <h3 class="text-xl font-bold mb-4 text-gray-800">Historial de Aportes</h3>
-                            <div id="contributionsList">
-                                <div class="text-center py-4 text-gray-500">
-                                    No has realizado aportes todavía
-                                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Deposit Modal -->
+    <div id="deposit-modal" class="modal">
+        <div class="modal-content">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold">Realizar Depósito</h2>
+                    <button id="close-deposit-modal" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <form id="deposit-form">
+                    <div class="mb-6">
+                        <label for="deposit-amount" class="block text-gray-700 mb-2">Monto a Depositar (USD)</label>
+                        <input type="number" id="deposit-amount" min="100" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" required>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2">Método de Pago</label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="payment-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+                                <input type="radio" id="method-bank" name="payment-method" value="bank" class="hidden" checked>
+                                <label for="method-bank" class="cursor-pointer">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-university text-blue-600 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium">Transferencia Bancaria</p>
+                                </label>
+                            </div>
+                            <div class="payment-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+                                <input type="radio" id="method-paypal" name="payment-method" value="paypal" class="hidden">
+                                <label for="method-paypal" class="cursor-pointer">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i class="fab fa-paypal text-blue-600 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium">PayPal</p>
+                                </label>
+                            </div>
+                            <div class="payment-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+                                <input type="radio" id="method-crypto" name="payment-method" value="crypto" class="hidden">
+                                <label for="method-crypto" class="cursor-pointer">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-coins text-blue-600 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium">Criptomonedas</p>
+                                </label>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-
-            <!-- Performance Section -->
-            <section id="performanceSection" class="py-8 px-4 hidden">
-                <div class="max-w-6xl mx-auto">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Rendimientos</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="dashboard-card p-6 fade-in">
-                            <h3 class="text-xl font-bold mb-4 text-gray-800">Resumen de Rendimientos</h3>
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Rendimiento Total</span>
-                                    <span class="font-bold text-green-600">+<span id="totalEarnings">0.00</span>%</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Ganancias Acumuladas</span>
-                                    <span class="font-bold text-green-600">$<span id="totalEarningsAmount">0.00</span></span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Período de Inversión</span>
-                                    <span id="investmentPeriod" class="font-bold">--</span>
-                                </div>
-                            </div>
+                    
+                    <div id="payment-details" class="mb-6 p-4 bg-gray-50 rounded-lg">
+                        <h3 class="font-bold mb-2">Instrucciones para Transferencia Bancaria</h3>
+                        <p class="text-gray-600 mb-2">Realiza una transferencia a la siguiente cuenta:</p>
+                        <div class="bg-white p-4 rounded border border-gray-200">
+                            <p><strong>Banco:</strong> Canada Coin Financial</p>
+                            <p><strong>Cuenta:</strong> 1234567890</p>
+                            <p><strong>SWIFT/BIC:</strong> CCFIUS33</p>
+                            <p><strong>Beneficiario:</strong> Canada Coin Investments LLC</p>
                         </div>
-                        <div class="dashboard-card p-6 fade-in">
-                            <h3 class="text-xl font-bold mb-4 text-gray-800">Proyección de Crecimiento</h3>
-                            <div class="bg-gray-100 p-4 rounded-lg">
-                                <div class="h-40 flex items-center justify-center text-gray-500">
-                                    Gráfico de rendimientos (próximamente)
-                                </div>
-                            </div>
-                        </div>
+                        <p class="text-sm text-gray-500 mt-2">Una vez realizada la transferencia, sube el comprobante a continuación.</p>
                     </div>
-                </div>
-            </section>
-
-            <!-- Referrals Section -->
-            <section id="referralsSection" class="py-8 px-4 hidden">
-                <div class="max-w-6xl mx-auto">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Sistema de Referidos</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="dashboard-card p-6 fade-in">
-                            <h3 class="text-xl font-bold mb-4 text-gray-800">Tu Red de Referidos</h3>
-                            <div class="space-y-4">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Referidos Directos</span>
-                                    <span class="font-bold"><span id="directReferrals">0</span> personas</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Bonos Ganados</span>
-                                    <span class="font-bold text-green-600">$<span id="referralBonuses">0.00</span></span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">Estado del Programa</span>
-                                    <span class="font-bold text-green-600">Activo</span>
-                                </div>
-                            </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2">Comprobante de Pago</label>
+                        <div id="drop-zone" class="drop-zone">
+                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-600">Arrastra tu archivo aquí o haz clic para seleccionar</p>
+                            <p class="text-sm text-gray-500 mt-1">Formatos permitidos: PDF, JPG, PNG (Máx. 5 MB)</p>
+                            <input type="file" id="file-input" class="hidden" accept=".pdf,.jpg,.jpeg,.png">
                         </div>
-                        <div class="dashboard-card p-6 fade-in">
-                            <h3 class="text-xl font-bold mb-4 text-gray-800">Comparte tu Enlace</h3>
-                            <div class="space-y-4">
-                                <div class="bg-gray-100 p-4 rounded-lg">
-                                    <p class="text-sm text-gray-600 mb-2">Tu enlace personalizado:</p>
-                                    <code id="referralLink" class="text-sm break-all">Cargando...</code>
+                        <div id="file-preview" class="hidden mt-4">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-file text-blue-600 text-xl mr-3"></i>
+                                    <div>
+                                        <p id="file-name" class="font-medium"></p>
+                                        <p id="file-size" class="text-sm text-gray-500"></p>
+                                    </div>
                                 </div>
-                                <button id="shareReferralBtn" class="w-full btn-primary">
-                                    Compartir en Redes Sociales
+                                <button id="remove-file" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-times"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-
-            <!-- Profile Section -->
-            <section id="profileSection" class="py-8 px-4 hidden">
-                <div class="max-w-4xl mx-auto">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Mi Perfil</h2>
-                    <div class="dashboard-card p-6 fade-in">
-                        <h3 class="text-xl font-bold mb-4 text-gray-800">Información Personal</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-gray-700 mb-2">Nombre Completo</label>
-                                <input type="text" id="profileName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 mb-2">Correo Electrónico</label>
-                                <input type="email" id="profileEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 mb-2">Teléfono</label>
-                                <input type="tel" id="profilePhone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 mb-2">País</label>
-							<select id="profileCountry" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-								<option value="">Selecciona tu país</option>
-
-								<!-- Sudamérica -->
-								<option value="AR">Argentina</option>
-								<option value="BO">Bolivia</option>
-								<option value="BR">Brasil</option>
-								<option value="CL">Chile</option>
-								<option value="CO">Colombia</option>
-								<option value="EC">Ecuador</option>
-								<option value="GY">Guyana</option>
-								<option value="PY">Paraguay</option>
-								<option value="PE">Perú</option>
-								<option value="SR">Surinam</option>
-								<option value="UY">Uruguay</option>
-								<option value="VE">Venezuela</option>
-
-								<!-- Centroamérica -->
-								<option value="BZ">Belice</option>
-								<option value="CR">Costa Rica</option>
-								<option value="SV">El Salvador</option>
-								<option value="GT">Guatemala</option>
-								<option value="HN">Honduras</option>
-								<option value="NI">Nicaragua</option>
-								<option value="PA">Panamá</option>
-
-								<!-- Norteamérica -->
-								<option value="MX">México</option>
-								<option value="US">Estados Unidos</option>
-								<option value="CA">Canadá</option>
-
-								<!-- Europa relevante -->
-								<option value="ES">España</option>
-							</select>
-                            </div>
-                        </div>
-                        <div class="mt-6">
-                            <button id="saveProfileBtn" class="btn-primary">
-                                Guardar Cambios
-                            </button>
-                        </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="cancel-deposit" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
+                        <button type="submit" id="submit-deposit" class="btn-primary flex items-center">
+                            <span>Confirmar Depósito</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
                     </div>
-                </div>
-            </section>
-
-            <!-- Help Section -->
-            <section id="helpSection" class="py-8 px-4 hidden">
-                <div class="max-w-4xl mx-auto">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Centro de Ayuda</h2>
-                    <div class="dashboard-card p-6 fade-in">
-                        <h3 class="text-xl font-bold mb-4 text-gray-800">Preguntas Frecuentes</h3>
-                        <div class="space-y-4">
-                            <div class="border-b border-gray-200 pb-4">
-                                <h4 class="font-bold text-gray-800 mb-2">¿Cómo puedo realizar mi primer aporte?</h4>
-                                <p class="text-gray-600">Para realizar tu primer aporte, dirígete a la sección "Dashboard" y haz clic en el botón "Realizar Aporte". Sigue las instrucciones para completar el proceso de pago.</p>
-                            </div>
-                            <div class="border-b border-gray-200 pb-4">
-                                <h4 class="font-bold text-gray-800 mb-2">¿Cómo funciona el sistema de referidos?</h4>
-                                <p class="text-gray-600">Cada usuario tiene un código único de referido. Al compartirlo con amigos, recibirás un bono de $25 cuando se registren y completen su verificación KYC.</p>
-                            </div>
-                            <div class="border-b border-gray-200 pb-4">
-                                <h4 class="font-bold text-gray-800 mb-2">¿Cuándo puedo retirar mis fondos?</h4>
-                                <p class="text-gray-600">Puedes solicitar retiros en cualquier momento. Los retiros se procesan dentro de 3-5 días hábiles, sujetos a verificación de seguridad.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Legal Section -->
-            <section id="legalSection" class="py-12 px-4 bg-gray-100">
-                <div class="max-w-4xl mx-auto">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Información Legal y de Riesgos</h2>
-                    <div class="dashboard-card p-6">
-                        <div class="prose max-w-none">
-                            <p class="text-gray-700 mb-4">
-                                <strong>Advertencia:</strong> Las inversiones conllevan riesgos, incluida la posible pérdida del capital invertido. 
-                                El rendimiento pasado no es garantía de resultados futuros.
-                            </p>
-                            <p class="text-gray-700 mb-4">
-                                Canada Coin opera bajo estrictos protocolos de cumplimiento normativo, incluyendo KYC (Conozca a su Cliente) 
-                                y AML (Anti-Lavado de Dinero). Todos los usuarios deben completar el proceso de verificación antes de poder realizar aportes.
-                            </p>
-                            <p class="text-gray-700 mb-4">
-                                Las tarifas y comisiones están claramente detalladas en nuestros términos y condiciones. 
-                                No cobramos tarifas ocultas y todos los costos son transparentes desde el inicio.
-                            </p>
-                            <p class="text-gray-700">
-                                Consulte con un asesor financiero independiente antes de realizar cualquier inversión. 
-                                Este servicio puede no estar disponible en todas las jurisdicciones.
-                            </p>
-                        </div>
-                        <div class="mt-6 flex items-center">
-                            <input type="checkbox" id="agreeTerms" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
-                            <label for="agreeTerms" class="ml-2 text-gray-700">He leído y acepto los <a href="#" class="text-blue-600 hover:underline">términos y condiciones</a></label>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Footer -->
-            <footer class="bg-gray-800 text-white py-8 px-4">
-                <div class="max-w-6xl mx-auto">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div>
-                            <h3 class="text-lg font-bold mb-4">Canada Coin</h3>
-                            <p class="text-gray-400">Plataforma de inversión legal y transparente con seguimiento en tiempo real.</p>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold mb-4">Enlaces Rápidos</h3>
-                            <ul class="space-y-2">
-                                <li><a href="#" class="text-gray-400 hover:text-white transition">Inicio</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-white transition">Acerca de</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-white transition">Preguntas Frecuentes</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-white transition">Contacto</a></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold mb-4">Legal</h3>
-                            <ul class="space-y-2">
-                                <li><a href="#" class="text-gray-400 hover:text-white transition">Términos y Condiciones</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-white transition">Política de Privacidad</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-white transition">Advertencia de Riesgos</a></li>
-                                <li><a href="#" class="text-gray-400 hover:text-white transition">Información Regulatoria</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
-                        <p>&copy; 2023 Canada Coin. Todos los derechos reservados.</p>
-                    </div>
-                </div>
-            </footer>
-        </div>
-    </div>
-
-    <!-- Modals -->
-    <!-- Login Modal -->
-    <div id="loginModal" class="modal">
-        <div class="modal-content p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-gray-800">Iniciar Sesión</h3>
-                <button id="closeLoginModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
+                </form>
             </div>
-            <form id="loginForm">
-                <div class="mb-4">
-                    <label for="loginEmail" class="block text-gray-700 mb-2">Correo Electrónico</label>
-                    <input type="email" id="loginEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                </div>
-                <div class="mb-6">
-                    <label for="loginPassword" class="block text-gray-700 mb-2">Contraseña</label>
-                    <input type="password" id="loginPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                </div>
-                <button type="submit" class="w-full btn-primary">Iniciar Sesión</button>
-            </form>
-            <p class="text-center mt-4 text-gray-600">
-                ¿No tienes cuenta? <button id="switchToRegister" class="text-blue-600 hover:underline">Regístrate</button>
-            </p>
-        </div>
-    </div>
-
-    <!-- Register Modal -->
-    <div id="registerModal" class="modal">
-        <div class="modal-content p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-gray-800">Crear Cuenta</h3>
-                <button id="closeRegisterModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="registerForm">
-                <div class="mb-4">
-                    <label for="registerName" class="block text-gray-700 mb-2">Nombre Completo</label>
-                    <input type="text" id="registerName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                </div>
-                <div class="mb-4">
-                    <label for="registerEmail" class="block text-gray-700 mb-2">Correo Electrónico</label>
-                    <input type="email" id="registerEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                </div>
-                <div class="mb-4">
-                    <label for="registerPhone" class="block text-gray-700 mb-2">Teléfono</label>
-                    <input type="tel" id="registerPhone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                </div>
-                <div class="mb-4">
-                    <label for="registerCountry" class="block text-gray-700 mb-2">País</label>
-                    <select id="registerCountry" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-						<option value="">Selecciona tu país</option>
-
-						<!-- Sudamérica -->
-						<option value="AR">Argentina</option>
-						<option value="BO">Bolivia</option>
-						<option value="BR">Brasil</option>
-						<option value="CL">Chile</option>
-						<option value="CO">Colombia</option>
-						<option value="EC">Ecuador</option>
-						<option value="GY">Guyana</option>
-						<option value="PY">Paraguay</option>
-						<option value="PE">Perú</option>
-						<option value="SR">Surinam</option>
-						<option value="UY">Uruguay</option>
-						<option value="VE">Venezuela</option>
-
-						<!-- Centroamérica -->
-						<option value="BZ">Belice</option>
-						<option value="CR">Costa Rica</option>
-						<option value="SV">El Salvador</option>
-						<option value="GT">Guatemala</option>
-						<option value="HN">Honduras</option>
-						<option value="NI">Nicaragua</option>
-						<option value="PA">Panamá</option>
-
-						<!-- Norteamérica -->
-						<option value="MX">México</option>
-						<option value="US">Estados Unidos</option>
-						<option value="CA">Canadá</option>
-
-						<!-- Europa relevante -->
-						<option value="ES">España</option>
-					</select>
-                </div>
-                <div class="mb-4">
-                    <label for="registerPassword" class="block text-gray-700 mb-2">Contraseña</label>
-                    <input type="password" id="registerPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                </div>
-                <div class="mb-6">
-                    <label for="registerReferral" class="block text-gray-700 mb-2">Código de Referido (opcional)</label>
-                    <input type="text" id="registerReferral" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="mb-4 flex items-start">
-                    <input type="checkbox" id="registerAgree" class="h-4 w-4 text-blue-600 border-gray-300 rounded mt-1" required>
-                    <label for="registerAgree" class="ml-2 text-gray-700 text-sm">Acepto los <a href="#" class="text-blue-600 hover:underline">términos y condiciones</a> y la <a href="#" class="text-blue-600 hover:underline">política de privacidad</a></label>
-                </div>
-                <button type="submit" class="w-full btn-primary">Crear Cuenta</button>
-            </form>
-            <p class="text-center mt-4 text-gray-600">
-                ¿Ya tienes cuenta? <button id="switchToLogin" class="text-blue-600 hover:underline">Inicia Sesión</button>
-            </p>
-        </div>
-    </div>
-
-    <!-- Contribution Modal -->
-    <div id="contributionModal" class="modal">
-        <div class="modal-content p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-gray-800">Realizar Aporte</h3>
-                <button id="closeContributionModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form id="contributionForm">
-                <div class="mb-4">
-                    <label for="contributionAmount" class="block text-gray-700 mb-2">Monto del Aporte</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-3 text-gray-500">$</span>
-                        <input type="number" id="contributionAmount" min="10" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" required>
-                    </div>
-                </div>
-                <div class="mb-6">
-                    <label for="contributionMethod" class="block text-gray-700 mb-2">Método de Pago</label>
-                    <select id="contributionMethod" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                        <option value="">Selecciona un método</option>
-                        <option value="stripe">Tarjeta de Crédito/Débito</option>
-                        <option value="paypal">PayPal</option>
-                        <option value="bank">Transferencia Bancaria</option>
-                    </select>
-                </div>
-                <button type="submit" class="w-full btn-primary">Continuar al Pago</button>
-            </form>
-            <p class="text-center mt-4 text-gray-600 text-sm">
-                Al realizar un aporte, aceptas nuestros <a href="#" class="text-blue-600 hover:underline">términos y condiciones</a>
-            </p>
         </div>
     </div>
 
     <!-- Withdrawal Modal -->
-    <div id="withdrawalModal" class="modal">
-        <div class="modal-content p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-gray-800">Retirar Fondos</h3>
-                <button id="closeWithdrawalModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
+    <div id="withdrawal-modal" class="modal">
+        <div class="modal-content">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold">Solicitar Retiro</h2>
+                    <button id="close-withdrawal-modal" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
             </div>
-            <form id="withdrawalForm">
-                <div class="mb-4">
-                    <label for="withdrawalAmount" class="block text-gray-700 mb-2">Monto a Retirar</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-3 text-gray-500">$</span>
-                        <input type="number" id="withdrawalAmount" min="10" step="0.01" class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" required>
+            
+            <div class="p-6">
+                <form id="withdrawal-form">
+                    <div class="mb-6">
+                        <label for="withdrawal-amount" class="block text-gray-700 mb-2">Monto a Retirar (USD)</label>
+                        <input type="number" id="withdrawal-amount" min="10" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" required>
+                        <p class="text-sm text-gray-500 mt-1">Saldo disponible: <span id="available-balance">$0.00</span></p>
                     </div>
-                    <p class="text-sm text-gray-500 mt-1">Saldo disponible: $<span id="availableBalance">0.00</span></p>
+                    
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2">Método de Retiro</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="payment-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+                                <input type="radio" id="withdrawal-bank" name="withdrawal-method" value="bank" class="hidden" checked>
+                                <label for="withdrawal-bank" class="cursor-pointer">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-university text-blue-600 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium">Transferencia Bancaria</p>
+                                </label>
+                            </div>
+                            <div class="payment-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+                                <input type="radio" id="withdrawal-paypal" name="withdrawal-method" value="paypal" class="hidden">
+                                <label for="withdrawal-paypal" class="cursor-pointer">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i class="fab fa-paypal text-blue-600 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium">PayPal</p>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div class="flex items-start">
+                            <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
+                            <div>
+                                <p class="font-medium text-yellow-800">Tiempo de Procesamiento</p>
+                                <p class="text-yellow-700 text-sm mt-1">Los retiros generalmente se procesan en 3-5 días hábiles. Te notificaremos por correo electrónico cuando tu solicitud sea aprobada.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="cancel-withdrawal" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
+                        <button type="submit" id="submit-withdrawal" class="btn-primary flex items-center">
+                            <span>Solicitar Retiro</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Referral Modal -->
+    <div id="referral-modal" class="modal">
+        <div class="modal-content">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold">Compartir Código de Referido</h2>
+                    <button id="close-referral-modal" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
                 </div>
+            </div>
+            
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <p class="text-gray-600 mb-4">Comparte tu código único y gana $25 por cada amigo que se registre y realice su primer depósito.</p>
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-600 text-white p-6 rounded-xl inline-block">
+                        <p class="text-sm mb-2">Tu código de referido:</p>
+                        <p id="modal-referral-code" class="text-2xl font-bold">CARGANDO...</p>
+                    </div>
+                </div>
+                
                 <div class="mb-6">
-                    <label for="withdrawalMethod" class="block text-gray-700 mb-2">Método de Retiro</label>
-                    <select id="withdrawalMethod" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                        <option value="">Selecciona un método</option>
-                        <option value="bank">Transferencia Bancaria</option>
-                        <option value="paypal">PayPal</option>
-                    </select>
+                    <label class="block text-gray-700 mb-2">Compartir en:</label>
+                    <div class="flex justify-center space-x-4">
+                        <button class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700">
+                            <i class="fab fa-facebook-f"></i>
+                        </button>
+                        <button class="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center text-white hover:bg-blue-500">
+                            <i class="fab fa-twitter"></i>
+                        </button>
+                        <button class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white hover:bg-green-600">
+                            <i class="fab fa-whatsapp"></i>
+                        </button>
+                        <button class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center text-white hover:bg-gray-900">
+                            <i class="fas fa-envelope"></i>
+                        </button>
+                    </div>
                 </div>
-                <button type="submit" class="w-full btn-primary">Solicitar Retiro</button>
-            </form>
-            <p class="text-center mt-4 text-gray-600 text-sm">
-                Los retiros pueden tardar 3-5 días hábiles en procesarse
-            </p>
+                
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">O copia tu enlace personalizado:</label>
+                    <div class="flex">
+                        <input type="text" id="referral-link" class="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500" readonly>
+                        <button id="copy-referral-link" class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button id="close-referral-modal-2" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cerrar</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Notification -->
-    <div id="notification" class="fixed bottom-4 right-4 p-4 rounded-lg shadow-lg z-50 hidden">
-        <div class="flex items-center">
-            <i class="fas fa-check-circle mr-2 text-green-500"></i>
-            <span id="notificationText">Operación completada con éxito</span>
-        </div>
-    </div>
-
+    <!-- Firebase Configuration -->
     <script>
-        // Estado de la aplicación
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBI4O0d_Mec38FDiuhirujCnX99PFKiXW4",
+            authDomain: "projekt-pc.firebaseapp.com",
+            databaseURL: "https://projekt-pc-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "projekt-pc",
+            storageBucket: "projekt-pc.appspot.com",
+            messagingSenderId: "90098431634",
+            appId: "1:90098431634:web:7cb61800d03533c2a6984b",
+            measurementId: "G-59YH8W8W1L"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Firebase services
+        const auth = firebase.auth();
+        const db = firebase.database();
+        const storage = firebase.storage();
+    </script>
+
+    <!-- Application JavaScript -->
+    <script>
+        // Global state
         const appState = {
             currentUser: null,
             userData: null,
-            currentSection: 'dashboard'
-        };
-
-        // Datos de ejemplo para usuarios registrados
-        const sampleUserData = {
-            name: "Juan Pérez",
-            email: "juan@example.com",
-            balance: 1250.00,
-            totalContributions: 1000.00,
-            performancePercentage: 25.00,
-            referralCode: "CANADA25",
-            transactions: [
-                { type: 'Depósito', date: '15 Nov 2023, 10:30', amount: 500.00 },
-                { type: 'Bono de Referido', date: '14 Nov 2023, 16:45', amount: 25.00 },
-                { type: 'Aporte', date: '10 Nov 2023, 09:15', amount: 500.00 },
-                { type: 'Retiro', date: '5 Nov 2023, 14:20', amount: -250.00 }
-            ],
-            contributions: [
-                { date: '10 Nov 2023, 09:15', amount: 500.00, method: 'Transferencia Bancaria' },
-                { date: '1 Nov 2023, 11:30', amount: 500.00, method: 'Tarjeta de Crédito' }
-            ]
+            transactions: [],
+            deposits: [],
+            withdrawals: [],
+            referrals: []
         };
 
         // DOM Elements
-        const loginBtn = document.getElementById('loginBtn');
-        const registerBtn = document.getElementById('registerBtn');
-        const heroRegisterBtn = document.getElementById('heroRegisterBtn');
-        const loginModal = document.getElementById('loginModal');
-        const registerModal = document.getElementById('registerModal');
-        const closeLoginModal = document.getElementById('closeLoginModal');
-        const closeRegisterModal = document.getElementById('closeRegisterModal');
-        const switchToRegister = document.getElementById('switchToRegister');
-        const switchToLogin = document.getElementById('switchToLogin');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const sidebar = document.getElementById('sidebar');
-        const toggleSidebar = document.getElementById('toggleSidebar');
-        const mainContent = document.getElementById('mainContent');
-        const dashboardSection = document.getElementById('dashboardSection');
-        const contributionsSection = document.getElementById('contributionsSection');
-        const performanceSection = document.getElementById('performanceSection');
-        const referralsSection = document.getElementById('referralsSection');
-        const profileSection = document.getElementById('profileSection');
-        const helpSection = document.getElementById('helpSection');
-        const heroSection = document.getElementById('heroSection');
-        const featuresSection = document.getElementById('featuresSection');
-        const legalSection = document.getElementById('legalSection');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
-        const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
-        const mobileLoginBtn = document.getElementById('mobileLoginBtn');
-        const mobileRegisterBtn = document.getElementById('mobileRegisterBtn');
-        const makeContributionBtn = document.getElementById('makeContributionBtn');
-        const withdrawFundsBtn = document.getElementById('withdrawFundsBtn');
-        const contributionModal = document.getElementById('contributionModal');
-        const withdrawalModal = document.getElementById('withdrawalModal');
-        const closeContributionModal = document.getElementById('closeContributionModal');
-        const closeWithdrawalModal = document.getElementById('closeWithdrawalModal');
-        const contributionForm = document.getElementById('contributionForm');
-        const withdrawalForm = document.getElementById('withdrawalForm');
-        const referralBtn = document.getElementById('referralBtn');
-        const copyReferralBtn = document.getElementById('copyReferralBtn');
-        const shareReferralBtn = document.getElementById('shareReferralBtn');
-        const saveProfileBtn = document.getElementById('saveProfileBtn');
-        const notification = document.getElementById('notification');
-        const notificationText = document.getElementById('notificationText');
-        const navLinks = document.querySelectorAll('.nav-link');
-        const mobileNavLinks = document.querySelectorAll('.nav-link-mobile');
-        const mobileMenu = document.getElementById('mobileMenu');
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const closeMobileMenu = document.getElementById('closeMobileMenu');
-        const userInfo = document.getElementById('userInfo');
-        const mobileUserInfo = document.getElementById('mobileUserInfo');
-        const authButtons = document.getElementById('authButtons');
-        const mobileAuthButtons = document.getElementById('mobileAuthButtons');
+        const authSection = document.getElementById('auth-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const showRegisterLink = document.getElementById('show-register');
+        const showLoginLink = document.getElementById('show-login');
+        const loginFormElement = document.getElementById('loginForm');
+        const registerFormElement = document.getElementById('registerForm');
+        const logoutButton = document.getElementById('logout-button');
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        const userName = document.getElementById('user-name');
+        const dashboardUserName = document.getElementById('dashboard-user-name');
+        const kycStatus = document.getElementById('kyc-status');
+        const totalBalance = document.getElementById('total-balance');
+        const totalDeposits = document.getElementById('total-deposits');
+        const totalEarnings = document.getElementById('total-earnings');
+        const totalReferrals = document.getElementById('total-referrals');
+        
+        // Modals
+        const depositModal = document.getElementById('deposit-modal');
+        const openDepositModalButton = document.getElementById('open-deposit-modal');
+        const openDepositModalFromSectionButton = document.getElementById('open-deposit-modal-from-section');
+        const closeDepositModalButton = document.getElementById('close-deposit-modal');
+        const cancelDepositButton = document.getElementById('cancel-deposit');
+        const depositForm = document.getElementById('deposit-form');
+        
+        const withdrawalModal = document.getElementById('withdrawal-modal');
+        const openWithdrawalModalButton = document.getElementById('open-withdrawal-modal');
+        const openWithdrawalModalFromSectionButton = document.getElementById('open-withdrawal-modal-from-section');
+        const closeWithdrawalModalButton = document.getElementById('close-withdrawal-modal');
+        const cancelWithdrawalButton = document.getElementById('cancel-withdrawal');
+        const withdrawalForm = document.getElementById('withdrawal-form');
+        const availableBalance = document.getElementById('available-balance');
+        
+        const referralModal = document.getElementById('referral-modal');
+        const openReferralModalButton = document.getElementById('open-referral-modal');
+        const closeReferralModalButton = document.getElementById('close-referral-modal');
+        const closeReferralModalButton2 = document.getElementById('close-referral-modal-2');
+        const modalReferralCode = document.getElementById('modal-referral-code');
+        const referralLink = document.getElementById('referral-link');
+        const copyReferralLink = document.getElementById('copy-referral-link');
+        
+        // File upload elements
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const filePreview = document.getElementById('file-preview');
+        const fileName = document.getElementById('file-name');
+        const fileSize = document.getElementById('file-size');
+        const removeFileButton = document.getElementById('remove-file');
+        const paymentMethods = document.querySelectorAll('input[name="payment-method"]');
+        const paymentDetails = document.getElementById('payment-details');
+        const submitDepositButton = document.getElementById('submit-deposit');
+        
+        // Navigation elements
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.section');
+        
+        // Referral elements
+        const referralCode = document.getElementById('referral-code');
+        const copyReferralCode = document.getElementById('copy-referral-code');
+        const referralsCount = document.getElementById('referrals-count');
+        
+        // Profile form
+        const profileForm = document.getElementById('profile-form');
+        
+        // FAQ elements
+        const faqQuestions = document.querySelectorAll('.faq-question');
+
+        // Selected file for upload
+        let selectedFile = null;
 
         // Event Listeners
-        loginBtn.addEventListener('click', () => openModal(loginModal));
-        registerBtn.addEventListener('click', () => openModal(registerModal));
-        heroRegisterBtn.addEventListener('click', () => openModal(registerModal));
-        mobileLoginBtn.addEventListener('click', () => openModal(loginModal));
-        mobileRegisterBtn.addEventListener('click', () => openModal(registerModal));
-        closeLoginModal.addEventListener('click', () => closeModal(loginModal));
-        closeRegisterModal.addEventListener('click', () => closeModal(registerModal));
-        switchToRegister.addEventListener('click', () => {
-            closeModal(loginModal);
-            openModal(registerModal);
-        });
-        switchToLogin.addEventListener('click', () => {
-            closeModal(registerModal);
-            openModal(loginModal);
-        });
-        toggleSidebar.addEventListener('click', toggleSidebarView);
-        logoutBtn.addEventListener('click', handleLogout);
-        sidebarLogoutBtn.addEventListener('click', handleLogout);
-        mobileLogoutBtn.addEventListener('click', handleLogout);
-        makeContributionBtn.addEventListener('click', () => openModal(contributionModal));
-        withdrawFundsBtn.addEventListener('click', () => openModal(withdrawalModal));
-        closeContributionModal.addEventListener('click', () => closeModal(contributionModal));
-        closeWithdrawalModal.addEventListener('click', () => closeModal(withdrawalModal));
-        copyReferralBtn.addEventListener('click', copyReferralCode);
-        shareReferralBtn.addEventListener('click', shareReferralLink);
-        saveProfileBtn.addEventListener('click', saveProfile);
-        loginForm.addEventListener('submit', handleLogin);
-        registerForm.addEventListener('submit', handleRegister);
-        contributionForm.addEventListener('submit', handleContribution);
+        document.addEventListener('DOMContentLoaded', initApp);
+        showRegisterLink.addEventListener('click', showRegisterForm);
+        showLoginLink.addEventListener('click', showLoginForm);
+        loginFormElement.addEventListener('submit', handleLogin);
+        registerFormElement.addEventListener('submit', handleRegister);
+        logoutButton.addEventListener('click', handleLogout);
+        userMenuButton.addEventListener('click', toggleUserMenu);
+        
+        // Deposit modal events
+        openDepositModalButton.addEventListener('click', openDepositModal);
+        openDepositModalFromSectionButton.addEventListener('click', openDepositModal);
+        closeDepositModalButton.addEventListener('click', closeDepositModal);
+        cancelDepositButton.addEventListener('click', closeDepositModal);
+        depositForm.addEventListener('submit', handleDeposit);
+        
+        // Withdrawal modal events
+        openWithdrawalModalButton.addEventListener('click', openWithdrawalModal);
+        openWithdrawalModalFromSectionButton.addEventListener('click', openWithdrawalModal);
+        closeWithdrawalModalButton.addEventListener('click', closeWithdrawalModal);
+        cancelWithdrawalButton.addEventListener('click', closeWithdrawalModal);
         withdrawalForm.addEventListener('submit', handleWithdrawal);
-
-        // Navigation
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
+        
+        // Referral modal events
+        openReferralModalButton.addEventListener('click', openReferralModal);
+        closeReferralModalButton.addEventListener('click', closeReferralModal);
+        closeReferralModalButton2.addEventListener('click', closeReferralModal);
+        copyReferralLink.addEventListener('click', copyToClipboard);
+        copyReferralCode.addEventListener('click', copyToClipboard);
+        
+        // File upload events
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', handleDragOver);
+        dropZone.addEventListener('dragleave', handleDragLeave);
+        dropZone.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+        removeFileButton.addEventListener('click', removeSelectedFile);
+        paymentMethods.forEach(method => {
+            method.addEventListener('change', updatePaymentDetails);
+        });
+        
+        // Navigation events
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
                 e.preventDefault();
-                const section = link.getAttribute('data-section');
-                showSection(section);
+                const sectionId = item.getAttribute('data-section');
+                switchSection(sectionId);
+                
+                // Update active nav item
+                navItems.forEach(navItem => navItem.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+        
+        // Profile form events
+        profileForm.addEventListener('submit', handleProfileUpdate);
+        
+        // FAQ events
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                answer.classList.toggle('hidden');
             });
         });
 
-        mobileNavLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const section = link.getAttribute('data-section');
-                showSection(section);
-                closeMobileMenuFunc();
-            });
-        });
-
-        // Mobile Menu Functions
-        mobileMenuBtn.addEventListener('click', openMobileMenu);
-        closeMobileMenu.addEventListener('click', closeMobileMenuFunc);
-
-        // Functions
-        function toggleSidebarView() {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-        }
-
-        function openModal(modal) {
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal(modal) {
-            modal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-        }
-
-        function openMobileMenu() {
-            mobileMenu.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeMobileMenuFunc() {
-            mobileMenu.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        }
-
-        function showSection(section) {
-            // Hide all sections
-            dashboardSection.classList.add('hidden');
-            contributionsSection.classList.add('hidden');
-            performanceSection.classList.add('hidden');
-            referralsSection.classList.add('hidden');
-            profileSection.classList.add('hidden');
-            helpSection.classList.add('hidden');
-            
-            // Show selected section
-            switch(section) {
-                case 'dashboard':
-                    dashboardSection.classList.remove('hidden');
-                    break;
-                case 'contributions':
-                    contributionsSection.classList.remove('hidden');
-                    updateContributionsList();
-                    break;
-                case 'performance':
-                    performanceSection.classList.remove('hidden');
-                    updatePerformanceData();
-                    break;
-                case 'referrals':
-                    referralsSection.classList.remove('hidden');
-                    updateReferralsData();
-                    break;
-                case 'profile':
-                    profileSection.classList.remove('hidden');
-                    loadProfileData();
-                    break;
-                case 'help':
-                    helpSection.classList.remove('hidden');
-                    break;
-            }
-
-            // Update active nav link
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('data-section') === section) {
-                    link.classList.add('active');
+        // Initialize the application
+        function initApp() {
+            // Check authentication state
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in
+                    appState.currentUser = user;
+                    loadUserData();
+                    showDashboard();
+                } else {
+                    // User is signed out
+                    showAuth();
                 }
             });
-            
-            appState.currentSection = section;
         }
 
+        // Show authentication section
+        function showAuth() {
+            authSection.classList.remove('hidden');
+            dashboardSection.classList.add('hidden');
+        }
+
+        // Show dashboard section
         function showDashboard() {
-            // Hide public content
-            heroSection.classList.add('hidden');
-            featuresSection.classList.add('hidden');
-            legalSection.classList.add('hidden');
-            
-            // Show private content
-            sidebar.classList.remove('hidden');
+            authSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
-            
-            // Hide other private sections
-            contributionsSection.classList.add('hidden');
-            performanceSection.classList.add('hidden');
-            referralsSection.classList.add('hidden');
-            profileSection.classList.add('hidden');
-            helpSection.classList.add('hidden');
-            
-            // Update navigation
-            authButtons.classList.add('hidden');
-            userInfo.classList.remove('hidden');
-            logoutBtn.classList.remove('hidden');
-            mobileUserInfo.classList.remove('hidden');
-            mobileLogoutBtn.classList.remove('hidden');
-            mobileAuthButtons.classList.add('hidden');
-            
-            // Update dashboard with user data
             updateDashboard();
         }
 
-        function showPublicContent() {
-            // Show public content
-            heroSection.classList.remove('hidden');
-            featuresSection.classList.remove('hidden');
-            legalSection.classList.remove('hidden');
-            
-            // Hide private content
-            sidebar.classList.add('hidden');
-            dashboardSection.classList.add('hidden');
-            contributionsSection.classList.add('hidden');
-            performanceSection.classList.add('hidden');
-            referralsSection.classList.add('hidden');
-            profileSection.classList.add('hidden');
-            helpSection.classList.add('hidden');
-            
-            // Update navigation
-            authButtons.classList.remove('hidden');
-            userInfo.classList.add('hidden');
-            logoutBtn.classList.add('hidden');
-            mobileUserInfo.classList.add('hidden');
-            mobileLogoutBtn.classList.add('hidden');
-            mobileAuthButtons.classList.remove('hidden');
-            
-            // Close modals
-            closeModal(loginModal);
-            closeModal(registerModal);
-            closeModal(contributionModal);
-            closeModal(withdrawalModal);
+        // Show register form
+        function showRegisterForm(e) {
+            e.preventDefault();
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
         }
 
+        // Show login form
+        function showLoginForm(e) {
+            e.preventDefault();
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+        }
+
+        // Handle user login
         function handleLogin(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            // Simulate login - In a real app, this would connect to a backend
-            if (email && password) {
-                appState.currentUser = { email: email };
-                appState.userData = { ...sampleUserData, email: email };
-                
-                showNotification('Inicio de sesión exitoso', 'success');
-                closeModal(loginModal);
-                loginForm.reset();
-                showDashboard();
-                updateUserInfo();
-            } else {
-                showNotification('Por favor, completa todos los campos', 'error');
-            }
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            showNotification('Iniciando sesión...', 'warning');
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    showNotification('¡Inicio de sesión exitoso!', 'success');
+                })
+                .catch(error => {
+                    console.error('Login error:', error);
+                    showNotification('Error al iniciar sesión: ' + error.message, 'error');
+                });
         }
 
+        // Handle user registration
         function handleRegister(e) {
             e.preventDefault();
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const phone = document.getElementById('registerPhone').value;
-            const country = document.getElementById('registerCountry').value;
-            const password = document.getElementById('registerPassword').value;
-            const referralCode = document.getElementById('registerReferral').value;
-
-            // Simulate registration - In a real app, this would connect to a backend
-            if (name && email && phone && country && password) {
-                appState.currentUser = { email: email };
-                appState.userData = { 
-                    ...sampleUserData, 
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    country: country
-                };
-                
-                showNotification('Cuenta creada exitosamente', 'success');
-                closeModal(registerModal);
-                registerForm.reset();
-                showDashboard();
-                updateUserInfo();
-            } else {
-                showNotification('Por favor, completa todos los campos obligatorios', 'error');
+            
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const phone = document.getElementById('register-phone').value;
+            const country = document.getElementById('register-country').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            const termsAccepted = document.getElementById('register-terms').checked;
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                showNotification('Las contraseñas no coinciden', 'error');
+                return;
             }
+            
+            // Validate terms accepted
+            if (!termsAccepted) {
+                showNotification('Debes aceptar los términos y condiciones', 'error');
+                return;
+            }
+            
+            showNotification('Creando cuenta...', 'warning');
+            
+            // Create user with Firebase Auth
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    const user = userCredential.user;
+                    
+                    // Generate unique referral code
+                    const referralCode = generateReferralCode();
+                    
+                    // Create user data for Realtime Database
+                    const userData = {
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        country: country,
+                        referralCode: referralCode,
+                        kycStatus: 'pending',
+                        balance: 0,
+                        totalDeposits: 0,
+                        totalEarnings: 0,
+                        totalReferrals: 0,
+                        referralBonus: 0,
+                        createdAt: Date.now(),
+                        updatedAt: Date.now()
+                    };
+                    
+                    // Save user data to Realtime Database
+                    return db.ref('users/' + user.uid).set(userData);
+                })
+                .then(() => {
+                    showNotification('¡Cuenta creada exitosamente!', 'success');
+                    showLoginForm(e);
+                })
+                .catch(error => {
+                    console.error('Registration error:', error);
+                    showNotification('Error al crear la cuenta: ' + error.message, 'error');
+                });
         }
 
+        // Handle user logout
+        function handleLogout() {
+            auth.signOut()
+                .then(() => {
+                    showNotification('Sesión cerrada correctamente', 'success');
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    showNotification('Error al cerrar sesión', 'error');
+                });
+        }
+
+        // Toggle user menu
+        function toggleUserMenu() {
+            userMenu.classList.toggle('hidden');
+        }
+
+        // Load user data from Realtime Database
+		function loadUserData() {
+			if (!appState.currentUser) return;
+			
+			const userRef = db.ref('users/' + appState.currentUser.uid);
+			
+			userRef.on('value', (snapshot) => {
+				const data = snapshot.val();
+				if (data) {
+					appState.userData = data;
+					updateUIWithUserData();
+					updateDashboard();
+					
+					// Load user transactions
+					loadUserTransactions();
+					// Load user deposits
+					loadUserDeposits();
+					// Load user withdrawals
+					loadUserWithdrawals();
+					// Load user referrals
+					loadUserReferrals();
+
+					// ⭐⭐ CONECTAR PERFORMANCE ⭐⭐
+					// Solo se llama cuando ya tienes todos los datos listos
+					initPerformanceCharts(appState);
+
+				} else {
+					console.error('No user data found');
+				}
+			});
+		}
+
+
+        // Load user transactions
+        function loadUserTransactions() {
+            if (!appState.currentUser) return;
+            
+            const transactionsRef = db.ref('transactions/' + appState.currentUser.uid);
+            
+            transactionsRef.orderByChild('createdAt').limitToLast(10).on('value', (snapshot) => {
+                appState.transactions = [];
+                snapshot.forEach((childSnapshot) => {
+                    appState.transactions.push({ id: childSnapshot.key, ...childSnapshot.val() });
+                });
+                // Reverse to show newest first
+                appState.transactions.reverse();
+                updateTransactionsList();
+            });
+        }
+
+        // Load user deposits
+        function loadUserDeposits() {
+            if (!appState.currentUser) return;
+            
+            const depositsRef = db.ref('deposits/' + appState.currentUser.uid);
+            
+            depositsRef.orderByChild('createdAt').limitToLast(10).on('value', (snapshot) => {
+                appState.deposits = [];
+                snapshot.forEach((childSnapshot) => {
+                    appState.deposits.push({ id: childSnapshot.key, ...childSnapshot.val() });
+                });
+                // Reverse to show newest first
+                appState.deposits.reverse();
+                updateDepositsList();
+            });
+        }
+
+        // Load user withdrawals
+        function loadUserWithdrawals() {
+            if (!appState.currentUser) return;
+            
+            const withdrawalsRef = db.ref('withdrawals/' + appState.currentUser.uid);
+            
+            withdrawalsRef.orderByChild('createdAt').limitToLast(10).on('value', (snapshot) => {
+                appState.withdrawals = [];
+                snapshot.forEach((childSnapshot) => {
+                    appState.withdrawals.push({ id: childSnapshot.key, ...childSnapshot.val() });
+                });
+                // Reverse to show newest first
+                appState.withdrawals.reverse();
+                updateWithdrawalsList();
+            });
+        }
+
+        // Load user referrals
+        function loadUserReferrals() {
+            if (!appState.currentUser) return;
+            
+            const referralsRef = db.ref('referrals/' + appState.currentUser.uid);
+            
+            referralsRef.on('value', (snapshot) => {
+                appState.referrals = [];
+                snapshot.forEach((childSnapshot) => {
+                    appState.referrals.push({ id: childSnapshot.key, ...childSnapshot.val() });
+                });
+                updateReferralsList();
+            });
+        }
+
+        // Update UI with user data
+        function updateUIWithUserData() {
+            if (!appState.userData) return;
+            
+            userName.textContent = appState.userData.name;
+            dashboardUserName.textContent = appState.userData.name;
+            
+            // Update KYC status
+            kycStatus.textContent = `KYC ${appState.userData.kycStatus === 'verified' ? 'Verificado' : 'Pendiente'}`;
+            kycStatus.className = `kyc-status ${appState.userData.kycStatus === 'verified' ? 'kyc-verified' : 'kyc-pending'}`;
+            
+            // Update referral code
+            if (appState.userData.referralCode) {
+                referralCode.textContent = appState.userData.referralCode;
+                modalReferralCode.textContent = appState.userData.referralCode;
+                referralLink.value = `${window.location.origin}?ref=${appState.userData.referralCode}`;
+            }
+            
+            // Update profile form
+            document.getElementById('profile-name').value = appState.userData.name || '';
+            document.getElementById('profile-email').value = appState.userData.email || '';
+            document.getElementById('profile-phone').value = appState.userData.phone || '';
+            document.getElementById('profile-country').value = appState.userData.country || '';
+        }
+
+        // Update dashboard with financial data
         function updateDashboard() {
             if (!appState.userData) return;
             
-            const data = appState.userData;
+            totalBalance.textContent = `$${appState.userData.balance?.toFixed(2) || '0.00'}`;
+            totalDeposits.textContent = `$${appState.userData.totalDeposits?.toFixed(2) || '0.00'}`;
+            totalEarnings.textContent = `$${appState.userData.totalEarnings?.toFixed(2) || '0.00'}`;
+            totalReferrals.textContent = appState.userData.totalReferrals || '0';
             
-            document.getElementById('currentBalance').textContent = data.balance.toFixed(2);
-            document.getElementById('totalContributions').textContent = data.totalContributions.toFixed(2);
-            document.getElementById('numberOfContributions').textContent = data.contributions.length;
-            document.getElementById('performancePercentage').textContent = data.performancePercentage.toFixed(2);
-            document.getElementById('performanceSince').textContent = 'el inicio';
-            document.getElementById('referralCode').textContent = data.referralCode;
-            document.getElementById('referralLink').textContent = `${window.location.origin}?ref=${data.referralCode}`;
-            document.getElementById('availableBalance').textContent = data.balance.toFixed(2);
+            // Update available balance for withdrawals
+            availableBalance.textContent = `$${appState.userData.balance?.toFixed(2) || '0.00'}`;
             
-            // Update transactions list
-            updateTransactionsList();
+            // Update performance section
+            document.getElementById('performance-earnings').textContent = `$${appState.userData.totalEarnings?.toFixed(2) || '0.00'}`;
+            
+            // Update referrals count
+            referralsCount.textContent = appState.userData.totalReferrals || '0';
         }
 
-        function updateUserInfo() {
-            if (!appState.userData) return;
-            
-            const userName = appState.userData.name;
-            document.getElementById('userName').textContent = userName;
-            document.getElementById('userInitial').textContent = userName.charAt(0).toUpperCase();
-            
-            const mobileUserName = document.querySelector('#mobileUserInfo span');
-            if (mobileUserName) {
-                mobileUserName.textContent = userName;
-            }
-            
-            const mobileInitial = document.querySelector('#mobileUserInfo .rounded-full span');
-            if (mobileInitial) {
-                mobileInitial.textContent = userName.charAt(0).toUpperCase();
-            }
-        }
-
+        // Update transactions list
         function updateTransactionsList() {
-            if (!appState.userData) return;
+            const transactionsList = document.getElementById('transactions-list');
             
-            const transactionsList = document.getElementById('transactionsList');
-            const transactions = appState.userData.transactions;
-            
-            if (transactions.length === 0) {
-                transactionsList.innerHTML = '<div class="text-center py-4 text-gray-500">No hay transacciones recientes</div>';
+            if (appState.transactions.length === 0) {
+                transactionsList.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-exchange-alt text-3xl mb-2"></i>
+                        <p>No hay transacciones recientes</p>
+                    </div>
+                `;
                 return;
             }
             
-            // Take the last 4 transactions
-            const recentTransactions = transactions.slice(-4);
+            let transactionsHTML = '';
             
-            transactionsList.innerHTML = recentTransactions.map(transaction => `
-                <div class="transaction-item">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 ${transaction.amount > 0 ? 'bg-green-100' : 'bg-red-100'} rounded-full flex items-center justify-center mr-3">
-                            <i class="fas ${transaction.amount > 0 ? 'fa-arrow-down text-green-600' : 'fa-arrow-up text-red-600'}"></i>
+            appState.transactions.forEach(transaction => {
+                const isPositive = transaction.type === 'deposit' || transaction.type === 'earning' || transaction.type === 'referral';
+                const iconClass = transaction.type === 'deposit' ? 'fa-arrow-up text-blue-600' : 
+                                transaction.type === 'withdrawal' ? 'fa-arrow-down text-red-600' : 
+                                transaction.type === 'earning' ? 'fa-chart-line text-green-600' : 
+                                'fa-gift text-purple-600';
+                
+                const typeText = transaction.type === 'deposit' ? 'Depósito' : 
+                               transaction.type === 'withdrawal' ? 'Retiro' : 
+                               transaction.type === 'earning' ? 'Rendimiento' : 
+                               'Bono de Referido';
+                
+                const amountClass = isPositive ? 'positive' : 'negative';
+                const amountPrefix = isPositive ? '+' : '-';
+                
+                transactionsHTML += `
+                    <div class="transaction-item">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas ${iconClass}"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">${typeText}</p>
+                                <p class="text-sm text-gray-500">${formatDate(transaction.createdAt)}</p>
+                            </div>
                         </div>
-                        <div class="transaction-info">
-                            <div class="transaction-type font-medium">${transaction.type}</div>
-                            <div class="transaction-date text-sm text-gray-500">${transaction.date}</div>
-                        </div>
+                        <div class="transaction-amount ${amountClass}">${amountPrefix}$${Math.abs(transaction.amount).toFixed(2)}</div>
                     </div>
-                    <div class="transaction-amount ${transaction.amount > 0 ? 'positive' : 'negative'}">
-                        ${transaction.amount > 0 ? '+' : ''}$${transaction.amount.toFixed(2)}
-                    </div>
-                </div>
-            `).join('');
+                `;
+            });
+            
+            transactionsList.innerHTML = transactionsHTML;
         }
 
-        function updateContributionsList() {
-            if (!appState.userData) return;
+        // Update deposits list
+        function updateDepositsList() {
+            const depositsList = document.getElementById('deposits-list');
             
-            const contributionsList = document.getElementById('contributionsList');
-            const contributions = appState.userData.contributions;
-            
-            if (contributions.length === 0) {
-                contributionsList.innerHTML = '<div class="text-center py-4 text-gray-500">No has realizado aportes todavía</div>';
+            if (appState.deposits.length === 0) {
+                depositsList.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-wallet text-3xl mb-2"></i>
+                        <p>No hay depósitos registrados</p>
+                    </div>
+                `;
                 return;
             }
             
-            contributionsList.innerHTML = contributions.map(contribution => `
-                <div class="transaction-item">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                            <i class="fas fa-arrow-down text-green-600"></i>
+            let depositsHTML = '';
+            
+            appState.deposits.forEach(deposit => {
+                const statusClass = deposit.status === 'approved' ? 'kyc-verified' : 
+                                  deposit.status === 'rejected' ? 'kyc-rejected' : 'kyc-pending';
+                const statusText = deposit.status === 'approved' ? 'Aprobado' : 
+                                 deposit.status === 'rejected' ? 'Rechazado' : 'Pendiente';
+                
+                depositsHTML += `
+                    <div class="transaction-item">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-arrow-up text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Depósito #${deposit.id.substring(0, 8)}</p>
+                                <p class="text-sm text-gray-500">${formatDate(deposit.createdAt)} • ${deposit.method}</p>
+                            </div>
                         </div>
-                        <div class="transaction-info">
-                            <div class="transaction-type font-medium">Aporte</div>
-                            <div class="transaction-date text-sm text-gray-500">${contribution.date} - ${contribution.method}</div>
+                        <div class="flex items-center">
+                            <span class="transaction-amount positive mr-4">+$${deposit.amount.toFixed(2)}</span>
+                            <span class="${statusClass}">${statusText}</span>
                         </div>
                     </div>
-                    <div class="transaction-amount positive">
-                        +$${contribution.amount.toFixed(2)}
+                `;
+            });
+            
+            depositsList.innerHTML = depositsHTML;
+        }
+
+        // Update withdrawals list
+        function updateWithdrawalsList() {
+            const withdrawalsList = document.getElementById('withdrawals-list');
+            
+            if (appState.withdrawals.length === 0) {
+                withdrawalsList.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-money-bill-wave text-3xl mb-2"></i>
+                        <p>No hay retiros registrados</p>
                     </div>
-                </div>
-            `).join('');
+                `;
+                return;
+            }
+            
+            let withdrawalsHTML = '';
+            
+            appState.withdrawals.forEach(withdrawal => {
+                const statusClass = withdrawal.status === 'approved' ? 'kyc-verified' : 
+                                  withdrawal.status === 'rejected' ? 'kyc-rejected' : 'kyc-pending';
+                const statusText = withdrawal.status === 'approved' ? 'Aprobado' : 
+                                 withdrawal.status === 'rejected' ? 'Rechazado' : 'Pendiente';
+                
+                withdrawalsHTML += `
+                    <div class="transaction-item">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-arrow-down text-red-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Retiro #${withdrawal.id.substring(0, 8)}</p>
+                                <p class="text-sm text-gray-500">${formatDate(withdrawal.createdAt)} • ${withdrawal.method}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="transaction-amount negative mr-4">-$${withdrawal.amount.toFixed(2)}</span>
+                            <span class="${statusClass}">${statusText}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            withdrawalsList.innerHTML = withdrawalsHTML;
         }
 
-        function updatePerformanceData() {
-            if (!appState.userData) return;
+        // Update referrals list
+        function updateReferralsList() {
+            const referralsBonusList = document.getElementById('referrals-bonus-list');
             
-            const data = appState.userData;
+            if (appState.referrals.length === 0) {
+                referralsBonusList.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-users text-3xl mb-2"></i>
+                        <p>No has recibido bonos por referidos aún</p>
+                        <p class="text-sm mt-2">Comparte tu código para empezar a ganar</p>
+                    </div>
+                `;
+                return;
+            }
             
-            document.getElementById('totalEarnings').textContent = data.performancePercentage.toFixed(2);
-            document.getElementById('totalEarningsAmount').textContent = (data.balance - data.totalContributions).toFixed(2);
-            document.getElementById('investmentPeriod').textContent = '30 días';
+            let referralsHTML = '';
+            
+            appState.referrals.forEach(referral => {
+                referralsHTML += `
+                    <div class="transaction-item">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-user-plus text-purple-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">${referral.referredName || 'Usuario referido'}</p>
+                                <p class="text-sm text-gray-500">${formatDate(referral.createdAt)}</p>
+                            </div>
+                        </div>
+                        <div class="transaction-amount positive">+$${referral.bonus.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+            
+            referralsBonusList.innerHTML = referralsHTML;
         }
 
-        function updateReferralsData() {
-            if (!appState.userData) return;
+        // Switch between sections
+        function switchSection(sectionId) {
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
             
-            document.getElementById('directReferrals').textContent = '3';
-            document.getElementById('referralBonuses').textContent = '75.00';
+            const activeSection = document.getElementById(sectionId);
+            if (activeSection) {
+                activeSection.classList.add('active');
+            }
         }
 
-        function handleContribution(e) {
+        // Open deposit modal
+        function openDepositModal() {
+            depositModal.classList.add('active');
+            resetDepositForm();
+        }
+
+        // Close deposit modal
+        function closeDepositModal() {
+            depositModal.classList.remove('active');
+            resetDepositForm();
+        }
+
+        // Reset deposit form
+        function resetDepositForm() {
+            depositForm.reset();
+            removeSelectedFile();
+            updatePaymentDetails();
+        }
+
+        // Open withdrawal modal
+        function openWithdrawalModal() {
+            if (!appState.userData || appState.userData.balance <= 0) {
+                showNotification('No tienes saldo disponible para retirar', 'error');
+                return;
+            }
+            
+            withdrawalModal.classList.add('active');
+            availableBalance.textContent = `$${appState.userData.balance.toFixed(2)}`;
+        }
+
+        // Close withdrawal modal
+        function closeWithdrawalModal() {
+            withdrawalModal.classList.remove('active');
+            withdrawalForm.reset();
+        }
+
+        // Open referral modal
+        function openReferralModal() {
+            referralModal.classList.add('active');
+        }
+
+        // Close referral modal
+        function closeReferralModal() {
+            referralModal.classList.remove('active');
+        }
+
+        // Handle file selection
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            processSelectedFile(file);
+        }
+
+        // Handle drag over event
+        function handleDragOver(e) {
             e.preventDefault();
-            const amountInput = document.getElementById('contributionAmount');
-            const amount = parseFloat(amountInput.value);
-            const method = document.getElementById('contributionMethod').value;
-
-            if (!appState.currentUser) {
-                showNotification('Debes iniciar sesión para realizar un aporte', 'error');
-                return;
-            }
-
-            if (isNaN(amount) || amount < 10) {
-                showNotification('Por favor, ingresa un monto válido (mínimo $10)', 'error');
-                return;
-            }
-
-            if (!method) {
-                showNotification('Por favor, selecciona un método de pago', 'error');
-                return;
-            }
-
-            // Simulate contribution processing
-            const newTransaction = {
-                type: 'Aporte',
-                date: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-                amount: amount
-            };
-            
-            const newContribution = {
-                date: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-                amount: amount,
-                method: method
-            };
-            
-            // Update user data
-            appState.userData.balance += amount;
-            appState.userData.totalContributions += amount;
-            appState.userData.transactions.push(newTransaction);
-            appState.userData.contributions.push(newContribution);
-            
-            showNotification(`Aporte de $${amount.toFixed(2)} realizado exitosamente`, 'success');
-            closeModal(contributionModal);
-            contributionForm.reset();
-            
-            // Update dashboard
-            updateDashboard();
+            dropZone.classList.add('active');
         }
 
+        // Handle drag leave event
+        function handleDragLeave(e) {
+            e.preventDefault();
+            if (!dropZone.contains(e.relatedTarget)) {
+                dropZone.classList.remove('active');
+            }
+        }
+
+        // Handle drop event
+        function handleDrop(e) {
+            e.preventDefault();
+            dropZone.classList.remove('active');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processSelectedFile(files[0]);
+            }
+        }
+
+        // Process selected file
+        function processSelectedFile(file) {
+            if (!file) return;
+            
+            // Validate file type
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+            if (!allowedTypes.includes(file.type)) {
+                showNotification('Formato de archivo no permitido. Use PDF, JPG o PNG.', 'error');
+                return;
+            }
+            
+            // Validate file size (5 MB max)
+            const maxSize = 5 * 1024 * 1024; // 5 MB in bytes
+            if (file.size > maxSize) {
+                showNotification('El archivo es demasiado grande. El tamaño máximo es 5 MB.', 'error');
+                return;
+            }
+            
+            selectedFile = file;
+            
+            // Display file preview
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            filePreview.classList.remove('hidden');
+            
+            showNotification('Archivo seleccionado correctamente', 'success');
+        }
+
+        // Remove selected file
+        function removeSelectedFile() {
+            selectedFile = null;
+            fileInput.value = '';
+            filePreview.classList.add('hidden');
+        }
+
+        // Update payment details based on selected method
+        function updatePaymentDetails() {
+            const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            
+            let detailsHTML = '';
+            
+            switch (selectedMethod) {
+                case 'bank':
+                    detailsHTML = `
+                        <h3 class="font-bold mb-2">Instrucciones para Transferencia Bancaria</h3>
+                        <p class="text-gray-600 mb-2">Realiza una transferencia a la siguiente cuenta:</p>
+                        <div class="bg-white p-4 rounded border border-gray-200">
+                            <p><strong>Banco:</strong> Canada Coin Financial</p>
+                            <p><strong>Cuenta:</strong> 1234567890</p>
+                            <p><strong>SWIFT/BIC:</strong> CCFIUS33</p>
+                            <p><strong>Beneficiario:</strong> Canada Coin Investments LLC</p>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">Una vez realizada la transferencia, sube el comprobante a continuación.</p>
+                    `;
+                    break;
+                case 'paypal':
+                    detailsHTML = `
+                        <h3 class="font-bold mb-2">Instrucciones para PayPal</h3>
+                        <p class="text-gray-600 mb-2">Realiza el pago a la siguiente dirección de PayPal:</p>
+                        <div class="bg-white p-4 rounded border border-gray-200">
+                            <p><strong>Email de PayPal:</strong> payments@canadacoin.com</p>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">Una vez realizado el pago, sube el comprobante a continuación.</p>
+                    `;
+                    break;
+                case 'crypto':
+                    detailsHTML = `
+                        <h3 class="font-bold mb-2">Instrucciones para Criptomonedas</h3>
+                        <p class="text-gray-600 mb-2">Envía la criptomoneda a la siguiente dirección:</p>
+                        <div class="bg-white p-4 rounded border border-gray-200">
+                            <p><strong>Bitcoin (BTC):</strong> 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa</p>
+                            <p><strong>Ethereum (ETH):</strong> 0x742d35Cc6634C0532925a3b8D4C9db7c1b7c8e8e</p>
+                            <p><strong>USDT (ERC-20):</strong> 0x742d35Cc6634C0532925a3b8D4C9db7c1b7c8e8e</p>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">Una vez realizada la transacción, sube el comprobante a continuación.</p>
+                    `;
+                    break;
+            }
+            
+            paymentDetails.innerHTML = detailsHTML;
+        }
+
+        // Handle deposit submission
+        function handleDeposit(e) {
+            e.preventDefault();
+            
+            if (!appState.currentUser) {
+                showNotification('Debes iniciar sesión para realizar un depósito', 'error');
+                return;
+            }
+            
+            const amount = parseFloat(document.getElementById('deposit-amount').value);
+            const method = document.querySelector('input[name="payment-method"]:checked').value;
+            
+            // Validate amount
+            if (!amount || amount < 100) {
+                showNotification('El monto mínimo de depósito es $100', 'error');
+                return;
+            }
+            
+            // Validate file
+            if (!selectedFile) {
+                showNotification('Debes subir un comprobante de pago', 'error');
+                return;
+            }
+            
+            showNotification('Procesando depósito...', 'warning');
+            submitDepositButton.disabled = true;
+            
+            // Generate unique ID for deposit
+            const depositId = generateId();
+            
+            // Create deposit data for Realtime Database
+            const depositData = {
+                amount: amount,
+                method: method,
+                status: 'pending',
+                createdAt: Date.now()
+            };
+            
+            // Save deposit to Realtime Database
+            db.ref('deposits/' + appState.currentUser.uid + '/' + depositId).set(depositData)
+                .then(() => {
+                    // Create transaction record
+                    const transactionData = {
+                        type: 'deposit',
+                        amount: amount,
+                        description: `Depósito #${depositId.substring(0, 8)}`,
+                        createdAt: Date.now()
+                    };
+                    
+                    return db.ref('transactions/' + appState.currentUser.uid).push(transactionData);
+                })
+                .then(() => {
+                    // Upload file to Firebase Storage if needed
+                    if (selectedFile) {
+                        const fileRef = storage.ref().child(`deposits/${appState.currentUser.uid}/${depositId}_${selectedFile.name}`);
+                        return fileRef.put(selectedFile);
+                    }
+                })
+                .then(() => {
+                    showNotification('¡Depósito enviado correctamente! Será revisado por nuestro equipo.', 'success');
+                    closeDepositModal();
+                    submitDepositButton.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Error saving deposit:', error);
+                    showNotification('Error al guardar el depósito: ' + error.message, 'error');
+                    submitDepositButton.disabled = false;
+                });
+        }
+
+        // Handle withdrawal submission
         function handleWithdrawal(e) {
             e.preventDefault();
-            const amountInput = document.getElementById('withdrawalAmount');
-            const amount = parseFloat(amountInput.value);
-            const method = document.getElementById('withdrawalMethod').value;
-
+            
             if (!appState.currentUser) {
-                showNotification('Debes iniciar sesión para realizar un retiro', 'error');
+                showNotification('Debes iniciar sesión para solicitar un retiro', 'error');
                 return;
             }
-
-            if (isNaN(amount) || amount < 10) {
-                showNotification('Por favor, ingresa un monto válido (mínimo $10)', 'error');
+            
+            const amount = parseFloat(document.getElementById('withdrawal-amount').value);
+            const method = document.querySelector('input[name="withdrawal-method"]:checked').value;
+            
+            // Validate amount
+            if (!amount || amount < 10) {
+                showNotification('El monto mínimo de retiro es $10', 'error');
                 return;
             }
-
+            
+            // Validate available balance
             if (amount > appState.userData.balance) {
-                showNotification('No tienes suficiente saldo para realizar este retiro', 'error');
+                showNotification('No tienes suficiente saldo disponible', 'error');
                 return;
             }
-
-            if (!method) {
-                showNotification('Por favor, selecciona un método de retiro', 'error');
-                return;
-            }
-
-            // Simulate withdrawal processing
-            const newTransaction = {
-                type: 'Retiro',
-                date: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-                amount: -amount
+            
+            showNotification('Procesando solicitud de retiro...', 'warning');
+            
+            // Generate unique ID for withdrawal
+            const withdrawalId = generateId();
+            
+            // Create withdrawal data for Realtime Database
+            const withdrawalData = {
+                amount: amount,
+                method: method,
+                status: 'pending',
+                createdAt: Date.now()
             };
             
-            // Update user data
-            appState.userData.balance -= amount;
-            appState.userData.transactions.push(newTransaction);
-            
-            showNotification(`Retiro de $${amount.toFixed(2)} solicitado exitosamente`, 'success');
-            closeModal(withdrawalModal);
-            withdrawalForm.reset();
-            
-            // Update dashboard
-            updateDashboard();
-        }
-
-        function handleLogout() {
-            appState.currentUser = null;
-            appState.userData = null;
-            showNotification('Sesión cerrada exitosamente', 'success');
-            showPublicContent();
-        }
-
-        function loadProfileData() {
-            if (!appState.userData) return;
-            
-            document.getElementById('profileName').value = appState.userData.name || '';
-            document.getElementById('profileEmail').value = appState.userData.email || '';
-            document.getElementById('profilePhone').value = appState.userData.phone || '';
-            document.getElementById('profileCountry').value = appState.userData.country || '';
-        }
-
-        function saveProfile() {
-            if (!appState.currentUser) return;
-
-            const name = document.getElementById('profileName').value;
-            const phone = document.getElementById('profilePhone').value;
-            const country = document.getElementById('profileCountry').value;
-
-            // Update user data
-            appState.userData.name = name;
-            appState.userData.phone = phone;
-            appState.userData.country = country;
-            
-            showNotification('Perfil actualizado exitosamente', 'success');
-            updateUserInfo();
-        }
-
-        function copyReferralCode() {
-            const referralCode = document.getElementById('referralCode').textContent;
-            const referralLink = `${window.location.origin}?ref=${referralCode}`;
-            
-            navigator.clipboard.writeText(referralLink).then(() => {
-                showNotification('Enlace de referido copiado al portapapeles', 'success');
-            }).catch(err => {
-                console.error('Error al copiar enlace: ', err);
-                showNotification('Error al copiar enlace', 'error');
-            });
-        }
-
-        function shareReferralLink() {
-            const referralLink = document.getElementById('referralLink').textContent;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Únete a Canada Coin',
-                    text: 'Regístrate en Canada Coin usando mi enlace de referido y obtén beneficios exclusivos',
-                    url: referralLink,
+            // Save withdrawal to Realtime Database
+            db.ref('withdrawals/' + appState.currentUser.uid + '/' + withdrawalId).set(withdrawalData)
+                .then(() => {
+                    // Create transaction record
+                    const transactionData = {
+                        type: 'withdrawal',
+                        amount: amount,
+                        description: `Retiro #${withdrawalId.substring(0, 8)}`,
+                        createdAt: Date.now()
+                    };
+                    
+                    return db.ref('transactions/' + appState.currentUser.uid).push(transactionData);
                 })
-                .then(() => showNotification('Enlace compartido exitosamente', 'success'))
-                .catch((error) => {
-                    console.error('Error al compartir:', error);
-                    copyReferralCode();
+                .then(() => {
+                    showNotification('¡Solicitud de retiro enviada correctamente! Será procesada en 3-5 días hábiles.', 'success');
+                    closeWithdrawalModal();
+                })
+                .catch(error => {
+                    console.error('Error saving withdrawal:', error);
+                    showNotification('Error al guardar la solicitud de retiro: ' + error.message, 'error');
                 });
-            } else {
-                copyReferralCode();
-            }
         }
 
-        function showNotification(message, type = 'success') {
-            notificationText.textContent = message;
+        // Handle profile update
+        function handleProfileUpdate(e) {
+            e.preventDefault();
             
-            if (type === 'success') {
-                notification.className = 'fixed bottom-4 right-4 p-4 rounded-lg shadow-lg z-50 bg-green-100 text-green-800 border border-green-200';
-                notification.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-check-circle mr-2 text-green-500"></i>
-                        <span>${message}</span>
-                    </div>
-                `;
-            } else if (type === 'error') {
-                notification.className = 'fixed bottom-4 right-4 p-4 rounded-lg shadow-lg z-50 bg-red-100 text-red-800 border border-red-200';
-                notification.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas fa-exclamation-circle mr-2 text-red-500"></i>
-                        <span>${message}</span>
-                    </div>
-                `;
+            if (!appState.currentUser) return;
+            
+            const name = document.getElementById('profile-name').value;
+            const email = document.getElementById('profile-email').value;
+            const phone = document.getElementById('profile-phone').value;
+            const country = document.getElementById('profile-country').value;
+            
+            // Update user data in Realtime Database
+            const updates = {
+                name: name,
+                email: email,
+                phone: phone,
+                country: country,
+                updatedAt: Date.now()
+            };
+            
+            db.ref('users/' + appState.currentUser.uid).update(updates)
+                .then(() => {
+                    showNotification('Perfil actualizado correctamente', 'success');
+                })
+                .catch(error => {
+                    console.error('Error updating profile:', error);
+                    showNotification('Error al actualizar el perfil', 'error');
+                });
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(e) {
+            let textToCopy = '';
+            
+            if (e.target.id === 'copy-referral-link' || e.target.parentElement.id === 'copy-referral-link') {
+                textToCopy = referralLink.value;
+            } else {
+                textToCopy = appState.userData.referralCode;
             }
             
-            notification.classList.remove('hidden');
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    showNotification('Copiado al portapapeles', 'success');
+                })
+                .catch(err => {
+                    console.error('Error copying text: ', err);
+                    showNotification('Error al copiar al portapapeles', 'error');
+                });
+        }
+
+        // Generate a unique ID
+        function generateId() {
+            return 'id_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
+        }
+
+        // Generate a unique referral code
+        function generateReferralCode() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Format date
+        function formatDate(timestamp) {
+            if (!timestamp) return '';
+            const date = new Date(timestamp);
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('es-ES', options);
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notificationsContainer = document.getElementById('notifications-container');
+            const notificationId = 'notification-' + Date.now();
             
+            const notification = document.createElement('div');
+            notification.id = notificationId;
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            notificationsContainer.appendChild(notification);
+            
+            // Show notification
             setTimeout(() => {
-                notification.classList.add('hidden');
+                notification.classList.add('show');
+            }, 10);
+            
+            // Hide and remove notification after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
             }, 5000);
         }
 
-        // Check for referral code in URL parameters
-        function checkReferralCode() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const refCode = urlParams.get('ref');
-            
-            if (refCode) {
-                document.getElementById('registerReferral').value = refCode;
+        // Close notification when clicking on it
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.notification')) {
+                const notification = e.target.closest('.notification');
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
             }
-        }
-
-        // Initialize
-        checkReferralCode();
-        showPublicContent();
+        });
     </script>
+	
+	<!-- Librerías externas -->
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+	<!-- Firebase -->
+	<script src="/firebase-config.js" type="module"></script>
+
+	<!-- Archivos principales -->
+	<script src="/js/app.js" type="module"></script>
+	<script src="/js/auth.js" type="module"></script>
+	<script src="/js/ui.js" type="module"></script>
+	<script src="/js/data.js" type="module"></script>
+	<script src="/js/formatters.js" type="module"></script>
+
+	<!-- Módulos funcionales -->
+	<script src="/js/deposits.js" type="module"></script>
+	<script src="/js/withdrawals.js" type="module"></script>
+	<script src="/js/profile.js" type="module"></script>
+	<script src="/js/referrals.js" type="module"></script>
+	<script src="/js/help.js" type="module"></script>
+	<script src="/js/validators.js" type="module"></script>
+	<script src="/js/storage.js" type="module"></script>
+
+	<!-- Charts propios -->
+	<script src="/js/charts.js" type="module"></script>
+
+	<!-- ⚡ PERFOMANCE: ESTE ES EL IMPORTANTE -->
+	<script src="/js/performance.js" type="module"></script>
+	
 </body>
 </html>

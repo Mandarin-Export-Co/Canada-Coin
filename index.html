@@ -1439,15 +1439,36 @@
         }
 
         // Update UI with user data
-        function updateUIWithUserData() {
-            if (!appState.userData) return;
-            
-            userName.textContent = appState.userData.name;
-            dashboardUserName.textContent = appState.userData.name;
-            
-            // Update KYC status
-            kycStatus.textContent = `KYC ${appState.userData.kycStatus === 'verified' ? 'Verificado' : 'Activado'}`;
-            kycStatus.className = `kyc-status ${appState.userData.kycStatus === 'verified' ? 'kyc-verified' : 'kyc-pending'}`;
+		// Update UI with user data
+		function updateUIWithUserData() {
+		    if (!appState.userData) return;
+		
+		    userName.textContent = appState.userData.name;
+		    dashboardUserName.textContent = appState.userData.name;
+		
+		    // Update KYC status
+		    const status = appState.userData.kycStatus;
+		
+		    let text = '';
+		    let cssClass = '';
+		
+		    if (status === 'verified') {
+		        text = 'KYC Verificado';
+		        cssClass = 'kyc-status kyc-verified';
+		
+		    } else if (status === 'activated') {
+		        text = 'KYC Activado';
+		        cssClass = 'kyc-status kyc-activated';
+		
+		    } else {
+		        text = 'KYC Pendiente';
+		        cssClass = 'kyc-status kyc-pending';
+		    }
+		
+		    kycStatus.textContent = text;
+		    kycStatus.className = cssClass;
+		}
+
             
             // Update referral code
             if (appState.userData.referralCode) {

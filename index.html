@@ -1446,7 +1446,7 @@
             dashboardUserName.textContent = appState.userData.name;
             
             // Update KYC status
-            kycStatus.textContent = `KYC ${appState.userData.kycStatus === 'verified' ? 'Verificado' : 'Pendiente'}`;
+            kycStatus.textContent = `KYC ${appState.userData.kycStatus === 'verified' ? 'Verificado' : 'Activado'}`;
             kycStatus.className = `kyc-status ${appState.userData.kycStatus === 'verified' ? 'kyc-verified' : 'kyc-pending'}`;
             
             // Update referral code

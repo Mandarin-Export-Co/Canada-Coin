@@ -1299,7 +1299,7 @@
                         phone: phone,
                         country: country,
                         referralCode: referralCode,
-                        kycStatus: 'Activado,
+                        kycStatus: 'pending',
                         balance: 0,
                         totalDeposits: 0,
                         totalEarnings: 0,
@@ -1437,7 +1437,7 @@
                 updateReferralsList();
             });
         }
-		
+
         // Update UI with user data
         function updateUIWithUserData() {
             if (!appState.userData) return;
@@ -1448,7 +1448,6 @@
             // Update KYC status
             kycStatus.textContent = `KYC ${appState.userData.kycStatus === 'verified' ? 'Verificado' : 'Pendiente'}`;
             kycStatus.className = `kyc-status ${appState.userData.kycStatus === 'verified' ? 'kyc-verified' : 'kyc-pending'}`;
-
             
             // Update referral code
             if (appState.userData.referralCode) {

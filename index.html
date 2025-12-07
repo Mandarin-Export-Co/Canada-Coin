@@ -192,18 +192,21 @@
         }
         
         .kyc-pending {
-            background-color: #4ADE80;
+            background-color: #fef3c7; /* Cambiado de verde a amarillo */
             color: #92400e;
+            border: 1px solid #f59e0b;
         }
         
         .kyc-verified {
             background-color: #d1fae5;
             color: #065f46;
+            border: 1px solid #10b981;
         }
         
         .kyc-rejected {
             background-color: #fee2e2;
             color: #991b1b;
+            border: 1px solid #ef4444;
         }
         
         .transaction-item {
@@ -289,32 +292,70 @@
         .section.active {
             display: block;
         }
-		/* Estilo para la sección de autenticación con imagen de fondo */
-		#auth-section {
-		    background-image: url('assets/logo.png');
-		    background-size: cover;
-		    background-position: center;
-		    background-repeat: no-repeat;
-		    position: relative;
-		}
-		
-		/* Capa oscura semi-transparente para mejorar legibilidad */
-		#auth-section::before {
-		    content: '';
-		    position: absolute;
-		    top: 0;
-		    left: 0;
-		    right: 0;
-		    bottom: 0;
-		    background-color: rgba(0, 0, 0, 0.5); /* Ajusta la opacidad según necesites */
-		    z-index: 1;
-		}
-		
-		/* Asegurar que el contenido esté por encima de la capa oscura */
-		#auth-section > div {
-		    position: relative;
-		    z-index: 2;
-		}		
+        
+        /* Estilo para la sección de autenticación con imagen de fondo CORREGIDO */
+        #auth-section {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); /* Cambiado de imagen a gradiente */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+        
+        /* Capa oscura semi-transparente para mejorar legibilidad */
+        #auth-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+        
+        /* Asegurar que el contenido esté por encima de la capa oscura */
+        #auth-section > div {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Estilos para los detalles de métodos de retiro */
+        .method-details {
+            transition: all 0.3s ease;
+            max-height: 1000px;
+            overflow: hidden;
+        }
+
+        .method-details.hidden {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* Estilos para los radio buttons seleccionados */
+        .payment-method {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method:hover {
+            border-color: var(--primary-color);
+            background-color: #f0f7ff;
+        }
+
+        .payment-method.selected {
+            border-color: var(--primary-color);
+            background-color: #e6f0ff;
+            box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2);
+        }
+
+        .payment-method input[type="radio"]:checked + label {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -363,55 +404,107 @@
                         <label for="register-phone" class="block text-gray-700 mb-2">Teléfono</label>
                         <input type="tel" id="register-phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     </div>
-					<div class="mb-4">
-					    <label for="register-country" class="block text-gray-700 mb-2">País</label>
-					    <select id="register-country" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-					        <option value="">Selecciona un país</option>
-					
-					        <!-- América del Norte -->
-					        <option value="CA">Canadá</option>
-					        <option value="US">Estados Unidos</option>
-					        <option value="MX">México</option>
-					
-					        <!-- América Central -->
-					        <option value="BZ">Belice</option>
-					        <option value="CR">Costa Rica</option>
-					        <option value="SV">El Salvador</option>
-					        <option value="GT">Guatemala</option>
-					        <option value="HN">Honduras</option>
-					        <option value="NI">Nicaragua</option>
-					        <option value="PA">Panamá</option>
-					
-					        <!-- Caribe -->
-					        <option value="AG">Antigua y Barbuda</option>
-					        <option value="BS">Bahamas</option>
-					        <option value="BB">Barbados</option>
-					        <option value="CU">Cuba</option>
-					        <option value="DM">Dominica</option>
-					        <option value="DO">República Dominicana</option>
-					        <option value="GD">Granada</option>
-					        <option value="HT">Haití</option>
-					        <option value="JM">Jamaica</option>
-					        <option value="KN">San Cristóbal y Nieves</option>
-					        <option value="LC">Santa Lucía</option>
-					        <option value="VC">San Vicente y las Granadinas</option>
-					        <option value="TT">Trinidad y Tobago</option>
-					
-					        <!-- América del Sur -->
-					        <option value="AR">Argentina</option>
-					        <option value="BO">Bolivia</option>
-					        <option value="BR">Brasil</option>
-					        <option value="CL">Chile</option>
-					        <option value="CO">Colombia</option>
-					        <option value="EC">Ecuador</option>
-					        <option value="GY">Guyana</option>
-					        <option value="PY">Paraguay</option>
-					        <option value="PE">Perú</option>
-					        <option value="SR">Surinam</option>
-					        <option value="UY">Uruguay</option>
-					        <option value="VE">Venezuela</option>
-					    </select>
-					</div>
+                    <div class="mb-4">
+                        <label for="register-country" class="block text-gray-700 mb-2">País</label>
+                        <select id="register-country" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="">Selecciona un país</option>
+                            
+                            <!-- América del Norte -->
+                            <option value="CA">Canadá</option>
+                            <option value="US">Estados Unidos</option>
+                            <option value="MX">México</option>
+                            
+                            <!-- América Central -->
+                            <option value="BZ">Belice</option>
+                            <option value="CR">Costa Rica</option>
+                            <option value="SV">El Salvador</option>
+                            <option value="GT">Guatemala</option>
+                            <option value="HN">Honduras</option>
+                            <option value="NI">Nicaragua</option>
+                            <option value="PA">Panamá</option>
+                            
+                            <!-- Caribe -->
+                            <option value="AG">Antigua y Barbuda</option>
+                            <option value="BS">Bahamas</option>
+                            <option value="BB">Barbados</option>
+                            <option value="CU">Cuba</option>
+                            <option value="DM">Dominica</option>
+                            <option value="DO">República Dominicana</option>
+                            <option value="GD">Granada</option>
+                            <option value="HT">Haití</option>
+                            <option value="JM">Jamaica</option>
+                            <option value="KN">San Cristóbal y Nieves</option>
+                            <option value="LC">Santa Lucía</option>
+                            <option value="VC">San Vicente y las Granadinas</option>
+                            <option value="TT">Trinidad y Tobago</option>
+                            
+                            <!-- América del Sur -->
+                            <option value="AR">Argentina</option>
+                            <option value="BO">Bolivia</option>
+                            <option value="BR">Brasil</option>
+                            <option value="CL">Chile</option>
+                            <option value="CO">Colombia</option>
+                            <option value="EC">Ecuador</option>
+                            <option value="GY">Guyana</option>
+                            <option value="PY">Paraguay</option>
+                            <option value="PE">Perú</option>
+                            <option value="SR">Surinam</option>
+                            <option value="UY">Uruguay</option>
+                            <option value="VE">Venezuela</option>
+
+							<!-- Europa -->
+							<option value="AL">Albania</option>
+							<option value="AD">Andorra</option>
+							<option value="AM">Armenia</option>
+							<option value="AT">Austria</option>
+							<option value="AZ">Azerbaiyán</option>
+							<option value="BY">Bielorrusia</option>
+							<option value="BE">Bélgica</option>
+							<option value="BA">Bosnia y Herzegovina</option>
+							<option value="BG">Bulgaria</option>
+							<option value="HR">Croacia</option>
+							<option value="CY">Chipre</option>
+							<option value="CZ">Chequia</option>
+							<option value="DK">Dinamarca</option>
+							<option value="EE">Estonia</option>
+							<option value="FI">Finlandia</option>
+							<option value="FR">Francia</option>
+							<option value="GE">Georgia</option>
+							<option value="DE">Alemania</option>
+							<option value="GR">Grecia</option>
+							<option value="HU">Hungría</option>
+							<option value="IS">Islandia</option>
+							<option value="IE">Irlanda</option>
+							<option value="IT">Italia</option>
+							<option value="KZ">Kazajistán (parte en Europa)</option>
+							<option value="LV">Letonia</option>
+							<option value="LI">Liechtenstein</option>
+							<option value="LT">Lituania</option>
+							<option value="LU">Luxemburgo</option>
+							<option value="MT">Malta</option>
+							<option value="MD">Moldavia</option>
+							<option value="MC">Mónaco</option>
+							<option value="ME">Montenegro</option>
+							<option value="NL">Países Bajos</option>
+							<option value="MK">Macedonia del Norte</option>
+							<option value="NO">Noruega</option>
+							<option value="PL">Polonia</option>
+							<option value="PT">Portugal</option>
+							<option value="RO">Rumanía</option>
+							<option value="RU">Rusia (parte en Europa)</option>
+							<option value="SM">San Marino</option>
+							<option value="RS">Serbia</option>
+							<option value="SK">Eslovaquia</option>
+							<option value="SI">Eslovenia</option>
+							<option value="ES">España</option>
+							<option value="SE">Suecia</option>
+							<option value="CH">Suiza</option>
+							<option value="TR">Turquía (parte en Europa)</option>
+							<option value="UA">Ucrania</option>
+							<option value="UK">Reino Unido</option>
+							<option value="VA">Ciudad del Vaticano</option>
+                        </select>
+                    </div>
 
                     <div class="mb-4">
                         <label for="register-password" class="block text-gray-700 mb-2">Contraseña</label>
@@ -476,7 +569,7 @@
                             <div>
                                 <h2 id="dashboard-user-name" class="font-bold text-lg">Usuario</h2>
                                 <div class="flex items-center mt-1">
-                                    <span id="kyc-status" class="kyc-status kyc-pending">KYC Activado</span>
+                                    <span id="kyc-status" class="kyc-status kyc-pending">KYC Pendiente</span>
                                 </div>
                             </div>
                         </div>
@@ -800,7 +893,7 @@
             </div>
         </div>
     </section>
-    
+
     <!-- Deposit Modal -->
     <div id="deposit-modal" class="modal">
         <div class="modal-content">
@@ -818,6 +911,7 @@
                     <div class="mb-6">
                         <label for="deposit-amount" class="block text-gray-700 mb-2">Monto a Depositar (USD)</label>
                         <input type="number" id="deposit-amount" min="100" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" required>
+                        <p class="text-xs text-gray-500 mt-1">Monto mínimo: $100 USD</p>
                     </div>
                     
                     <div class="mb-6">
@@ -861,6 +955,7 @@
                             <p><strong>Cuenta:</strong> 1234567890</p>
                             <p><strong>SWIFT/BIC:</strong> CCFIUS33</p>
                             <p><strong>Beneficiario:</strong> Canada Coin Investments LLC</p>
+                            <p><strong>Referencia:</strong> Tu correo electrónico o ID de usuario</p>
                         </div>
                         <p class="text-sm text-gray-500 mt-2">Una vez realizada la transferencia, sube el comprobante a continuación.</p>
                     </div>
@@ -889,6 +984,16 @@
                         </div>
                     </div>
                     
+                    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div class="flex items-start">
+                            <i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+                            <div>
+                                <p class="font-medium text-blue-800">Tiempo de Procesamiento</p>
+                                <p class="text-blue-700 text-sm mt-1">Los depósitos son verificados manualmente por nuestro equipo y generalmente se procesan en 24-48 horas hábiles. Recibirás una notificación por correo electrónico una vez aprobado.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="flex justify-end space-x-4">
                         <button type="button" id="cancel-deposit" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
                         <button type="submit" id="submit-deposit" class="btn-primary flex items-center">
@@ -901,71 +1006,282 @@
         </div>
     </div>
 
-    <!-- Withdrawal Modal -->
-    <div id="withdrawal-modal" class="modal">
-        <div class="modal-content">
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold">Solicitar Retiro</h2>
-                    <button id="close-withdrawal-modal" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="p-6">
-                <form id="withdrawal-form">
-                    <div class="mb-6">
-                        <label for="withdrawal-amount" class="block text-gray-700 mb-2">Monto a Retirar (USD)</label>
-                        <input type="number" id="withdrawal-amount" min="10" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" required>
-                        <p class="text-sm text-gray-500 mt-1">Saldo disponible: <span id="available-balance">$0.00</span></p>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label class="block text-gray-700 mb-2">Método de Retiro</label>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="payment-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
-                                <input type="radio" id="withdrawal-bank" name="withdrawal-method" value="bank" class="hidden" checked>
-                                <label for="withdrawal-bank" class="cursor-pointer">
-                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                                        <i class="fas fa-university text-blue-600 text-xl"></i>
-                                    </div>
-                                    <p class="font-medium">Transferencia Bancaria</p>
-                                </label>
-                            </div>
-                            <div class="payment-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
-                                <input type="radio" id="withdrawal-paypal" name="withdrawal-method" value="paypal" class="hidden">
-                                <label for="withdrawal-paypal" class="cursor-pointer">
-                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                                        <i class="fab fa-paypal text-blue-600 text-xl"></i>
-                                    </div>
-                                    <p class="font-medium">PayPal</p>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <div class="flex items-start">
-                            <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
-                            <div>
-                                <p class="font-medium text-yellow-800">Tiempo de Procesamiento</p>
-                                <p class="text-yellow-700 text-sm mt-1">Los retiros generalmente se procesan en 3-5 días hábiles. Te notificaremos por correo electrónico cuando tu solicitud sea aprobada.</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-4">
-                        <button type="button" id="cancel-withdrawal" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
-                        <button type="submit" id="submit-withdrawal" class="btn-primary flex items-center">
-                            <span>Solicitar Retiro</span>
-                            <i class="fas fa-arrow-right ml-2"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+	<!-- Withdrawal Modal -->
+	<div id="withdrawal-modal" class="modal">
+		<div class="modal-content">
+			<div class="p-6 border-b border-gray-200">
+				<div class="flex justify-between items-center">
+					<h2 class="text-xl font-bold">Solicitar Retiro</h2>
+					<button id="close-withdrawal-modal" class="text-gray-400 hover:text-gray-600">
+						<i class="fas fa-times text-xl"></i>
+					</button>
+				</div>
+			</div>
+			
+			<div class="p-6">
+				<form id="withdrawal-form">
+					<div class="mb-6">
+						<label for="withdrawal-amount" class="block text-gray-700 mb-2">Monto a Retirar (USD)</label>
+						<input type="number" id="withdrawal-amount" min="10" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" required>
+						<p class="text-sm text-gray-500 mt-1">Saldo disponible: <span id="available-balance">$0.00</span></p>
+					</div>
+					
+					<div class="mb-6">
+						<label class="block text-gray-700 mb-2">Método de Retiro</label>
+						<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+							<!-- Transferencia Bancaria -->
+							<div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+								<input type="radio" id="withdrawal-bank" name="withdrawal-method" value="bank" class="hidden" checked>
+								<label for="withdrawal-bank" class="cursor-pointer">
+									<div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+										<i class="fas fa-university text-blue-600 text-xl"></i>
+									</div>
+									<p class="font-medium">Transferencia Bancaria</p>
+								</label>
+							</div>
+							
+							<!-- PayPal -->
+							<div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+								<input type="radio" id="withdrawal-paypal" name="withdrawal-method" value="paypal" class="hidden">
+								<label for="withdrawal-paypal" class="cursor-pointer">
+									<div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+										<i class="fab fa-paypal text-blue-600 text-xl"></i>
+									</div>
+									<p class="font-medium">PayPal</p>
+								</label>
+							</div>
+							
+							<!-- Criptomonedas -->
+							<div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+								<input type="radio" id="withdrawal-crypto" name="withdrawal-method" value="crypto" class="hidden">
+								<label for="withdrawal-crypto" class="cursor-pointer">
+									<div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+										<i class="fas fa-coins text-blue-600 text-xl"></i>
+									</div>
+									<p class="font-medium">Criptomonedas</p>
+								</label>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Sección de Detalles según Método -->
+					<div id="withdrawal-details" class="mb-6">
+						<!-- Transferencia Bancaria (Visible por defecto) -->
+						<div id="bank-details" class="method-details">
+							<h3 class="font-bold mb-4 text-gray-800">Información Bancaria</h3>
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+								<div>
+									<label for="bank-country" class="block text-gray-700 mb-2">País del Banco *</label>
+									<select id="bank-country" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+										<option value="">Selecciona un país</option>
+										<option value="CA">Canadá</option>
+										<option value="US">Estados Unidos</option>
+										<option value="MX">México</option>
+										<option value="AR">Argentina</option>
+										<option value="BR">Brasil</option>
+										<option value="CL">Chile</option>
+										<option value="CO">Colombia</option>
+										<option value="ES">España</option>
+									</select>
+								</div>
+								<div>
+									<label for="bank-name" class="block text-gray-700 mb-2">Nombre del Banco *</label>
+									<input type="text" id="bank-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: Banco Nacional" required>
+								</div>
+							</div>
+							
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+								<div>
+									<label for="account-type" class="block text-gray-700 mb-2">Tipo de Cuenta *</label>
+									<select id="account-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+										<option value="savings">Cuenta de Ahorros</option>
+										<option value="checking">Cuenta Corriente</option>
+										<option value="business">Cuenta Empresarial</option>
+									</select>
+								</div>
+								<div>
+									<label for="currency" class="block text-gray-700 mb-2">Moneda de la Cuenta *</label>
+									<select id="currency" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+										<option value="USD">Dólar Americano (USD)</option>
+										<option value="CAD">Dólar Canadiense (CAD)</option>
+										<option value="EUR">Euro (EUR)</option>
+										<option value="GBP">Libra Esterlina (GBP)</option>
+										<option value="MXN">Peso Mexicano (MXN)</option>
+										<option value="ARS">Peso Argentino (ARS)</option>
+										<option value="BRL">Real Brasileño (BRL)</option>
+										<option value="CLP">Peso Chileno (CLP)</option>
+										<option value="COP">Peso Colombiano (COP)</option>
+									</select>
+								</div>
+							</div>
+							
+							<div class="mb-4">
+								<label for="account-number" class="block text-gray-700 mb-2">Número de Cuenta *</label>
+								<input type="text" id="account-number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 1234567890" required>
+								<p class="text-xs text-gray-500 mt-1">Ingresa solo números, sin guiones ni espacios</p>
+							</div>
+							
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+								<div>
+									<label for="routing-number" class="block text-gray-700 mb-2">Número de Ruta/ABA *</label>
+									<input type="text" id="routing-number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 021000021" required>
+								</div>
+								<div>
+									<label for="swift-code" class="block text-gray-700 mb-2">Código SWIFT/BIC</label>
+									<input type="text" id="swift-code" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: BOFAUS3N">
+									<p class="text-xs text-gray-500 mt-1">Requerido para transferencias internacionales</p>
+								</div>
+							</div>
+							
+							<div class="mb-4">
+								<label for="account-holder" class="block text-gray-700 mb-2">Nombre del Titular *</label>
+								<input type="text" id="account-holder" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nombre completo como aparece en el banco" required>
+							</div>
+							
+							<div class="mb-4">
+								<label for="bank-address" class="block text-gray-700 mb-2">Dirección del Banco</label>
+								<textarea id="bank-address" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" rows="2" placeholder="Dirección completa del banco (opcional)"></textarea>
+							</div>
+						</div>
+						
+						<!-- PayPal (Oculto por defecto) -->
+						<div id="paypal-details" class="method-details hidden">
+							<h3 class="font-bold mb-4 text-gray-800">Información de PayPal</h3>
+							<div class="mb-4">
+								<label for="paypal-email" class="block text-gray-700 mb-2">Correo Electrónico de PayPal *</label>
+								<input type="email" id="paypal-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="tucorreo@paypal.com" required>
+								<p class="text-xs text-gray-500 mt-1">Debe coincidir con la cuenta de PayPal registrada</p>
+							</div>
+							
+							<div class="mb-4">
+								<label for="paypal-country" class="block text-gray-700 mb-2">País de la Cuenta PayPal *</label>
+								<select id="paypal-country" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+									<option value="">Selecciona un país</option>
+									<option value="US">Estados Unidos</option>
+									<option value="CA">Canadá</option>
+									<option value="UK">Reino Unido</option>
+									<option value="AU">Australia</option>
+									<option value="DE">Alemania</option>
+									<option value="FR">Francia</option>
+									<option value="ES">España</option>
+									<option value="MX">México</option>
+									<option value="BR">Brasil</option>
+								</select>
+							</div>
+							
+							<div class="mb-4 p-4 bg-blue-50 rounded-lg">
+								<div class="flex items-start">
+									<i class="fas fa-info-circle text-blue-500 mt-1 mr-3"></i>
+									<div>
+										<p class="font-medium text-blue-800">Verificación de PayPal</p>
+										<p class="text-blue-700 text-sm mt-1">Tu cuenta de PayPal debe estar verificada y tener confirmado el correo electrónico para recibir retiros.</p>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<!-- Criptomonedas (Oculto por defecto) -->
+						<div id="crypto-details" class="method-details hidden">
+							<h3 class="font-bold mb-4 text-gray-800">Información de Criptomonedas</h3>
+							
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+								<div>
+									<label for="crypto-currency" class="block text-gray-700 mb-2">Selecciona Criptomoneda *</label>
+									<select id="crypto-currency" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+										<option value="">Selecciona una criptomoneda</option>
+										<optgroup label="Principales">
+											<option value="BTC">Bitcoin (BTC)</option>
+											<option value="ETH">Ethereum (ETH)</option>
+											<option value="USDT">Tether (USDT)</option>
+											<option value="BNB">Binance Coin (BNB)</option>
+										</optgroup>
+										<optgroup label="Estables">
+											<option value="USDC">USD Coin (USDC)</option>
+											<option value="DAI">DAI</option>
+											<option value="BUSD">Binance USD (BUSD)</option>
+										</optgroup>
+										<optgroup label="Altcoins">
+											<option value="XRP">Ripple (XRP)</option>
+											<option value="ADA">Cardano (ADA)</option>
+											<option value="SOL">Solana (SOL)</option>
+											<option value="DOT">Polkadot (DOT)</option>
+											<option value="DOGE">Dogecoin (DOGE)</option>
+										</optgroup>
+									</select>
+								</div>
+								
+								<div>
+									<label for="crypto-network" class="block text-gray-700 mb-2">Red/Blockchain *</label>
+									<select id="crypto-network" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+										<option value="">Selecciona una red</option>
+										<option value="bitcoin">Bitcoin (BTC Network)</option>
+										<option value="ethereum">Ethereum (ERC-20)</option>
+										<option value="bsc">Binance Smart Chain (BEP-20)</option>
+										<option value="polygon">Polygon (MATIC)</option>
+										<option value="tron">TRON (TRC-20)</option>
+										<option value="solana">Solana</option>
+										<option value="avalanche">Avalanche (AVAX)</option>
+										<option value="arbitrum">Arbitrum</option>
+										<option value="optimism">Optimism</option>
+									</select>
+								</div>
+							</div>
+							
+							<div class="mb-4">
+								<label for="wallet-type" class="block text-gray-700 mb-2">Tipo de Billetera *</label>
+								<select id="wallet-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+									<option value="">Selecciona tipo de billetera</option>
+									<option value="exchange">Exchange (Binance, Coinbase, etc.)</option>
+									<option value="software">Billetera de Software (MetaMask, Trust Wallet)</option>
+									<option value="hardware">Billetera de Hardware (Ledger, Trezor)</option>
+									<option value="paper">Billetera de Papel</option>
+								</select>
+							</div>
+							
+							<div class="mb-4">
+								<label for="wallet-address" class="block text-gray-700 mb-2">Dirección de la Billetera *</label>
+								<input type="text" id="wallet-address" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 0x742d35Cc6634C0532925a3b8D4C9db7c1b7c8e8e" required>
+								<p class="text-xs text-gray-500 mt-1">Copia y pega la dirección completa. Verifica cuidadosamente cada carácter.</p>
+							</div>
+							
+							<div class="mb-4">
+								<label for="wallet-name" class="block text-gray-700 mb-2">Nombre de la Billetera (Opcional)</label>
+								<input type="text" id="wallet-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: Mi Billetera Principal">
+							</div>
+							
+							<div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+								<div class="flex items-start">
+									<i class="fas fa-exclamation-triangle text-red-500 mt-1 mr-3"></i>
+									<div>
+										<p class="font-medium text-red-800">¡ADVERTENCIA CRÍTICA!</p>
+										<p class="text-red-700 text-sm mt-1">Las transacciones en criptomonedas son IRREVERSIBLES. Verifica TRES VECES la dirección de tu billetera antes de enviar. Canada Coin no es responsable por pérdidas debido a direcciones incorrectas.</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+						<div class="flex items-start">
+							<i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
+							<div>
+								<p class="font-medium text-yellow-800">Tiempo de Procesamiento</p>
+								<p class="text-yellow-700 text-sm mt-1">Los retiros generalmente se procesan en 3-5 días hábiles. Los retiros en criptomonedas pueden procesarse en 24-48 horas. Te notificaremos por correo electrónico cuando tu solicitud sea aprobada.</p>
+							</div>
+						</div>
+					</div>
+					
+					<div class="flex justify-end space-x-4">
+						<button type="button" id="cancel-withdrawal" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
+						<button type="submit" id="submit-withdrawal" class="btn-primary flex items-center">
+							<span>Solicitar Retiro</span>
+							<i class="fas fa-arrow-right ml-2"></i>
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 
     <!-- Referral Modal -->
     <div id="referral-modal" class="modal">
@@ -1148,12 +1464,28 @@
         depositForm.addEventListener('submit', handleDeposit);
         
         // Withdrawal modal events
-        openWithdrawalModalButton.addEventListener('click', openWithdrawalModal);
-        openWithdrawalModalFromSectionButton.addEventListener('click', openWithdrawalModal);
-        closeWithdrawalModalButton.addEventListener('click', closeWithdrawalModal);
-        cancelWithdrawalButton.addEventListener('click', closeWithdrawalModal);
-        withdrawalForm.addEventListener('submit', handleWithdrawal);
-        
+        if (openWithdrawalModalButton) {
+            openWithdrawalModalButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                openWithdrawalModal();
+            });
+        }
+
+        if (openWithdrawalModalFromSectionButton) {
+            openWithdrawalModalFromSectionButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                openWithdrawalModal();
+            });
+        }
+
+        if (closeWithdrawalModalButton) {
+            closeWithdrawalModalButton.addEventListener('click', closeWithdrawalModal);
+        }
+
+        if (cancelWithdrawalButton) {
+            cancelWithdrawalButton.addEventListener('click', closeWithdrawalModal);
+        }
+
         // Referral modal events
         openReferralModalButton.addEventListener('click', openReferralModal);
         closeReferralModalButton.addEventListener('click', closeReferralModal);
@@ -1246,6 +1578,12 @@
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             
+            // Validación básica de campos
+            if (!email || !password) {
+                showNotification('Por favor completa todos los campos', 'error');
+                return;
+            }
+            
             showNotification('Iniciando sesión...', 'warning');
             
             auth.signInWithEmailAndPassword(email, password)
@@ -1254,7 +1592,30 @@
                 })
                 .catch(error => {
                     console.error('Login error:', error);
-                    showNotification('Error al iniciar sesión: ' + error.message, 'error');
+                    let errorMessage = 'Error al iniciar sesión';
+                    
+                    // Mejores mensajes de error
+                    switch(error.code) {
+                        case 'auth/user-not-found':
+                            errorMessage = 'Usuario no encontrado';
+                            break;
+                        case 'auth/wrong-password':
+                            errorMessage = 'Contraseña incorrecta';
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage = 'Correo electrónico inválido';
+                            break;
+                        case 'auth/user-disabled':
+                            errorMessage = 'Cuenta deshabilitada';
+                            break;
+                        case 'auth/too-many-requests':
+                            errorMessage = 'Demasiados intentos. Intenta más tarde';
+                            break;
+                        default:
+                            errorMessage = 'Error: ' + error.message;
+                    }
+                    
+                    showNotification(errorMessage, 'error');
                 });
         }
 
@@ -1269,6 +1630,25 @@
             const password = document.getElementById('register-password').value;
             const confirmPassword = document.getElementById('register-confirm-password').value;
             const termsAccepted = document.getElementById('register-terms').checked;
+            
+            // Validar campos obligatorios
+            if (!name || !email || !phone || !country || !password || !confirmPassword) {
+                showNotification('Por favor completa todos los campos obligatorios', 'error');
+                return;
+            }
+            
+            // Validar formato de email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showNotification('Por favor ingresa un correo electrónico válido', 'error');
+                return;
+            }
+            
+            // Validar longitud de contraseña
+            if (password.length < 8) {
+                showNotification('La contraseña debe tener al menos 8 caracteres', 'error');
+                return;
+            }
             
             // Validate passwords match
             if (password !== confirmPassword) {
@@ -1318,7 +1698,26 @@
                 })
                 .catch(error => {
                     console.error('Registration error:', error);
-                    showNotification('Error al crear la cuenta: ' + error.message, 'error');
+                    let errorMessage = 'Error al crear la cuenta';
+                    
+                    switch(error.code) {
+                        case 'auth/email-already-in-use':
+                            errorMessage = 'El correo electrónico ya está en uso';
+                            break;
+                        case 'auth/invalid-email':
+                            errorMessage = 'Correo electrónico inválido';
+                            break;
+                        case 'auth/operation-not-allowed':
+                            errorMessage = 'Operación no permitida';
+                            break;
+                        case 'auth/weak-password':
+                            errorMessage = 'La contraseña es demasiado débil';
+                            break;
+                        default:
+                            errorMessage = 'Error: ' + error.message;
+                    }
+                    
+                    showNotification(errorMessage, 'error');
                 });
         }
 
@@ -1340,37 +1739,32 @@
         }
 
         // Load user data from Realtime Database
-		function loadUserData() {
-			if (!appState.currentUser) return;
-			
-			const userRef = db.ref('users/' + appState.currentUser.uid);
-			
-			userRef.on('value', (snapshot) => {
-				const data = snapshot.val();
-				if (data) {
-					appState.userData = data;
-					updateUIWithUserData();
-					updateDashboard();
-					
-					// Load user transactions
-					loadUserTransactions();
-					// Load user deposits
-					loadUserDeposits();
-					// Load user withdrawals
-					loadUserWithdrawals();
-					// Load user referrals
-					loadUserReferrals();
+        function loadUserData() {
+            if (!appState.currentUser) return;
+            
+            const userRef = db.ref('users/' + appState.currentUser.uid);
+            
+            userRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    appState.userData = data;
+                    updateUIWithUserData();
+                    updateDashboard();
+                    
+                    // Load user transactions
+                    loadUserTransactions();
+                    // Load user deposits
+                    loadUserDeposits();
+                    // Load user withdrawals
+                    loadUserWithdrawals();
+                    // Load user referrals
+                    loadUserReferrals();
 
-					// ⭐⭐ CONECTAR PERFORMANCE ⭐⭐
-					// Solo se llama cuando ya tienes todos los datos listos
-					initPerformanceCharts(appState);
-
-				} else {
-					console.error('No user data found');
-				}
-			});
-		}
-
+                } else {
+                    console.error('No user data found');
+                }
+            });
+        }
 
         // Load user transactions
         function loadUserTransactions() {
@@ -1655,7 +2049,7 @@
             });
             
             referralsBonusList.innerHTML = referralsHTML;
-        }
+        }	
 
         // Switch between sections
         function switchSection(sectionId) {
@@ -1697,16 +2091,54 @@
             
             withdrawalModal.classList.add('active');
             availableBalance.textContent = `$${appState.userData.balance.toFixed(2)}`;
+            
+            // Seleccionar banco por defecto y mostrar detalles
+            const bankRadio = document.getElementById('withdrawal-bank');
+            if (bankRadio) {
+                bankRadio.checked = true;
+                updateWithdrawalDetails();
+            }
         }
 
         // Close withdrawal modal
         function closeWithdrawalModal() {
             withdrawalModal.classList.remove('active');
             withdrawalForm.reset();
+            
+            // Resetear todos los campos de detalles
+            document.querySelectorAll('#withdrawal-details input, #withdrawal-details select, #withdrawal-details textarea').forEach(el => {
+                el.value = '';
+            });
+            
+            // Ocultar todos los detalles excepto banco
+            Object.values(methodDetails).forEach(detail => {
+                if (detail) detail.classList.add('hidden');
+            });
+            
+            // Mostrar detalles de banco por defecto
+            if (methodDetails.bank) {
+                methodDetails.bank.classList.remove('hidden');
+            }
+            
+            // Remover clase selected
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // Seleccionar banco por defecto
+            const bankRadio = document.getElementById('withdrawal-bank');
+            if (bankRadio) {
+                bankRadio.checked = true;
+            }
         }
 
         // Open referral modal
         function openReferralModal() {
+            if (!appState.userData || !appState.userData.referralCode) {
+                showNotification('Cargando información de referidos...', 'warning');
+                return;
+            }
+            
             referralModal.classList.add('active');
         }
 
@@ -1783,11 +2215,13 @@
 
         // Update payment details based on selected method
         function updatePaymentDetails() {
-            const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            const selectedMethod = document.querySelector('input[name="payment-method"]:checked');
+            
+            if (!selectedMethod) return;
             
             let detailsHTML = '';
             
-            switch (selectedMethod) {
+            switch (selectedMethod.value) {
                 case 'bank':
                     detailsHTML = `
                         <h3 class="font-bold mb-2">Instrucciones para Transferencia Bancaria</h3>
@@ -1797,6 +2231,7 @@
                             <p><strong>Cuenta:</strong> 1234567890</p>
                             <p><strong>SWIFT/BIC:</strong> CCFIUS33</p>
                             <p><strong>Beneficiario:</strong> Canada Coin Investments LLC</p>
+                            <p><strong>Referencia:</strong> Tu correo electrónico o ID de usuario</p>
                         </div>
                         <p class="text-sm text-gray-500 mt-2">Una vez realizada la transferencia, sube el comprobante a continuación.</p>
                     `;
@@ -1807,6 +2242,7 @@
                         <p class="text-gray-600 mb-2">Realiza el pago a la siguiente dirección de PayPal:</p>
                         <div class="bg-white p-4 rounded border border-gray-200">
                             <p><strong>Email de PayPal:</strong> payments@canadacoin.com</p>
+                            <p><strong>Referencia:</strong> Tu correo electrónico o ID de usuario</p>
                         </div>
                         <p class="text-sm text-gray-500 mt-2">Una vez realizado el pago, sube el comprobante a continuación.</p>
                     `;
@@ -1819,6 +2255,7 @@
                             <p><strong>Bitcoin (BTC):</strong> 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa</p>
                             <p><strong>Ethereum (ETH):</strong> 0x742d35Cc6634C0532925a3b8D4C9db7c1b7c8e8e</p>
                             <p><strong>USDT (ERC-20):</strong> 0x742d35Cc6634C0532925a3b8D4C9db7c1b7c8e8e</p>
+                            <p><strong>Referencia:</strong> Tu correo electrónico o ID de usuario</p>
                         </div>
                         <p class="text-sm text-gray-500 mt-2">Una vez realizada la transacción, sube el comprobante a continuación.</p>
                     `;
@@ -1837,12 +2274,21 @@
                 return;
             }
             
-            const amount = parseFloat(document.getElementById('deposit-amount').value);
-            const method = document.querySelector('input[name="payment-method"]:checked').value;
+            const amountInput = document.getElementById('deposit-amount');
+            const amount = parseFloat(amountInput.value);
+            const methodElement = document.querySelector('input[name="payment-method"]:checked');
+            
+            if (!methodElement) {
+                showNotification('Por favor selecciona un método de pago', 'error');
+                return;
+            }
+            
+            const method = methodElement.value;
             
             // Validate amount
-            if (!amount || amount < 100) {
-                showNotification('El monto mínimo de depósito es $100', 'error');
+            if (!amount || isNaN(amount) || amount < 100) {
+                showNotification('El monto mínimo de depósito es $100 USD', 'error');
+                amountInput.focus();
                 return;
             }
             
@@ -1853,7 +2299,11 @@
             }
             
             showNotification('Procesando depósito...', 'warning');
-            submitDepositButton.disabled = true;
+            
+            // Disable submit button to prevent multiple submissions
+            const submitButton = document.getElementById('submit-deposit');
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span>Procesando...</span><i class="fas fa-spinner fa-spin ml-2"></i>';
             
             // Generate unique ID for deposit
             const depositId = generateId();
@@ -1863,7 +2313,10 @@
                 amount: amount,
                 method: method,
                 status: 'pending',
-                createdAt: Date.now()
+                userId: appState.currentUser.uid,
+                userEmail: appState.currentUser.email,
+                createdAt: Date.now(),
+                updatedAt: Date.now()
             };
             
             // Save deposit to Realtime Database
@@ -1873,28 +2326,38 @@
                     const transactionData = {
                         type: 'deposit',
                         amount: amount,
+                        method: method,
                         description: `Depósito #${depositId.substring(0, 8)}`,
+                        status: 'pending',
                         createdAt: Date.now()
                     };
                     
                     return db.ref('transactions/' + appState.currentUser.uid).push(transactionData);
                 })
                 .then(() => {
-                    // Upload file to Firebase Storage if needed
+                    // Upload file to Firebase Storage
                     if (selectedFile) {
-                        const fileRef = storage.ref().child(`deposits/${appState.currentUser.uid}/${depositId}_${selectedFile.name}`);
+                        const fileExtension = selectedFile.name.split('.').pop();
+                        const fileName = `deposit_${depositId}.${fileExtension}`;
+                        const fileRef = storage.ref().child(`deposits/${appState.currentUser.uid}/${fileName}`);
                         return fileRef.put(selectedFile);
                     }
                 })
                 .then(() => {
                     showNotification('¡Depósito enviado correctamente! Será revisado por nuestro equipo.', 'success');
                     closeDepositModal();
-                    submitDepositButton.disabled = false;
+                    
+                    // Reset submit button
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<span>Confirmar Depósito</span><i class="fas fa-arrow-right ml-2"></i>';
                 })
                 .catch(error => {
                     console.error('Error saving deposit:', error);
                     showNotification('Error al guardar el depósito: ' + error.message, 'error');
-                    submitDepositButton.disabled = false;
+                    
+                    // Reset submit button
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<span>Confirmar Depósito</span><i class="fas fa-arrow-right ml-2"></i>';
                 });
         }
 
@@ -1907,42 +2370,161 @@
                 return;
             }
             
-            const amount = parseFloat(document.getElementById('withdrawal-amount').value);
-            const method = document.querySelector('input[name="withdrawal-method"]:checked').value;
+            const amountInput = document.getElementById('withdrawal-amount');
+            const amount = parseFloat(amountInput.value);
+            const methodElement = document.querySelector('input[name="withdrawal-method"]:checked');
+            
+            if (!methodElement) {
+                showNotification('Por favor selecciona un método de retiro', 'error');
+                return;
+            }
+            
+            const method = methodElement.value;
             
             // Validate amount
-            if (!amount || amount < 10) {
-                showNotification('El monto mínimo de retiro es $10', 'error');
+            if (!amount || isNaN(amount) || amount < 10) {
+                showNotification('El monto mínimo de retiro es $10 USD', 'error');
+                amountInput.focus();
                 return;
             }
             
             // Validate available balance
             if (amount > appState.userData.balance) {
                 showNotification('No tienes suficiente saldo disponible', 'error');
+                amountInput.focus();
+                return;
+            }
+            
+            // Validar detalles según método
+            let details = {};
+            let valid = true;
+            let errorMessage = '';
+            
+            if (method === 'bank') {
+                const country = document.getElementById('bank-country').value;
+                const bankName = document.getElementById('bank-name').value;
+                const accountNumber = document.getElementById('account-number').value;
+                const accountHolder = document.getElementById('account-holder').value;
+                
+                if (!country || !bankName || !accountNumber || !accountHolder) {
+                    errorMessage = 'Por favor completa todos los campos requeridos de información bancaria';
+                    valid = false;
+                }
+                
+                if (valid) {
+                    details = {
+                        country: country,
+                        bankName: bankName,
+                        accountType: document.getElementById('account-type').value,
+                        currency: document.getElementById('currency').value,
+                        accountNumber: accountNumber,
+                        routingNumber: document.getElementById('routing-number').value,
+                        swiftCode: document.getElementById('swift-code').value,
+                        accountHolder: accountHolder,
+                        bankAddress: document.getElementById('bank-address').value
+                    };
+                }
+                
+            } else if (method === 'paypal') {
+                const paypalEmail = document.getElementById('paypal-email').value;
+                const paypalCountry = document.getElementById('paypal-country').value;
+                
+                if (!paypalEmail || !paypalCountry) {
+                    errorMessage = 'Por favor completa la información de PayPal';
+                    valid = false;
+                }
+                
+                // Validar formato de email
+                if (valid) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(paypalEmail)) {
+                        errorMessage = 'Por favor ingresa un correo electrónico válido para PayPal';
+                        valid = false;
+                    }
+                }
+                
+                if (valid) {
+                    details = {
+                        paypalEmail: paypalEmail,
+                        paypalCountry: paypalCountry
+                    };
+                }
+                
+            } else if (method === 'crypto') {
+                const currency = document.getElementById('crypto-currency').value;
+                const network = document.getElementById('crypto-network').value;
+                const walletAddress = document.getElementById('wallet-address').value;
+                
+                if (!currency || !network || !walletAddress) {
+                    errorMessage = 'Por favor completa todos los campos requeridos para criptomonedas';
+                    valid = false;
+                }
+                
+                // Validar longitud mínima de dirección
+                if (valid && walletAddress.length < 10) {
+                    errorMessage = 'La dirección de la billetera es demasiado corta. Verifica que sea correcta.';
+                    valid = false;
+                }
+                
+                if (valid) {
+                    details = {
+                        currency: currency,
+                        network: network,
+                        walletType: document.getElementById('wallet-type').value,
+                        walletAddress: walletAddress,
+                        walletName: document.getElementById('wallet-name').value || ''
+                    };
+                }
+            }
+            
+            if (!valid) {
+                showNotification(errorMessage, 'error');
                 return;
             }
             
             showNotification('Procesando solicitud de retiro...', 'warning');
             
-            // Generate unique ID for withdrawal
+            // Disable submit button
+            const submitButton = document.getElementById('submit-withdrawal');
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span>Procesando...</span><i class="fas fa-spinner fa-spin ml-2"></i>';
+            
+            // Generar ID único
             const withdrawalId = generateId();
             
-            // Create withdrawal data for Realtime Database
+            // Calcular comisión (ejemplo: 2% con mínimo $5)
+            const feePercentage = 0.02; // 2%
+            const minFee = 5; // USD
+            const calculatedFee = amount * feePercentage;
+            const withdrawalFee = Math.max(calculatedFee, minFee);
+            const netAmount = amount - withdrawalFee;
+            
+            // Crear datos para Realtime Database
             const withdrawalData = {
                 amount: amount,
+                netAmount: netAmount,
+                fee: withdrawalFee,
                 method: method,
+                details: details,
                 status: 'pending',
-                createdAt: Date.now()
+                userId: appState.currentUser.uid,
+                userEmail: appState.currentUser.email,
+                createdAt: Date.now(),
+                updatedAt: Date.now()
             };
             
-            // Save withdrawal to Realtime Database
+            // Guardar en Firebase
             db.ref('withdrawals/' + appState.currentUser.uid + '/' + withdrawalId).set(withdrawalData)
                 .then(() => {
-                    // Create transaction record
+                    // Crear registro de transacción
                     const transactionData = {
                         type: 'withdrawal',
-                        amount: amount,
-                        description: `Retiro #${withdrawalId.substring(0, 8)}`,
+                        amount: -amount, // Negativo para retiro
+                        method: method,
+                        description: `Retiro #${withdrawalId.substring(0, 8)} (${method})`,
+                        fee: withdrawalFee,
+                        netAmount: netAmount,
+                        status: 'pending',
                         createdAt: Date.now()
                     };
                     
@@ -1951,10 +2533,18 @@
                 .then(() => {
                     showNotification('¡Solicitud de retiro enviada correctamente! Será procesada en 3-5 días hábiles.', 'success');
                     closeWithdrawalModal();
+                    
+                    // Reset submit button
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<span>Solicitar Retiro</span><i class="fas fa-arrow-right ml-2"></i>';
                 })
                 .catch(error => {
                     console.error('Error saving withdrawal:', error);
                     showNotification('Error al guardar la solicitud de retiro: ' + error.message, 'error');
+                    
+                    // Reset submit button
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<span>Solicitar Retiro</span><i class="fas fa-arrow-right ml-2"></i>';
                 });
         }
 
@@ -1964,10 +2554,25 @@
             
             if (!appState.currentUser) return;
             
-            const name = document.getElementById('profile-name').value;
-            const email = document.getElementById('profile-email').value;
-            const phone = document.getElementById('profile-phone').value;
+            const name = document.getElementById('profile-name').value.trim();
+            const email = document.getElementById('profile-email').value.trim();
+            const phone = document.getElementById('profile-phone').value.trim();
             const country = document.getElementById('profile-country').value;
+            
+            // Validar campos
+            if (!name || !email || !phone || !country) {
+                showNotification('Por favor completa todos los campos obligatorios', 'error');
+                return;
+            }
+            
+            // Validar formato de email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showNotification('Por favor ingresa un correo electrónico válido', 'error');
+                return;
+            }
+            
+            showNotification('Actualizando perfil...', 'warning');
             
             // Update user data in Realtime Database
             const updates = {
@@ -1981,6 +2586,8 @@
             db.ref('users/' + appState.currentUser.uid).update(updates)
                 .then(() => {
                     showNotification('Perfil actualizado correctamente', 'success');
+                    // Actualizar UI
+                    updateUIWithUserData();
                 })
                 .catch(error => {
                     console.error('Error updating profile:', error);
@@ -1994,8 +2601,15 @@
             
             if (e.target.id === 'copy-referral-link' || e.target.parentElement.id === 'copy-referral-link') {
                 textToCopy = referralLink.value;
-            } else {
+            } else if (e.target.id === 'copy-referral-code' || e.target.parentElement.id === 'copy-referral-code') {
                 textToCopy = appState.userData.referralCode;
+            } else {
+                return;
+            }
+            
+            if (!textToCopy || textToCopy === 'CARGANDO...') {
+                showNotification('No hay contenido para copiar', 'error');
+                return;
             }
             
             navigator.clipboard.writeText(textToCopy)
@@ -2004,7 +2618,21 @@
                 })
                 .catch(err => {
                     console.error('Error copying text: ', err);
-                    showNotification('Error al copiar al portapapeles', 'error');
+                    
+                    // Fallback para navegadores antiguos
+                    const textArea = document.createElement('textarea');
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    
+                    try {
+                        document.execCommand('copy');
+                        showNotification('Copiado al portapapeles', 'success');
+                    } catch (err) {
+                        showNotification('Error al copiar al portapapeles', 'error');
+                    }
+                    
+                    document.body.removeChild(textArea);
                 });
         }
 
@@ -2036,8 +2664,16 @@
         function formatDate(timestamp) {
             if (!timestamp) return '';
             const date = new Date(timestamp);
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return date.toLocaleDateString('es-ES', options);
+            
+            // Formato: 15 Ene 2024, 14:30
+            const day = date.getDate();
+            const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const month = monthNames[date.getMonth()];
+            const year = date.getFullYear();
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            
+            return `${day} ${month} ${year}, ${hours}:${minutes}`;
         }
 
         // Show notification
@@ -2071,6 +2707,20 @@
                     }
                 }, 300);
             }, 5000);
+            
+            // Auto-hide success notifications after 3 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.classList.remove('show');
+                        setTimeout(() => {
+                            if (notification.parentNode) {
+                                notification.parentNode.removeChild(notification);
+                            }
+                        }, 300);
+                    }
+                }, 3000);
+            }
         }
 
         // Close notification when clicking on it
@@ -2085,36 +2735,184 @@
                 }, 300);
             }
         });
+        
+        // Detalles de retiro
+        const withdrawalMethods = document.querySelectorAll('input[name="withdrawal-method"]');
+        const methodDetails = {
+            bank: document.getElementById('bank-details'),
+            paypal: document.getElementById('paypal-details'),
+            crypto: document.getElementById('crypto-details')
+        };
+
+        // Event listeners para métodos de retiro
+        if (withdrawalMethods.length > 0) {
+            withdrawalMethods.forEach(method => {
+                method.addEventListener('change', updateWithdrawalDetails);
+            });
+        }
+
+        // Función para actualizar detalles de retiro
+        function updateWithdrawalDetails() {
+            const selectedMethod = document.querySelector('input[name="withdrawal-method"]:checked');
+            
+            if (!selectedMethod) return;
+            
+            const methodValue = selectedMethod.value;
+            
+            // Ocultar todos los detalles
+            Object.values(methodDetails).forEach(detail => {
+                if (detail) detail.classList.add('hidden');
+            });
+            
+            // Remover clase selected de todos
+            document.querySelectorAll('.payment-method.withdrawal-method').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // Mostrar detalles del método seleccionado y agregar clase selected
+            const selectedElement = selectedMethod.closest('.payment-method');
+            if (selectedElement) {
+                selectedElement.classList.add('selected');
+            }
+            
+            // Mostrar detalles correspondientes
+            if (methodValue === 'bank' && methodDetails.bank) {
+                methodDetails.bank.classList.remove('hidden');
+                
+                // Configurar campos requeridos para banco
+                const requiredBankFields = ['bank-country', 'bank-name', 'account-type', 'currency', 'account-number', 'routing-number', 'account-holder'];
+                requiredBankFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) field.required = true;
+                });
+                
+                // Campos opcionales
+                const optionalBankFields = ['swift-code', 'bank-address'];
+                optionalBankFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) field.required = false;
+                });
+                
+            } else if (methodValue === 'paypal' && methodDetails.paypal) {
+                methodDetails.paypal.classList.remove('hidden');
+                
+                // Hacer campos requeridos para PayPal
+                const requiredPaypalFields = ['paypal-email', 'paypal-country'];
+                requiredPaypalFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) field.required = true;
+                });
+                
+            } else if (methodValue === 'crypto' && methodDetails.crypto) {
+                methodDetails.crypto.classList.remove('hidden');
+                
+                // Hacer campos requeridos para Crypto (excepto wallet-name)
+                const requiredCryptoFields = ['crypto-currency', 'crypto-network', 'wallet-type', 'wallet-address'];
+                requiredCryptoFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) field.required = true;
+                });
+                
+                // Campo opcional
+                const walletNameField = document.getElementById('wallet-name');
+                if (walletNameField) walletNameField.required = false;
+            }
+        }
+
+        // Configurar event listeners para los botones de métodos de pago
+        document.querySelectorAll('.payment-method.withdrawal-method').forEach(method => {
+            method.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.checked = true;
+                    updateWithdrawalDetails();
+                }
+            });
+        });
+
+        // Inicializar detalles de retiro al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar con banco seleccionado por defecto
+            const bankRadio = document.getElementById('withdrawal-bank');
+            if (bankRadio) {
+                bankRadio.checked = true;
+                // Llamar a updateWithdrawalDetails después de un pequeño delay
+                setTimeout(updateWithdrawalDetails, 100);
+            }
+            
+            // Función de rendimiento - IMPLEMENTADA
+            function initPerformanceCharts(appState) {
+                if (!appState.userData) return;
+                
+                // Calcular rendimiento total
+                const totalDeposits = appState.userData.totalDeposits || 0;
+                const currentBalance = appState.userData.balance || 0;
+                const totalEarnings = appState.userData.totalEarnings || 0;
+                
+                if (totalDeposits > 0) {
+                    // Calcular porcentaje de rendimiento
+                    const performancePercentage = ((currentBalance - totalDeposits) / totalDeposits * 100).toFixed(2);
+                    
+                    // Actualizar texto en la sección de rendimiento
+                    const performanceEarningsElement = document.getElementById('performance-earnings');
+                    if (performanceEarningsElement) {
+                        performanceEarningsElement.textContent = `$${totalEarnings.toFixed(2)}`;
+                    }
+                    
+                    // Actualizar porcentaje en dashboard
+                    const performancePercentageElements = document.querySelectorAll('.text-sm.text-gray-500.mt-2');
+                    performancePercentageElements.forEach(el => {
+                        if (el.textContent.includes('+0% desde el inicio')) {
+                            el.textContent = `+${performancePercentage}% desde el inicio`;
+                        }
+                    });
+                }
+                
+                console.log('Charts de rendimiento inicializados');
+            }
+            
+            // Asignar la función al appState para que sea accesible
+            window.initPerformanceCharts = initPerformanceCharts;
+        });
+
+        // Función auxiliar para verificar que todos los elementos existen
+        function verifyWithdrawalElements() {
+            console.log('Verificando elementos de retiro...');
+            
+            const elements = {
+                'openWithdrawalModalButton': document.getElementById('open-withdrawal-modal'),
+                'openWithdrawalModalFromSectionButton': document.getElementById('open-withdrawal-modal-from-section'),
+                'closeWithdrawalModalButton': document.getElementById('close-withdrawal-modal'),
+                'cancelWithdrawalButton': document.getElementById('cancel-withdrawal'),
+                'withdrawalForm': document.getElementById('withdrawal-form'),
+                'withdrawalModal': document.getElementById('withdrawal-modal'),
+                'bankRadio': document.getElementById('withdrawal-bank'),
+                'paypalRadio': document.getElementById('withdrawal-paypal'),
+                'cryptoRadio': document.getElementById('withdrawal-crypto')
+            };
+            
+            for (const [name, element] of Object.entries(elements)) {
+                if (element) {
+                    console.log(`✓ ${name}: OK`);
+                } else {
+                    console.warn(`⚠ ${name}: NO ENCONTRADO`);
+                }
+            }
+        }
+
+        // Verificar elementos al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            verifyWithdrawalElements();
+            
+            // Verificar botones de métodos de pago
+            const paymentMethods = document.querySelectorAll('.payment-method.withdrawal-method');
+            console.log(`Botones de métodos de retiro encontrados: ${paymentMethods.length}`);
+        });
     </script>
-	
-	<!-- Librerías externas -->
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    
+    <!-- Librerías externas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 
-	<!-- Firebase -->
-	<script src="/firebase-config.js" type="module"></script>
-
-	<!-- Archivos principales -->
-	<script src="/js/app.js" type="module"></script>
-	<script src="/js/auth.js" type="module"></script>
-	<script src="/js/ui.js" type="module"></script>
-	<script src="/js/data.js" type="module"></script>
-	<script src="/js/formatters.js" type="module"></script>
-
-	<!-- Módulos funcionales -->
-	<script src="/js/deposits.js" type="module"></script>
-	<script src="/js/withdrawals.js" type="module"></script>
-	<script src="/js/profile.js" type="module"></script>
-	<script src="/js/referrals.js" type="module"></script>
-	<script src="/js/help.js" type="module"></script>
-	<script src="/js/validators.js" type="module"></script>
-	<script src="/js/storage.js" type="module"></script>
-
-	<!-- Charts propios -->
-	<script src="/js/charts.js" type="module"></script>
-
-	<!-- ⚡ PERFOMANCE: ESTE ES EL IMPORTANTE -->
-	<script src="/js/performance.js" type="module"></script>
-	
 </body>
-</html>
+</html>		

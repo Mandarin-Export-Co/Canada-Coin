@@ -599,6 +599,10 @@
                                 <i class="fas fa-cog w-5"></i>
                                 <span>Configuración</span>
                             </a>
+                            <a href="#" class="nav-item" data-section="kyc-verification">
+                                <i class="fas fa-user-check w-5"></i>
+                                <span>Verificación KYC</span>
+                            </a>
                             <a href="#" class="nav-item" data-section="help">
                                 <i class="fas fa-question-circle w-5"></i>
                                 <span>Ayuda</span>
@@ -851,6 +855,222 @@
                         </div>
                     </div>
                     
+					<!-- KYC Verification Section -->
+					<div id="kyc-verification" class="section">
+						<div class="card p-6">
+							<h2 class="text-xl font-bold mb-6">Verificación de Identidad (KYC)</h2>
+							
+							<div class="mb-6">
+								<div class="flex items-center mb-4">
+									<div id="kyc-status-badge" class="kyc-status kyc-pending">KYC Pendiente</div>
+									<button id="refresh-kyc-status" class="ml-4 text-blue-600 hover:text-blue-800">
+										<i class="fas fa-sync-alt"></i>
+									</button>
+								</div>
+								
+								<div id="kyc-instructions" class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
+									<h3 class="font-bold text-blue-800 mb-2">Instrucciones para la Verificación KYC</h3>
+									<p class="text-blue-700 mb-2">Para completar tu verificación de identidad, necesitamos que subas los siguientes documentos:</p>
+									<ol class="list-decimal list-inside text-blue-700 space-y-1">
+										<li>Documento de identificación oficial (DNI, Pasaporte o Licencia)</li>
+										<li>Selfie sosteniendo tu documento de identificación</li>
+										<li>Comprobante de domicilio reciente (menos de 3 meses)</li>
+									</ol>
+									<p class="text-blue-700 mt-2">Una vez enviados, nuestro equipo verificará tus documentos en 24-48 horas.</p>
+								</div>
+							</div>
+							
+							<form id="kyc-form" class="space-y-6">
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+									<div>
+										<label for="kyc-full-name" class="block text-gray-700 mb-2">Nombre Completo (como aparece en el documento)</label>
+										<input type="text" id="kyc-full-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+									</div>
+									
+									<div>
+										<label for="kyc-birthdate" class="block text-gray-700 mb-2">Fecha de Nacimiento</label>
+										<input type="date" id="kyc-birthdate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+									</div>
+									
+									<div>
+										<label for="kyc-id-type" class="block text-gray-700 mb-2">Tipo de Documento</label>
+										<select id="kyc-id-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+											<option value="">Seleccionar</option>
+											<option value="dni">DNI</option>
+											<option value="passport">Pasaporte</option>
+											<option value="driver_license">Licencia de Conducir</option>
+											<option value="other">Otro</option>
+										</select>
+									</div>
+									
+									<div>
+										<label for="kyc-id-number" class="block text-gray-700 mb-2">Número de Documento</label>
+										<input type="text" id="kyc-id-number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+									</div>
+									
+									<div>
+										<label for="kyc-id-country" class="block text-gray-700 mb-2">País Emisor</label>
+										<select id="kyc-id-country" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+											<option value="">Seleccionar país</option>
+											<!-- América del Norte -->
+											<option value="CA">Canadá</option>
+											<option value="US">Estados Unidos</option>
+											<option value="MX">México</option>
+											
+											<!-- América Central -->
+											<option value="BZ">Belice</option>
+											<option value="CR">Costa Rica</option>
+											<option value="SV">El Salvador</option>
+											<option value="GT">Guatemala</option>
+											<option value="HN">Honduras</option>
+											<option value="NI">Nicaragua</option>
+											<option value="PA">Panamá</option>
+											
+											<!-- Caribe -->
+											<option value="AG">Antigua y Barbuda</option>
+											<option value="BS">Bahamas</option>
+											<option value="BB">Barbados</option>
+											<option value="CU">Cuba</option>
+											<option value="DM">Dominica</option>
+											<option value="DO">República Dominicana</option>
+											<option value="GD">Granada</option>
+											<option value="HT">Haití</option>
+											<option value="JM">Jamaica</option>
+											<option value="KN">San Cristóbal y Nieves</option>
+											<option value="LC">Santa Lucía</option>
+											<option value="VC">San Vicente y las Granadinas</option>
+											<option value="TT">Trinidad y Tobago</option>
+											
+											<!-- América del Sur -->
+											<option value="AR">Argentina</option>
+											<option value="BO">Bolivia</option>
+											<option value="BR">Brasil</option>
+											<option value="CL">Chile</option>
+											<option value="CO">Colombia</option>
+											<option value="EC">Ecuador</option>
+											<option value="GY">Guyana</option>
+											<option value="PY">Paraguay</option>
+											<option value="PE">Perú</option>
+											<option value="SR">Surinam</option>
+											<option value="UY">Uruguay</option>
+											<option value="VE">Venezuela</option>
+
+											<!-- Europa -->
+											<option value="AL">Albania</option>
+											<option value="AD">Andorra</option>
+											<option value="AM">Armenia</option>
+											<option value="AT">Austria</option>
+											<option value="AZ">Azerbaiyán</option>
+											<option value="BY">Bielorrusia</option>
+											<option value="BE">Bélgica</option>
+											<option value="BA">Bosnia y Herzegovina</option>
+											<option value="BG">Bulgaria</option>
+											<option value="HR">Croacia</option>
+											<option value="CY">Chipre</option>
+											<option value="CZ">Chequia</option>
+											<option value="DK">Dinamarca</option>
+											<option value="EE">Estonia</option>
+											<option value="FI">Finlandia</option>
+											<option value="FR">Francia</option>
+											<option value="GE">Georgia</option>
+											<option value="DE">Alemania</option>
+											<option value="GR">Grecia</option>
+											<option value="HU">Hungría</option>
+											<option value="IS">Islandia</option>
+											<option value="IE">Irlanda</option>
+											<option value="IT">Italia</option>
+											<option value="KZ">Kazajistán (parte en Europa)</option>
+											<option value="LV">Letonia</option>
+											<option value="LI">Liechtenstein</option>
+											<option value="LT">Lituania</option>
+											<option value="LU">Luxemburgo</option>
+											<option value="MT">Malta</option>
+											<option value="MD">Moldavia</option>
+											<option value="MC">Mónaco</option>
+											<option value="ME">Montenegro</option>
+											<option value="NL">Países Bajos</option>
+											<option value="MK">Macedonia del Norte</option>
+											<option value="NO">Noruega</option>
+											<option value="PL">Polonia</option>
+											<option value="PT">Portugal</option>
+											<option value="RO">Rumanía</option>
+											<option value="RU">Rusia (parte en Europa)</option>
+											<option value="SM">San Marino</option>
+											<option value="RS">Serbia</option>
+											<option value="SK">Eslovaquia</option>
+											<option value="SI">Eslovenia</option>
+											<option value="ES">España</option>
+											<option value="SE">Suecia</option>
+											<option value="CH">Suiza</option>
+											<option value="TR">Turquía (parte en Europa)</option>
+											<option value="UA">Ucrania</option>
+											<option value="UK">Reino Unido</option>
+											<option value="VA">Ciudad del Vaticano</option>
+										</select>
+									</div>
+									
+									<div>
+										<label for="kyc-address" class="block text-gray-700 mb-2">Dirección Completa</label>
+										<textarea id="kyc-address" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3" required></textarea>
+									</div>
+								</div>
+								
+								<!-- Document Upload Sections -->
+								<div class="space-y-6">
+									<div class="border border-gray-300 rounded-lg p-4">
+										<h3 class="font-bold text-lg mb-4">1. Documento de Identificación (Frente) *</h3>
+										<div class="kyc-drop-zone drop-zone" data-doc-type="id_front">
+											<i class="fas fa-id-card text-3xl text-gray-400 mb-2"></i>
+											<p class="text-gray-600">Arrastra la imagen del frente de tu documento aquí</p>
+											<p class="text-sm text-gray-500 mt-1">Formatos: JPG, PNG, PDF (Máx. 5 MB)</p>
+											<input type="file" class="hidden kyc-file-input" accept=".jpg,.jpeg,.png,.pdf" data-doc-type="id_front">
+										</div>
+										<div class="kyc-file-preview hidden mt-4" data-doc-type="id_front"></div>
+									</div>
+									
+									<div class="border border-gray-300 rounded-lg p-4">
+										<h3 class="font-bold text-lg mb-4">2. Documento de Identificación (Reverso) *</h3>
+										<div class="kyc-drop-zone drop-zone" data-doc-type="id_back">
+											<i class="fas fa-id-card text-3xl text-gray-400 mb-2"></i>
+											<p class="text-gray-600">Arrastra la imagen del reverso de tu documento aquí</p>
+											<p class="text-sm text-gray-500 mt-1">Formatos: JPG, PNG, PDF (Máx. 5 MB)</p>
+											<input type="file" class="hidden kyc-file-input" accept=".jpg,.jpeg,.png,.pdf" data-doc-type="id_back">
+										</div>
+										<div class="kyc-file-preview hidden mt-4" data-doc-type="id_back"></div>
+									</div>
+									
+									<div class="border border-gray-300 rounded-lg p-4">
+										<h3 class="font-bold text-lg mb-4">3. Selfie con Documento *</h3>
+										<div class="kyc-drop-zone drop-zone" data-doc-type="selfie">
+											<i class="fas fa-user text-3xl text-gray-400 mb-2"></i>
+											<p class="text-gray-600">Arrastra una selfie sosteniendo tu documento</p>
+											<p class="text-sm text-gray-500 mt-1">Formatos: JPG, PNG (Máx. 5 MB)</p>
+											<input type="file" class="hidden kyc-file-input" accept=".jpg,.jpeg,.png" data-doc-type="selfie">
+										</div>
+										<div class="kyc-file-preview hidden mt-4" data-doc-type="selfie"></div>
+									</div>
+									
+									<div class="border border-gray-300 rounded-lg p-4">
+										<h3 class="font-bold text-lg mb-4">4. Comprobante de Domicilio (Opcional)</h3>
+										<div class="kyc-drop-zone drop-zone" data-doc-type="proof_of_address">
+											<i class="fas fa-home text-3xl text-gray-400 mb-2"></i>
+											<p class="text-gray-600">Arrastra tu comprobante de domicilio</p>
+											<p class="text-sm text-gray-500 mt-1">Formatos: JPG, PNG, PDF (Máx. 5 MB)</p>
+											<input type="file" class="hidden kyc-file-input" accept=".jpg,.jpeg,.png,.pdf" data-doc-type="proof_of_address">
+										</div>
+										<div class="kyc-file-preview hidden mt-4" data-doc-type="proof_of_address"></div>
+									</div>
+								</div>
+								
+								<div class="flex justify-end">
+									<button type="submit" id="submit-kyc" class="btn-primary flex items-center">
+										<i class="fas fa-paper-plane mr-2"></i> Enviar para Verificación
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+					
                     <!-- Help Section -->
                     <div id="help" class="section">
                         <div class="card p-6">
@@ -1363,6 +1583,7 @@
     </script>
 
     <!-- Application JavaScript -->
+	
     <script>
         // Global state
         const appState = {
@@ -1393,7 +1614,22 @@
         const totalDeposits = document.getElementById('total-deposits');
         const totalEarnings = document.getElementById('total-earnings');
         const totalReferrals = document.getElementById('total-referrals');
-        
+
+		// KYC Elements
+		const kycForm = document.getElementById('kyc-form');
+		const kycFullName = document.getElementById('kyc-full-name');
+		const kycStatusBadge = document.getElementById('kyc-status-badge');
+		const refreshKycStatus = document.getElementById('refresh-kyc-status');
+		const submitKycButton = document.getElementById('submit-kyc');
+
+		// KYC File handling
+		let kycFiles = {
+			id_front: null,
+			id_back: null,
+			selfie: null,
+			proof_of_address: null
+		};   
+		
         // Modals
         const depositModal = document.getElementById('deposit-modal');
         const openDepositModalButton = document.getElementById('open-deposit-modal');
@@ -1528,22 +1764,200 @@
             });
         });
 
-        // Initialize the application
-        function initApp() {
-            // Check authentication state
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    // User is signed in
-                    appState.currentUser = user;
-                    loadUserData();
-                    showDashboard();
-                } else {
-                    // User is signed out
-                    showAuth();
-                }
-            });
-        }
+		// Initialize the application
+		function initApp() {
+			// Check authentication state
+			auth.onAuthStateChanged(user => {
+				if (user) {
+					// User is signed in
+					appState.currentUser = user;
+					loadUserData();
+					showDashboard();
+					// Inicializar KYC pero solo si no está ya inicializado
+					setTimeout(() => {
+						initKYC();
+					}, 500); // Pequeño delay para asegurar que el DOM esté listo
+				} else {
+					// User is signed out
+					showAuth();
+					// Resetear flag KYC al cerrar sesión
+					window.kycInitialized = false;
+				}
+			});
+		}
 
+		// Initialize KYC functionality
+		function initKYC() {
+			console.log('Inicializando funcionalidad KYC...');
+			
+			// Check if we're in the dashboard section
+			if (!dashboardSection || dashboardSection.classList.contains('hidden')) {
+				console.log('Dashboard no está visible, posponiendo inicialización KYC');
+				return;
+			}
+			
+			// ¡EVITA INICIALIZACIÓN MÚLTIPLE!
+			if (window.kycInitialized === true) {
+				console.log('KYC ya está inicializado, omitiendo...');
+				return;
+			}
+			
+			// Marcar como inicializado
+			window.kycInitialized = true;
+			console.log('Marcando KYC como inicializado');
+			
+			// Event listeners for KYC form - LIMPIAR PRIMERO
+			if (kycForm) {
+				console.log('Configurando event listener para formulario KYC');
+				// Remover listener previo si existe
+				kycForm.removeEventListener('submit', handleKYCSubmit);
+				kycForm.addEventListener('submit', handleKYCSubmit);
+			} else {
+				console.warn('Formulario KYC no encontrado');
+			}
+			
+			if (refreshKycStatus) {
+				console.log('Configurando event listener para botón de actualizar KYC');
+				refreshKycStatus.removeEventListener('click', updateKYCStatus);
+				refreshKycStatus.addEventListener('click', updateKYCStatus);
+			}
+			
+			// Event listeners for file uploads
+			const dropZones = document.querySelectorAll('.kyc-drop-zone');
+			console.log(`Configurando ${dropZones.length} zonas de arrastrar y soltar KYC`);
+			
+			dropZones.forEach(dropZone => {
+				const docType = dropZone.getAttribute('data-doc-type');
+				const fileInput = dropZone.querySelector('.kyc-file-input');
+				
+				if (!fileInput) {
+					console.warn(`No se encontró input de archivo para ${docType}`);
+					return;
+				}
+				
+				console.log(`Configurando zona KYC para: ${docType}`);
+				
+				// Crear funciones con nombre para poder removerlas
+				const clickHandler = (e) => {
+					e.stopPropagation(); // ¡IMPORTANTE! Previene propagación
+					console.log(`Clic en zona KYC: ${docType}`);
+					fileInput.click();
+				};
+				
+				const dragOverHandler = (e) => {
+					e.preventDefault();
+					dropZone.classList.add('active');
+				};
+				
+				const dragLeaveHandler = (e) => {
+					e.preventDefault();
+					if (!dropZone.contains(e.relatedTarget)) {
+						dropZone.classList.remove('active');
+					}
+				};
+				
+				const dropHandler = (e) => {
+					e.preventDefault();
+					dropZone.classList.remove('active');
+					console.log(`Archivo soltado en zona KYC: ${docType}`);
+					
+					if (e.dataTransfer.files.length > 0) {
+						const file = e.dataTransfer.files[0];
+						console.log(`Archivo recibido: ${file.name} (${file.type})`);
+						processKYCFile(file, docType);
+					}
+				};
+				
+				const fileChangeHandler = (e) => {
+					e.stopPropagation(); // ¡IMPORTANTE! Previene propagación múltiple
+					if (e.target.files.length > 0) {
+						const file = e.target.files[0];
+						console.log(`Archivo seleccionado: ${file.name} (${file.type})`);
+						processKYCFile(file, docType);
+					}
+				};
+				
+				const fileClickHandler = (e) => {
+					e.stopPropagation(); // Previene que el clic llegue al dropZone
+				};
+				
+				// Remover listeners previos
+				dropZone.removeEventListener('click', clickHandler);
+				dropZone.removeEventListener('dragover', dragOverHandler);
+				dropZone.removeEventListener('dragleave', dragLeaveHandler);
+				dropZone.removeEventListener('drop', dropHandler);
+				fileInput.removeEventListener('change', fileChangeHandler);
+				fileInput.removeEventListener('click', fileClickHandler);
+				
+				// Agregar nuevos listeners
+				dropZone.addEventListener('click', clickHandler);
+				dropZone.addEventListener('dragover', dragOverHandler);
+				dropZone.addEventListener('dragleave', dragLeaveHandler);
+				dropZone.addEventListener('drop', dropHandler);
+				fileInput.addEventListener('change', fileChangeHandler);
+				fileInput.addEventListener('click', fileClickHandler);
+			});
+			
+			// Initialize KYC status when user is logged in
+			if (appState.currentUser) {
+				console.log('Usuario autenticado, actualizando estado KYC');
+				updateKYCStatus();
+			}
+			
+			console.log('Funcionalidad KYC inicializada correctamente');
+		}
+
+		// También corrige la función switchSection para evitar doble inicialización
+		function switchSection(sectionId) {
+			sections.forEach(section => {
+				section.classList.remove('active');
+			});
+			
+			const activeSection = document.getElementById(sectionId);
+			if (activeSection) {
+				activeSection.classList.add('active');
+				
+				// Si se accede a la sección KYC
+				if (sectionId === 'kyc-verification') {
+					console.log('Accediendo a sección KYC');
+					
+					// Si KYC no está inicializado, inicialízalo
+					if (!window.kycInitialized) {
+						setTimeout(() => {
+							initKYC();
+						}, 100);
+					} else {
+						console.log('KYC ya está inicializado, solo actualizar estado');
+						// Solo actualizar el estado si ya está inicializado
+						updateKYCStatus();
+					}
+				}
+			}
+		}
+
+		// También agrega esto en handleLogout para resetear
+		function handleLogout() {
+			// Resetear estado KYC
+			window.kycInitialized = false;
+			
+			// Limpiar archivos KYC
+			kycFiles = {
+				id_front: null,
+				id_back: null,
+				selfie: null,
+				proof_of_address: null
+			};
+			
+			auth.signOut()
+				.then(() => {
+					showNotification('Sesión cerrada correctamente', 'success');
+				})
+				.catch(error => {
+					console.error('Logout error:', error);
+					showNotification('Error al cerrar sesión', 'error');
+				});
+		}
+			
         // Show authentication section
         function showAuth() {
             authSection.classList.remove('hidden');
@@ -1759,6 +2173,8 @@
                     loadUserWithdrawals();
                     // Load user referrals
                     loadUserReferrals();
+					// In the loadUserData function, add this after loading user data:
+					updateKYCStatus();					
 
                 } else {
                     console.error('No user data found');
@@ -2051,17 +2467,31 @@
             referralsBonusList.innerHTML = referralsHTML;
         }	
 
-        // Switch between sections
-        function switchSection(sectionId) {
-            sections.forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            const activeSection = document.getElementById(sectionId);
-            if (activeSection) {
-                activeSection.classList.add('active');
-            }
-        }
+		function switchSection(sectionId) {
+			sections.forEach(section => {
+				section.classList.remove('active');
+			});
+			
+			const activeSection = document.getElementById(sectionId);
+			if (activeSection) {
+				activeSection.classList.add('active');
+				
+				// Si se accede a la sección KYC
+				if (sectionId === 'kyc-verification') {
+					console.log('Accediendo a sección KYC');
+					// Solo inicializar si no está ya inicializado
+					if (!window.kycInitialized) {
+						setTimeout(() => {
+							initKYC();
+						}, 100);
+					} else {
+						console.log('KYC ya está inicializado, omitiendo nueva inicialización');
+						// Solo actualizar el estado si ya está inicializado
+						updateKYCStatus();
+					}
+				}
+			}
+		}
 
         // Open deposit modal
         function openDepositModal() {
@@ -2873,8 +3303,348 @@
             
             // Asignar la función al appState para que sea accesible
             window.initPerformanceCharts = initPerformanceCharts;
+            
+            // Verificar elementos KYC al cargar
+            console.log('Verificando elementos KYC...');
+            
+            const kycElements = {
+                'kycForm': document.getElementById('kyc-form'),
+                'kycFullName': document.getElementById('kyc-full-name'),
+                'refreshKycStatus': document.getElementById('refresh-kyc-status'),
+                'submitKycButton': document.getElementById('submit-kyc')
+            };
+            
+            for (const [name, element] of Object.entries(kycElements)) {
+                if (element) {
+                    console.log(`✓ Elemento KYC "${name}": OK`);
+                } else {
+                    console.warn(`⚠ Elemento KYC "${name}": NO ENCONTRADO`);
+                }
+            }
+            
+            // Verificar zonas de arrastrar y soltar
+            const dropZones = document.querySelectorAll('.kyc-drop-zone');
+            console.log(`Zonas KYC encontradas: ${dropZones.length}`);
         });
 
+			// Process KYC file
+			function processKYCFile(file, docType) {
+				// Check if user is logged in
+				if (!appState.currentUser) {
+					showNotification('Debes iniciar sesión para subir documentos', 'error');
+					return;
+				}
+				
+				// Validate file type
+				const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+				if (!allowedTypes.includes(file.type)) {
+					showNotification(`Formato de archivo no permitido para ${getDocTypeName(docType)}. Use JPG, PNG o PDF.`, 'error');
+					return;
+				}
+				
+				// Validate file size (5 MB max)
+				const maxSize = 5 * 1024 * 1024; // 5 MB in bytes
+				if (file.size > maxSize) {
+					showNotification(`El archivo es demasiado grande. El tamaño máximo es 5 MB para ${getDocTypeName(docType)}.`, 'error');
+					return;
+				}
+				
+				// Store file
+				kycFiles[docType] = file;
+				
+				// Show preview
+				showKYCFilePreview(file, docType);
+				
+				showNotification(`Documento ${getDocTypeName(docType)} cargado correctamente`, 'success');
+			}
+
+			// Get document type name
+			function getDocTypeName(docType) {
+				const names = {
+					'id_front': 'Documento Frente',
+					'id_back': 'Documento Reverso',
+					'selfie': 'Selfie con Documento',
+					'proof_of_address': 'Comprobante de Domicilio'
+				};
+				return names[docType] || docType;
+			}
+
+			// Show KYC file preview
+			function showKYCFilePreview(file, docType) {
+				const previewContainer = document.querySelector(`.kyc-file-preview[data-doc-type="${docType}"]`);
+				if (!previewContainer) return;
+				
+				const reader = new FileReader();
+				reader.onload = function(e) {
+					const isImage = file.type.startsWith('image/');
+					const isPDF = file.type === 'application/pdf';
+					
+					let previewHTML = '';
+					
+					if (isImage) {
+						previewHTML = `
+							<div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+								<div class="flex items-center">
+									<div class="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden mr-3">
+										<img src="${e.target.result}" alt="Preview" class="w-full h-full object-cover">
+									</div>
+									<div>
+										<p class="font-medium">${file.name}</p>
+										<p class="text-sm text-gray-500">${formatFileSize(file.size)}</p>
+										<p class="text-xs text-gray-400">${getDocTypeName(docType)}</p>
+									</div>
+								</div>
+								<div class="flex items-center space-x-2">
+									<button class="text-blue-600 hover:text-blue-800 view-kyc-file" data-file="${docType}" type="button">
+										<i class="fas fa-eye"></i>
+									</button>
+									<button class="text-red-600 hover:text-red-800 remove-kyc-file" data-file="${docType}" type="button">
+										<i class="fas fa-times"></i>
+									</button>
+								</div>
+							</div>
+						`;
+					} else if (isPDF) {
+						previewHTML = `
+							<div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+								<div class="flex items-center">
+									<div class="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+										<i class="fas fa-file-pdf text-red-600 text-xl"></i>
+									</div>
+									<div>
+										<p class="font-medium">${file.name}</p>
+										<p class="text-sm text-gray-500">${formatFileSize(file.size)}</p>
+										<p class="text-xs text-gray-400">${getDocTypeName(docType)} (PDF)</p>
+									</div>
+								</div>
+								<div class="flex items-center space-x-2">
+									<button class="text-blue-600 hover:text-blue-800 view-kyc-file" data-file="${docType}" type="button">
+										<i class="fas fa-eye"></i>
+									</button>
+									<button class="text-red-600 hover:text-red-800 remove-kyc-file" data-file="${docType}" type="button">
+										<i class="fas fa-times"></i>
+									</button>
+								</div>
+							</div>
+						`;
+					}
+					
+					previewContainer.innerHTML = previewHTML;
+					previewContainer.classList.remove('hidden');
+					
+					// Add event listeners to preview buttons
+					const viewButton = previewContainer.querySelector('.view-kyc-file');
+					const removeButton = previewContainer.querySelector('.remove-kyc-file');
+					
+					if (viewButton) {
+						viewButton.addEventListener('click', () => viewKYCFile(docType));
+					}
+					
+					if (removeButton) {
+						removeButton.addEventListener('click', () => removeKYCFile(docType));
+					}
+				};
+				
+				reader.readAsDataURL(file);
+			}
+
+			// View KYC file
+			function viewKYCFile(docType) {
+				const file = kycFiles[docType];
+				if (!file) return;
+				
+				const fileURL = URL.createObjectURL(file);
+				window.open(fileURL, '_blank');
+			}
+
+			// Remove KYC file
+			function removeKYCFile(docType) {
+				kycFiles[docType] = null;
+				const previewContainer = document.querySelector(`.kyc-file-preview[data-doc-type="${docType}"]`);
+				if (previewContainer) {
+					previewContainer.innerHTML = '';
+					previewContainer.classList.add('hidden');
+				}
+				
+				// Reset file input
+				const fileInput = document.querySelector(`.kyc-file-input[data-doc-type="${docType}"]`);
+				if (fileInput) {
+					fileInput.value = '';
+				}
+				
+				showNotification(`Documento ${getDocTypeName(docType)} eliminado`, 'success');
+			}
+
+			// Update KYC status
+			function updateKYCStatus() {
+				if (!appState.userData) return;
+				
+				const userKycStatus = appState.userData.kycStatus || 'pending';
+				const kycData = appState.userData.kycData || {};
+				
+				// Update badge in sidebar
+				if (kycStatus) {
+					kycStatus.textContent = `KYC ${userKycStatus === 'verified' ? 'Verificado' : userKycStatus === 'rejected' ? 'Rechazado' : 'Pendiente'}`;
+					kycStatus.className = `kyc-status ${userKycStatus === 'verified' ? 'kyc-verified' : userKycStatus === 'rejected' ? 'kyc-rejected' : 'kyc-pending'}`;
+				}
+				
+				// Update badge in KYC section
+				if (kycStatusBadge) {
+					kycStatusBadge.textContent = `KYC ${userKycStatus === 'verified' ? 'Verificado' : userKycStatus === 'rejected' ? 'Rechazado' : 'Pendiente'}`;
+					kycStatusBadge.className = `kyc-status ${userKycStatus === 'verified' ? 'kyc-verified' : userKycStatus === 'rejected' ? 'kyc-rejected' : 'kyc-pending'}`;
+				}
+				
+				// Auto-fill form if user has submitted KYC before
+				if (kycData.fullName && kycFullName) {
+					kycFullName.value = kycData.fullName;
+					document.getElementById('kyc-birthdate').value = kycData.birthdate || '';
+					document.getElementById('kyc-id-type').value = kycData.idType || '';
+					document.getElementById('kyc-id-number').value = kycData.idNumber || '';
+					document.getElementById('kyc-id-country').value = kycData.idCountry || '';
+					document.getElementById('kyc-address').value = kycData.address || '';
+				} else if (kycFullName && appState.userData.name) {
+					// Auto-fill name from user profile
+					kycFullName.value = appState.userData.name || '';
+				}
+				
+				// Disable form if already verified or rejected
+				if (kycForm && (userKycStatus === 'verified' || userKycStatus === 'rejected')) {
+					kycForm.querySelectorAll('input, select, textarea, button').forEach(el => {
+						el.disabled = true;
+					});
+					if (submitKycButton) {
+						submitKycButton.innerHTML = '<i class="fas fa-check mr-2"></i> KYC Ya Enviado';
+						submitKycButton.disabled = true;
+					}
+				} else if (kycForm) {
+					kycForm.querySelectorAll('input, select, textarea').forEach(el => {
+						el.disabled = false;
+					});
+					if (submitKycButton) {
+						submitKycButton.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Enviar para Verificación';
+						submitKycButton.disabled = false;
+					}
+				}
+			}
+
+			// Handle KYC form submission
+			function handleKYCSubmit(e) {
+				e.preventDefault();
+				
+				if (!appState.currentUser) {
+					showNotification('Debes iniciar sesión para enviar KYC', 'error');
+					return;
+				}
+				
+				// Validate required fields
+				const fullName = kycFullName ? kycFullName.value.trim() : '';
+				const birthdate = document.getElementById('kyc-birthdate') ? document.getElementById('kyc-birthdate').value : '';
+				const idType = document.getElementById('kyc-id-type') ? document.getElementById('kyc-id-type').value : '';
+				const idNumber = document.getElementById('kyc-id-number') ? document.getElementById('kyc-id-number').value.trim() : '';
+				const idCountry = document.getElementById('kyc-id-country') ? document.getElementById('kyc-id-country').value : '';
+				const address = document.getElementById('kyc-address') ? document.getElementById('kyc-address').value.trim() : '';
+				
+				if (!fullName || !birthdate || !idType || !idNumber || !idCountry || !address) {
+					showNotification('Por favor completa todos los campos obligatorios', 'error');
+					return;
+				}
+				
+				// Validate required documents
+				if (!kycFiles.id_front || !kycFiles.id_back || !kycFiles.selfie) {
+					showNotification('Debes subir todos los documentos requeridos (frente, reverso y selfie)', 'error');
+					return;
+				}
+				
+				showNotification('Enviando verificación KYC...', 'warning');
+				
+				// Disable submit button
+				if (submitKycButton) {
+					submitKycButton.disabled = true;
+					submitKycButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Enviando...';
+				}
+				
+				// Create KYC data object
+				const kycData = {
+					fullName: fullName,
+					birthdate: birthdate,
+					idType: idType,
+					idNumber: idNumber,
+					idCountry: idCountry,
+					address: address,
+					status: 'pending',
+					submittedAt: Date.now(),
+					updatedAt: Date.now()
+				};
+				
+				// First, save KYC data to user profile
+				db.ref('users/' + appState.currentUser.uid).update({
+					kycData: kycData,
+					kycStatus: 'pending',
+					updatedAt: Date.now()
+				})
+				.then(() => {
+					// Upload documents to Firebase Storage
+					const uploadPromises = [];
+					
+					// Upload each document
+					Object.keys(kycFiles).forEach(docType => {
+						const file = kycFiles[docType];
+						if (file) {
+							const fileExtension = file.name.split('.').pop();
+							const fileName = `kyc_${docType}_${Date.now()}.${fileExtension}`;
+							const fileRef = storage.ref().child(`kyc/${appState.currentUser.uid}/${fileName}`);
+							
+							const uploadPromise = fileRef.put(file).then(snapshot => {
+								return snapshot.ref.getDownloadURL().then(url => ({
+									type: docType,
+									url: url,
+									name: file.name,
+									size: file.size,
+									uploadedAt: Date.now()
+								}));
+							});
+							
+							uploadPromises.push(uploadPromise);
+						}
+					});
+					
+					return Promise.all(uploadPromises);
+				})
+				.then(documents => {
+					// Update user with document URLs
+					return db.ref('users/' + appState.currentUser.uid + '/kycData/documents').set(documents);
+				})
+				.then(() => {
+					showNotification('¡Verificación KYC enviada correctamente! Será revisada por nuestro equipo en 24-48 horas.', 'success');
+					
+					// Reset form and files
+					if (kycForm) {
+						kycForm.reset();
+					}
+					Object.keys(kycFiles).forEach(docType => {
+						kycFiles[docType] = null;
+						const previewContainer = document.querySelector(`.kyc-file-preview[data-doc-type="${docType}"]`);
+						if (previewContainer) {
+							previewContainer.classList.add('hidden');
+							previewContainer.innerHTML = '';
+						}
+					});
+					
+					// Update status
+					updateKYCStatus();
+				})
+				.catch(error => {
+					console.error('Error submitting KYC:', error);
+					showNotification('Error al enviar la verificación KYC: ' + error.message, 'error');
+				})
+				.finally(() => {
+					// Re-enable submit button
+					if (submitKycButton) {
+						submitKycButton.disabled = false;
+						submitKycButton.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Enviar para Verificación';
+					}
+				});
+			}
         // Función auxiliar para verificar que todos los elementos existen
         function verifyWithdrawalElements() {
             console.log('Verificando elementos de retiro...');

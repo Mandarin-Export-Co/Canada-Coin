@@ -5,19 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Canada Coin - Plataforma de Gestión de Inversiones</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -349,7 +345,6 @@
             border: 1px solid #e5e7eb;
         }
         
-        /* Estilos para proyección oculta por defecto */
         #earnings-projection-container {
             display: none;
         }
@@ -358,7 +353,6 @@
             display: block;
         }
         
-        /* Estilos mejorados para gráficos */
         .chart-container {
             position: relative;
             height: 300px;
@@ -367,10 +361,8 @@
     </style>
 </head>
 <body>
-    <!-- Notifications Container -->
     <div id="notifications-container"></div>
     
-    <!-- Authentication Section (Login/Register) -->
     <section id="auth-section" class="min-h-screen flex items-center justify-center p-4">
         <div class="card w-full max-w-md p-8">
             <div class="text-center mb-8">
@@ -420,12 +412,9 @@
                         <label for="register-country" class="block text-gray-700 mb-2">País</label>
                         <select id="register-country" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                             <option value="">Selecciona un país</option>
-                            <!-- América del Norte -->
                             <option value="CA">Canadá</option>
                             <option value="US">Estados Unidos</option>
                             <option value="MX">México</option>
-                            
-                            <!-- América Central -->
                             <option value="BZ">Belice</option>
                             <option value="CR">Costa Rica</option>
                             <option value="SV">El Salvador</option>
@@ -433,8 +422,6 @@
                             <option value="HN">Honduras</option>
                             <option value="NI">Nicaragua</option>
                             <option value="PA">Panamá</option>
-                            
-                            <!-- Caribe -->
                             <option value="AG">Antigua y Barbuda</option>
                             <option value="BS">Bahamas</option>
                             <option value="BB">Barbados</option>
@@ -448,8 +435,6 @@
                             <option value="LC">Santa Lucía</option>
                             <option value="VC">San Vicente y las Granadinas</option>
                             <option value="TT">Trinidad y Tobago</option>
-                            
-                            <!-- América del Sur -->
                             <option value="AR">Argentina</option>
                             <option value="BO">Bolivia</option>
                             <option value="BR">Brasil</option>
@@ -462,8 +447,6 @@
                             <option value="SR">Surinam</option>
                             <option value="UY">Uruguay</option>
                             <option value="VE">Venezuela</option>
-                            
-                            <!-- Europa -->
                             <option value="ES">España</option>
                             <option value="PT">Portugal</option>
                             <option value="FR">Francia</option>
@@ -471,19 +454,13 @@
                             <option value="IT">Italia</option>
                             <option value="GB">Reino Unido</option>
                             <option value="RU">Rusia</option>
-                            
-                            <!-- Asia -->
                             <option value="CN">China</option>
                             <option value="JP">Japón</option>
                             <option value="KR">Corea del Sur</option>
                             <option value="IN">India</option>
-                            
-                            <!-- África -->
                             <option value="ZA">Sudáfrica</option>
                             <option value="EG">Egipto</option>
                             <option value="NG">Nigeria</option>
-                            
-                            <!-- Oceanía -->
                             <option value="AU">Australia</option>
                             <option value="NZ">Nueva Zelanda</option>
                         </select>
@@ -517,9 +494,7 @@
         </div>
     </section>
     
-    <!-- Main Dashboard Section (Hidden by default) -->
     <section id="dashboard-section" class="hidden">
-        <!-- Header -->
         <header class="bg-white shadow-sm">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center py-4">
@@ -543,10 +518,8 @@
             </div>
         </header>
         
-        <!-- Main Content -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex flex-col lg:flex-row gap-8">
-                <!-- Sidebar Navigation -->
                 <div class="lg:w-1/4">
                     <div class="card p-6 mb-6">
                         <div class="flex items-center mb-6">
@@ -597,7 +570,6 @@
                         </nav>
                     </div>
                     
-                    <!-- Quick Actions -->
                     <div class="card p-6">
                         <h3 class="font-bold text-lg mb-4">Acciones Rápidas</h3>
                         <div class="space-y-3">
@@ -614,11 +586,8 @@
                     </div>
                 </div>
                 
-                <!-- Main Dashboard Content -->
                 <div class="lg:w-3/4">
-                    <!-- Dashboard Section -->
                     <div id="dashboard" class="section active">
-                        <!-- Financial Summary -->
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                             <div class="stat-card primary card">
                                 <div class="flex justify-between items-start">
@@ -673,7 +642,6 @@
                             </div>
                         </div>
                         
-                        <!-- Performance Chart -->
                         <div class="card p-6 mb-8">
                             <div class="flex justify-between items-center mb-6">
                                 <h2 class="text-xl font-bold">Rendimiento de Inversión</h2>
@@ -686,7 +654,6 @@
                             </div>
                             
                             <div class="relative">
-                                <!-- Stats overlay -->
                                 <div class="absolute top-4 left-4 z-10">
                                     <div class="bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-sm">
                                         <p class="text-xs text-gray-600">Rendimiento Total</p>
@@ -694,12 +661,10 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Chart canvas -->
                                 <div class="chart-container">
                                     <canvas id="performance-chart" class="w-full h-full rounded-lg"></canvas>
                                 </div>
                                 
-                                <!-- Legend -->
                                 <div class="flex justify-center mt-4 space-x-6">
                                     <div class="flex items-center">
                                         <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
@@ -716,7 +681,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Mini stats below chart -->
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
                                 <div class="text-center">
                                     <p class="text-sm text-gray-500">Rendimiento Diario</p>
@@ -737,7 +701,6 @@
                             </div>
                         </div>
                         
-                        <!-- Recent Transactions -->
                         <div class="card p-6">
                             <div class="flex justify-between items-center mb-6">
                                 <h2 class="text-xl font-bold">Transacciones Recientes</h2>
@@ -752,7 +715,6 @@
                         </div>
                     </div>
                     
-                    <!-- Performance Section -->
                     <div id="performance" class="section">
                         <div class="card p-6">
                             <h2 class="text-xl font-bold mb-6">Seguimiento de Rendimientos</h2>
@@ -793,7 +755,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Proyección de crecimiento - Oculto por defecto -->
                             <div id="earnings-projection-container" class="bg-gray-50 p-6 rounded-lg mb-6">
                                 <div class="flex justify-between items-center mb-4">
                                     <h3 class="text-lg font-bold">Proyección de Crecimiento (Próximos 30 días)</h3>
@@ -808,7 +769,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Cálculo detallado -->
                             <div class="bg-gray-50 p-6 rounded-lg">
                                 <h3 class="text-lg font-bold mb-4">Cálculo Detallado de Rendimientos</h3>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -829,7 +789,6 @@
                         </div>
                     </div>
                     
-                    <!-- Deposits Section -->
                     <div id="deposits" class="section">
                         <div class="card p-6">
                             <div class="flex justify-between items-center mb-6">
@@ -847,7 +806,6 @@
                         </div>
                     </div>
                     
-                    <!-- Withdrawals Section -->
                     <div id="withdrawals" class="section">
                         <div class="card p-6">
                             <div class="flex justify-between items-center mb-6">
@@ -865,7 +823,6 @@
                         </div>
                     </div>
                     
-                    <!-- Referrals Section -->
                     <div id="referrals" class="section">
                         <div class="card p-6">
                             <h2 class="text-xl font-bold mb-6">Programa de Referidos</h2>
@@ -886,7 +843,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Activar código de referido recibido -->
                             <div class="mb-6 p-6 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl">
                                 <h3 class="text-lg font-bold mb-4">Activar Código de Referido</h3>
                                 <p class="mb-4">¿Tienes un código de referido? ¡Actívalo para recibir tu bono de bienvenida de $25!</p>
@@ -899,7 +855,6 @@
                                 <p class="text-sm mt-2 opacity-90">* El bono se acredita después de tu primer depósito mínimo de $100</p>
                             </div>
                             
-                            <!-- Tus bonos -->
                             <div class="bg-gray-50 p-6 rounded-lg">
                                 <h3 class="text-lg font-bold mb-4">Tus Bonos por Referidos</h3>
                                 <div id="referrals-bonus-list">
@@ -913,7 +868,6 @@
                         </div>
                     </div>
                     
-                    <!-- Settings Section -->
                     <div id="settings" class="section">
                         <div class="card p-6">
                             <h2 class="text-xl font-bold mb-6">Configuración de Cuenta</h2>
@@ -937,24 +891,57 @@
                                             <label for="profile-country" class="block text-gray-700 mb-2">País</label>
                                             <select id="profile-country" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                                                 <option value="">Selecciona un país</option>
-                                                <option value="CA">Canadá</option>
-                                                <option value="US">Estados Unidos</option>
-                                                <option value="MX">México</option>
-                                                <option value="AR">Argentina</option>
-                                                <option value="BR">Brasil</option>
-                                                <option value="CL">Chile</option>
-                                                <option value="CO">Colombia</option>
-                                                <option value="ES">España</option>
-                                                <option value="FR">Francia</option>
-                                                <option value="DE">Alemania</option>
-                                                <option value="IT">Italia</option>
-                                                <option value="GB">Reino Unido</option>
-                                                <option value="AU">Australia</option>
-                                                <option value="JP">Japón</option>
-                                                <option value="CN">China</option>
-                                                <option value="IN">India</option>
-                                                <option value="ZA">Sudáfrica</option>
-                                                <option value="RU">Rusia</option>
+												<option value="CA">Canadá</option>
+												<option value="US">Estados Unidos</option>
+												<option value="MX">México</option>
+												<option value="BZ">Belice</option>
+												<option value="CR">Costa Rica</option>
+												<option value="SV">El Salvador</option>
+												<option value="GT">Guatemala</option>
+												<option value="HN">Honduras</option>
+												<option value="NI">Nicaragua</option>
+												<option value="PA">Panamá</option>
+												<option value="AG">Antigua y Barbuda</option>
+												<option value="BS">Bahamas</option>
+												<option value="BB">Barbados</option>
+												<option value="CU">Cuba</option>
+												<option value="DM">Dominica</option>
+												<option value="DO">República Dominicana</option>
+												<option value="GD">Granada</option>
+												<option value="HT">Haití</option>
+												<option value="JM">Jamaica</option>
+												<option value="KN">San Cristóbal y Nieves</option>
+												<option value="LC">Santa Lucía</option>
+												<option value="VC">San Vicente y las Granadinas</option>
+												<option value="TT">Trinidad y Tobago</option>
+												<option value="AR">Argentina</option>
+												<option value="BO">Bolivia</option>
+												<option value="BR">Brasil</option>
+												<option value="CL">Chile</option>
+												<option value="CO">Colombia</option>
+												<option value="EC">Ecuador</option>
+												<option value="GY">Guyana</option>
+												<option value="PY">Paraguay</option>
+												<option value="PE">Perú</option>
+												<option value="SR">Surinam</option>
+												<option value="UY">Uruguay</option>
+												<option value="VE">Venezuela</option>
+												<option value="ES">España</option>
+												<option value="PT">Portugal</option>
+												<option value="FR">Francia</option>
+												<option value="DE">Alemania</option>
+												<option value="IT">Italia</option>
+												<option value="GB">Reino Unido</option>
+												<option value="RU">Rusia</option>
+												<option value="CN">China</option>
+												<option value="JP">Japón</option>
+												<option value="KR">Corea del Sur</option>
+												<option value="IN">India</option>
+												<option value="ZA">Sudáfrica</option>
+												<option value="EG">Egipto</option>
+												<option value="NG">Nigeria</option>
+												<option value="AU">Australia</option>
+												<option value="NZ">Nueva Zelanda</option>
                                             </select>
                                         </div>
                                         <div class="mb-4">
@@ -993,7 +980,6 @@
                                     </div>
                                     <button id="change-password" class="btn-secondary">Cambiar Contraseña</button>
                                     
-                                    <!-- Configuración de retiros internacionales -->
                                     <div class="mt-8 pt-6 border-t border-gray-200">
                                         <h3 class="text-lg font-bold mb-4">Configuración de Retiros Internacionales</h3>
                                         <div class="mb-4">
@@ -1015,7 +1001,6 @@
                         </div>
                     </div>
                     
-                    <!-- KYC Verification Section -->
                     <div id="kyc-verification" class="section">
                         <div class="card p-6">
                             <h2 class="text-xl font-bold mb-6">Verificación de Identidad (KYC)</h2>
@@ -1076,24 +1061,57 @@
                                         <label for="kyc-id-country" class="block text-gray-700 mb-2">País Emisor</label>
                                         <select id="kyc-id-country" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                                             <option value="">Seleccionar país</option>
-                                            <option value="CA">Canadá</option>
-                                            <option value="US">Estados Unidos</option>
-                                            <option value="MX">México</option>
-                                            <option value="AR">Argentina</option>
-                                            <option value="BR">Brasil</option>
-                                            <option value="CL">Chile</option>
-                                            <option value="CO">Colombia</option>
-                                            <option value="ES">España</option>
-                                            <option value="FR">Francia</option>
-                                            <option value="DE">Alemania</option>
-                                            <option value="IT">Italia</option>
-                                            <option value="GB">Reino Unido</option>
-                                            <option value="AU">Australia</option>
-                                            <option value="JP">Japón</option>
-                                            <option value="CN">China</option>
-                                            <option value="IN">India</option>
-                                            <option value="ZA">Sudáfrica</option>
-                                            <option value="RU">Rusia</option>
+											<option value="CA">Canadá</option>
+											<option value="US">Estados Unidos</option>
+											<option value="MX">México</option>
+											<option value="BZ">Belice</option>
+											<option value="CR">Costa Rica</option>
+											<option value="SV">El Salvador</option>
+											<option value="GT">Guatemala</option>
+											<option value="HN">Honduras</option>
+											<option value="NI">Nicaragua</option>
+											<option value="PA">Panamá</option>
+											<option value="AG">Antigua y Barbuda</option>
+											<option value="BS">Bahamas</option>
+											<option value="BB">Barbados</option>
+											<option value="CU">Cuba</option>
+											<option value="DM">Dominica</option>
+											<option value="DO">República Dominicana</option>
+											<option value="GD">Granada</option>
+											<option value="HT">Haití</option>
+											<option value="JM">Jamaica</option>
+											<option value="KN">San Cristóbal y Nieves</option>
+											<option value="LC">Santa Lucía</option>
+											<option value="VC">San Vicente y las Granadinas</option>
+											<option value="TT">Trinidad y Tobago</option>
+											<option value="AR">Argentina</option>
+											<option value="BO">Bolivia</option>
+											<option value="BR">Brasil</option>
+											<option value="CL">Chile</option>
+											<option value="CO">Colombia</option>
+											<option value="EC">Ecuador</option>
+											<option value="GY">Guyana</option>
+											<option value="PY">Paraguay</option>
+											<option value="PE">Perú</option>
+											<option value="SR">Surinam</option>
+											<option value="UY">Uruguay</option>
+											<option value="VE">Venezuela</option>
+											<option value="ES">España</option>
+											<option value="PT">Portugal</option>
+											<option value="FR">Francia</option>
+											<option value="DE">Alemania</option>
+											<option value="IT">Italia</option>
+											<option value="GB">Reino Unido</option>
+											<option value="RU">Rusia</option>
+											<option value="CN">China</option>
+											<option value="JP">Japón</option>
+											<option value="KR">Corea del Sur</option>
+											<option value="IN">India</option>
+											<option value="ZA">Sudáfrica</option>
+											<option value="EG">Egipto</option>
+											<option value="NG">Nigeria</option>
+											<option value="AU">Australia</option>
+											<option value="NZ">Nueva Zelanda</option>
                                         </select>
                                     </div>
                                     
@@ -1103,7 +1121,6 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Document Upload Sections -->
                                 <div class="space-y-6">
                                     <div class="border border-gray-300 rounded-lg p-4">
                                         <h3 class="font-bold text-lg mb-4">1. Documento de Identificación (Frente) *</h3>
@@ -1159,7 +1176,6 @@
                         </div>
                     </div>
                     
-                    <!-- Help Section -->
                     <div id="help" class="section">
                         <div class="card p-6">
                             <h2 class="text-xl font-bold mb-6">Centro de Ayuda</h2>
@@ -1210,7 +1226,6 @@
         </div>
     </section>
 
-    <!-- Deposit Modal -->
     <div id="deposit-modal" class="modal">
         <div class="modal-content">
             <div class="p-6 border-b border-gray-200">
@@ -1223,7 +1238,7 @@
             </div>
             
             <div class="p-6">
-                <form id="deposit-form">
+                <form id="deposit-form" novalidate>
                     <div class="mb-6">
                         <label for="deposit-amount" class="block text-gray-700 mb-2">Monto a Depositar (USD)</label>
                         <input type="number" id="deposit-amount" min="100" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" required>
@@ -1322,192 +1337,341 @@
         </div>
     </div>
 
-    <!-- Withdrawal Modal -->
-    <div id="withdrawal-modal" class="modal">
-        <div class="modal-content">
-            <div class="p-6 border-b border-gray-200">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold">Solicitar Retiro</h2>
-                    <button id="close-withdrawal-modal" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="p-6">
-                <form id="withdrawal-form">
-                    <div class="mb-6">
-                        <label for="withdrawal-amount" class="block text-gray-700 mb-2">Monto a Retirar (USD)</label>
-                        <input type="number" id="withdrawal-amount" min="10" step="0.01" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" required>
-                        <p class="text-sm text-gray-500 mt-1">Saldo disponible: <span id="available-balance">$0.00</span></p>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label class="block text-gray-700 mb-2">Método de Retiro</label>
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
-                                <input type="radio" id="withdrawal-bank" name="withdrawal-method" value="bank" class="hidden" checked>
-                                <label for="withdrawal-bank" class="cursor-pointer">
-                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                                        <i class="fas fa-university text-blue-600 text-xl"></i>
-                                    </div>
-                                    <p class="font-medium">Banco Local</p>
-                                </label>
-                            </div>
-                            
-                            <div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
-                                <input type="radio" id="withdrawal-paypal" name="withdrawal-method" value="paypal" class="hidden">
-                                <label for="withdrawal-paypal" class="cursor-pointer">
-                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                                        <i class="fab fa-paypal text-blue-600 text-xl"></i>
-                                    </div>
-                                    <p class="font-medium">PayPal</p>
-                                </label>
-                            </div>
-                            
-                            <div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
-                                <input type="radio" id="withdrawal-crypto" name="withdrawal-method" value="crypto" class="hidden">
-                                <label for="withdrawal-crypto" class="cursor-pointer">
-                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                                        <i class="fas fa-coins text-blue-600 text-xl"></i>
-                                    </div>
-                                    <p class="font-medium">Criptomonedas</p>
-                                </label>
-                            </div>
-                            
-                            <div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
-                                <input type="radio" id="withdrawal-international" name="withdrawal-method" value="international" class="hidden">
-                                <label for="withdrawal-international" class="cursor-pointer">
-                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                                        <i class="fas fa-globe text-blue-600 text-xl"></i>
-                                    </div>
-                                    <p class="font-medium">Internacional</p>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="withdrawal-details" class="mb-6">
-                        <div id="bank-details" class="method-details">
-                            <h3 class="font-bold mb-4 text-gray-800">Información Bancaria Local</h3>
-                            <div class="mb-4">
-                                <label for="bank-name" class="block text-gray-700 mb-2">Nombre del Banco *</label>
-                                <input type="text" id="bank-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: Banco Nacional" required>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="account-number" class="block text-gray-700 mb-2">Número de Cuenta *</label>
-                                <input type="text" id="account-number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 1234567890" required>
-                                <p class="text-xs text-gray-500 mt-1">Ingresa solo números, sin guiones ni espacios</p>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="account-holder" class="block text-gray-700 mb-2">Nombre del Titular *</label>
-                                <input type="text" id="account-holder" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nombre completo como aparece en el banco" required>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="account-type" class="block text-gray-700 mb-2">Tipo de Cuenta *</label>
-                                <select id="account-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                    <option value="">Seleccionar tipo</option>
-                                    <option value="checking">Cuenta Corriente</option>
-                                    <option value="savings">Cuenta de Ahorros</option>
-                                    <option value="business">Cuenta Empresarial</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div id="paypal-details" class="method-details hidden">
-                            <h3 class="font-bold mb-4 text-gray-800">Información de PayPal</h3>
-                            <div class="mb-4">
-                                <label for="paypal-email" class="block text-gray-700 mb-2">Correo Electrónico de PayPal *</label>
-                                <input type="email" id="paypal-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="tucorreo@paypal.com" required>
-                                <p class="text-xs text-gray-500 mt-1">Debe coincidir con la cuenta de PayPal registrada</p>
-                            </div>
-                        </div>
-                        
-                        <div id="crypto-details" class="method-details hidden">
-                            <h3 class="font-bold mb-4 text-gray-800">Información de Criptomonedas</h3>
-                            <div class="mb-4">
-                                <label for="crypto-currency" class="block text-gray-700 mb-2">Selecciona Criptomoneda *</label>
-                                <select id="crypto-currency" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                    <option value="">Selecciona una criptomoneda</option>
-                                    <option value="BTC">Bitcoin (BTC)</option>
-                                    <option value="ETH">Ethereum (ETH)</option>
-                                    <option value="USDT">Tether (USDT)</option>
-                                    <option value="USDC">USD Coin (USDC)</option>
-                                    <option value="BNB">Binance Coin (BNB)</option>
-                                    <option value="ADA">Cardano (ADA)</option>
-                                    <option value="SOL">Solana (SOL)</option>
-                                </select>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="wallet-address" class="block text-gray-700 mb-2">Dirección de la Billetera *</label>
-                                <input type="text" id="wallet-address" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 0x742d35Cc6634C0532925a3b8D4C9db7c1b7c8e8e" required>
-                                <p class="text-xs text-gray-500 mt-1">Copia y pega la dirección completa. Verifica cuidadosamente cada carácter.</p>
-                            </div>
-                        </div>
-                        
-                        <div id="international-details" class="method-details hidden">
-                            <h3 class="font-bold mb-4 text-gray-800">Transferencia Bancaria Internacional</h3>
-                            <div class="mb-4">
-                                <label for="international-bank-name" class="block text-gray-700 mb-2">Nombre del Banco Internacional *</label>
-                                <input type="text" id="international-bank-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: HSBC, Citibank, etc." required>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="swift-bic" class="block text-gray-700 mb-2">Código SWIFT/BIC *</label>
-                                <input type="text" id="swift-bic" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: HSBCUS33" required>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="iban-number" class="block text-gray-700 mb-2">Número IBAN *</label>
-                                <input type="text" id="iban-number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: GB29NWBK60161331926819" required>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="international-account-holder" class="block text-gray-700 mb-2">Nombre del Titular *</label>
-                                <input type="text" id="international-account-holder" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nombre completo como aparece en el banco" required>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="international-address" class="block text-gray-700 mb-2">Dirección del Banco</label>
-                                <textarea id="international-address" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" rows="2" placeholder="Dirección completa del banco"></textarea>
-                            </div>
-                            
-                            <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                <p class="text-sm text-yellow-700">
-                                    <i class="fas fa-info-circle mr-1"></i>
-                                    Las transferencias internacionales pueden tener tarifas adicionales y un tiempo de procesamiento más largo (5-7 días hábiles).
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <div class="flex items-start">
-                            <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
-                            <div>
-                                <p class="font-medium text-yellow-800">Tiempo de Procesamiento</p>
-                                <p class="text-yellow-700 text-sm mt-1">Los retiros generalmente se procesan en 3-5 días hábiles. Los retiros en criptomonedas pueden procesarse en 24-48 horas. Te notificaremos por correo electrónico cuando tu solicitud sea aprobada.</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-end space-x-4">
-                        <button type="button" id="cancel-withdrawal" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
-                        <button type="submit" id="submit-withdrawal" class="btn-primary flex items-center">
-                            <span>Solicitar Retiro</span>
-                            <i class="fas fa-arrow-right ml-2"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+	<div id="withdrawal-modal" class="modal">
+		<div class="modal-content">
+			<div class="p-6 border-b border-gray-200">
+				<div class="flex justify-between items-center">
+					<h2 class="text-xl font-bold">Solicitar Retiro</h2>
+					<button id="close-withdrawal-modal" class="text-gray-400 hover:text-gray-600">
+						<i class="fas fa-times text-xl"></i>
+					</button>
+				</div>
+			</div>
 
-    <!-- Referral Modal -->
+			<div class="p-6">
+				<form id="withdrawal-form" novalidate>
+					<div class="mb-6">
+						<label for="withdrawal-amount" class="block text-gray-700 mb-2">Monto a Retirar (USD)</label>
+						<input type="number" id="withdrawal-amount" min="10" step="0.01"
+							   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+							   placeholder="0.00" required>
+						<p class="text-sm text-gray-500 mt-1">Saldo disponible: <span id="available-balance">$0.00</span></p>
+					</div>
+
+					<div class="mb-6">
+						<label class="block text-gray-700 mb-2">Método de Retiro</label>
+						<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+							<div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+								<input type="radio" id="withdrawal-bank" name="withdrawal-method" value="bank" class="hidden" checked>
+								<label for="withdrawal-bank" class="cursor-pointer">
+									<div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+										<i class="fas fa-university text-blue-600 text-xl"></i>
+									</div>
+									<p class="font-medium">Banco Local</p>
+								</label>
+							</div>
+
+							<div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+								<input type="radio" id="withdrawal-paypal" name="withdrawal-method" value="paypal" class="hidden">
+								<label for="withdrawal-paypal" class="cursor-pointer">
+									<div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+										<i class="fab fa-paypal text-blue-600 text-xl"></i>
+									</div>
+									<p class="font-medium">PayPal</p>
+								</label>
+							</div>
+
+							<div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+								<input type="radio" id="withdrawal-crypto" name="withdrawal-method" value="crypto" class="hidden">
+								<label for="withdrawal-crypto" class="cursor-pointer">
+									<div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+										<i class="fas fa-coins text-blue-600 text-xl"></i>
+									</div>
+									<p class="font-medium">Cripto</p>
+								</label>
+							</div>
+
+							<div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+								<input type="radio" id="withdrawal-international" name="withdrawal-method" value="international" class="hidden">
+								<label for="withdrawal-international" class="cursor-pointer">
+									<div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+										<i class="fas fa-globe text-blue-600 text-xl"></i>
+									</div>
+									<p class="font-medium">Banco Internacional</p>
+								</label>
+							</div>
+						</div>
+					</div>
+
+					<div id="withdrawal-details" class="mb-6">
+						<div id="bank-details" class="method-details">
+							<h3 class="font-bold mb-4 text-gray-800">Información Bancaria Local</h3>
+
+							<div class="mb-4">
+								<label for="bank-name" class="block text-gray-700 mb-2">Nombre del Banco *</label>
+								<input type="text" id="bank-name"
+									   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+									   placeholder="Ej: Banco Nacional" required>
+							</div>
+
+							<div class="mb-4">
+								<label for="account-number" class="block text-gray-700 mb-2">Número de Cuenta *</label>
+								<input type="text" id="account-number"
+									   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+									   placeholder="Ej: 1234567890" required>
+							</div>
+
+							<div class="mb-4">
+								<label for="account-holder" class="block text-gray-700 mb-2">Nombre del Titular *</label>
+								<input type="text" id="account-holder"
+									   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+									   placeholder="Nombre completo como aparece en el banco" required>
+							</div>
+
+							<div class="mb-4">
+								<label for="account-type" class="block text-gray-700 mb-2">Tipo de Cuenta *</label>
+								<select id="account-type"
+										class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+										required>
+									<option value="">Seleccionar tipo</option>
+									<option value="checking">Cuenta Corriente</option>
+									<option value="savings">Cuenta de Ahorros</option>
+									<option value="business">Cuenta Empresarial</option>
+								</select>
+							</div>
+						</div>
+
+						<div id="paypal-details" class="method-details hidden">
+							<h3 class="font-bold mb-4 text-gray-800">Información de PayPal</h3>
+							<div class="mb-4">
+								<label for="paypal-email" class="block text-gray-700 mb-2">Correo Electrónico de PayPal *</label>
+								<input type="email" id="paypal-email"
+									   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+									   placeholder="tucorreo@paypal.com" required>
+							</div>
+						</div>
+
+						<div id="crypto-details" class="method-details hidden">
+							<h3 class="font-bold mb-4 text-gray-800">Información de Criptomonedas</h3>
+
+							<div class="mb-4">
+								<label for="crypto-wallet" class="block text-gray-700 mb-2">Dirección de la Billetera *</label>
+								<input type="text" id="crypto-wallet"
+									   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+									   placeholder="Ej: 0x742d35Cc6634C0532925a3b8D4C9db7c1b7c8e8e" required>
+							</div>
+
+							<div class="mb-4">
+								<label for="crypto-network" class="block text-gray-700 mb-2">Red / Network *</label>
+								<input type="text" id="crypto-network"
+									   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+									   placeholder="Ej: ERC20, TRC20, BEP20" required>
+							</div>
+						</div>
+
+						<div id="international-details" class="method-details hidden">
+							<h3 class="font-bold mb-4 text-gray-800">Información Bancaria Internacional</h3>
+							
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+								<div>
+									<label for="international-bank-country" class="block text-gray-700 mb-2">País del Banco *</label>
+									<select id="international-bank-country" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+										<option value="">Selecciona un país</option>
+										<option value="CA">Canadá</option>
+										<option value="US">Estados Unidos</option>
+										<option value="MX">México</option>
+										<option value="BZ">Belice</option>
+										<option value="CR">Costa Rica</option>
+										<option value="SV">El Salvador</option>
+										<option value="GT">Guatemala</option>
+										<option value="HN">Honduras</option>
+										<option value="NI">Nicaragua</option>
+										<option value="PA">Panamá</option>
+										<option value="AG">Antigua y Barbuda</option>
+										<option value="BS">Bahamas</option>
+										<option value="BB">Barbados</option>
+										<option value="CU">Cuba</option>
+										<option value="DM">Dominica</option>
+										<option value="DO">República Dominicana</option>
+										<option value="GD">Granada</option>
+										<option value="HT">Haití</option>
+										<option value="JM">Jamaica</option>
+										<option value="KN">San Cristóbal y Nieves</option>
+										<option value="LC">Santa Lucía</option>
+										<option value="VC">San Vicente y las Granadinas</option>
+										<option value="TT">Trinidad y Tobago</option>
+										<option value="AR">Argentina</option>
+										<option value="BO">Bolivia</option>
+										<option value="BR">Brasil</option>
+										<option value="CL">Chile</option>
+										<option value="CO">Colombia</option>
+										<option value="EC">Ecuador</option>
+										<option value="GY">Guyana</option>
+										<option value="PY">Paraguay</option>
+										<option value="PE">Perú</option>
+										<option value="SR">Surinam</option>
+										<option value="UY">Uruguay</option>
+										<option value="VE">Venezuela</option>
+										<option value="ES">España</option>
+										<option value="PT">Portugal</option>
+										<option value="FR">Francia</option>
+										<option value="DE">Alemania</option>
+										<option value="IT">Italia</option>
+										<option value="GB">Reino Unido</option>
+										<option value="RU">Rusia</option>
+										<option value="CN">China</option>
+										<option value="JP">Japón</option>
+										<option value="KR">Corea del Sur</option>
+										<option value="IN">India</option>
+										<option value="ZA">Sudáfrica</option>
+										<option value="EG">Egipto</option>
+										<option value="NG">Nigeria</option>
+										<option value="AU">Australia</option>
+										<option value="NZ">Nueva Zelanda</option>
+									</select>
+								</div>
+								<div>
+									<label for="international-bank-name" class="block text-gray-700 mb-2">Nombre del Banco *</label>
+									<input type="text" id="international-bank-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: Banco Nacional" required>
+								</div>
+							</div>
+							
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+								<div>
+									<label for="international-account-type" class="block text-gray-700 mb-2">Tipo de Cuenta *</label>
+									<select id="international-account-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+										<option value="savings">Cuenta de Ahorros</option>
+										<option value="checking">Cuenta Corriente</option>
+										<option value="business">Cuenta Empresarial</option>
+									</select>
+								</div>
+								<div>
+									<label for="international-currency" class="block text-gray-700 mb-2">Moneda de la Cuenta *</label>
+									<select id="international-currency" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+										<option value="USD">Dólar Americano (USD)</option>
+										<option value="CAD">Dólar Canadiense (CAD)</option>
+										<option value="MXN">Peso Mexicano (MXN)</option>
+										<option value="BZD">Dólar Beliceño (BZD)</option>
+										<option value="CRC">Colón Costarricense (CRC)</option>
+										<option value="USD">Dólar Americano (USD) - El Salvador</option>
+										<option value="GTQ">Quetzal Guatemalteco (GTQ)</option>
+										<option value="HNL">Lempira Hondureña (HNL)</option>
+										<option value="NIO">Córdoba Nicaragüense (NIO)</option>
+										<option value="PAB">Balboa Panameño (PAB)</option>
+										<option value="USD">Dólar Americano (USD) - Panamá</option>
+										<option value="XCD">Dólar del Caribe Oriental (XCD) - Antigua y Barbuda</option>
+										<option value="BSD">Dólar Bahameño (BSD)</option>
+										<option value="BBD">Dólar Barbadense (BBD)</option>
+										<option value="CUP">Peso Cubano (CUP)</option>
+										<option value="XCD">Dólar del Caribe Oriental (XCD) - Dominica</option>
+										<option value="DOP">Peso Dominicano (DOP)</option>
+										<option value="XCD">Dólar del Caribe Oriental (XCD) - Granada</option>
+										<option value="HTG">Gourde Haitiano (HTG)</option>
+										<option value="JMD">Dólar Jamaiquino (JMD)</option>
+										<option value="XCD">Dólar del Caribe Oriental (XCD) - San Cristóbal y Nieves</option>
+										<option value="XCD">Dólar del Caribe Oriental (XCD) - Santa Lucía</option>
+										<option value="XCD">Dólar del Caribe Oriental (XCD) - San Vicente</option>
+										<option value="TTD">Dólar de Trinidad y Tobago (TTD)</option>
+										<option value="ARS">Peso Argentino (ARS)</option>
+										<option value="BOB">Boliviano (BOB)</option>
+										<option value="BRL">Real Brasileño (BRL)</option>
+										<option value="CLP">Peso Chileno (CLP)</option>
+										<option value="COP">Peso Colombiano (COP)</option>
+										<option value="USD">Dólar Americano (USD) - Ecuador</option>
+										<option value="GYD">Dólar Guyanés (GYD)</option>
+										<option value="PYG">Guaraní Paraguayo (PYG)</option>
+										<option value="PEN">Sol Peruano (PEN)</option>
+										<option value="SRD">Dólar Surinamés (SRD)</option>
+										<option value="UYU">Peso Uruguayo (UYU)</option>
+										<option value="VES">Bolívar Soberano (VES)</option>
+										<option value="EUR">Euro (EUR) - España</option>
+										<option value="EUR">Euro (EUR) - Portugal</option>
+										<option value="EUR">Euro (EUR) - Francia</option>
+										<option value="EUR">Euro (EUR) - Alemania</option>
+										<option value="EUR">Euro (EUR) - Italia</option>
+										<option value="GBP">Libra Esterlina (GBP)</option>
+										<option value="RUB">Rublo Ruso (RUB)</option>
+										<option value="CNY">Yuan Chino (CNY)</option>
+										<option value="JPY">Yen Japonés (JPY)</option>
+										<option value="KRW">Won Surcoreano (KRW)</option>
+										<option value="INR">Rupia India (INR)</option>
+										<option value="ZAR">Rand Sudafricano (ZAR)</option>
+										<option value="EGP">Libra Egipcia (EGP)</option>
+										<option value="NGN">Naira Nigeriana (NGN)</option>
+										<option value="AUD">Dólar Australiano (AUD)</option>
+										<option value="NZD">Dólar Neozelandés (NZD)</option>
+									</select>
+								</div>
+							</div>
+							
+							<div class="mb-4">
+								<label for="international-account-number" class="block text-gray-700 mb-2">Número de Cuenta *</label>
+								<input type="text" id="international-account-number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 1234567890" required>
+								<p class="text-xs text-gray-500 mt-1">Ingresa solo números, sin guiones ni espacios</p>
+							</div>
+							
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+								<div>
+									<label for="international-routing-number" class="block text-gray-700 mb-2">Número de Ruta/ABA *</label>
+									<input type="text" id="international-routing-number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 021000021" required>
+								</div>
+								<div>
+									<label for="international-swift-code" class="block text-gray-700 mb-2">Código SWIFT/BIC</label>
+									<input type="text" id="international-swift-code" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: BOFAUS3N">
+									<p class="text-xs text-gray-500 mt-1">Requerido para transferencias internacionales</p>
+								</div>
+							</div>
+							
+							<div class="mb-4">
+								<label for="international-account-holder" class="block text-gray-700 mb-2">Nombre del Titular *</label>
+								<input type="text" id="international-account-holder" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nombre completo como aparece en el banco" required>
+							</div>
+							
+							<div class="mb-4">
+								<label for="international-bank-address" class="block text-gray-700 mb-2">Dirección del Banco</label>
+								<textarea id="international-bank-address" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" rows="2" placeholder="Dirección completa del banco (opcional)"></textarea>
+							</div>
+							
+							<div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+								<div class="flex items-start">
+									<i class="fas fa-info-circle text-yellow-500 mt-1 mr-3"></i>
+									<div>
+										<p class="font-medium text-yellow-800">Información Importante</p>
+										<p class="text-yellow-700 text-sm mt-1">Las transferencias internacionales pueden tener un tiempo de procesamiento de 3-5 días hábiles. Asegúrate de que toda la información bancaria sea correcta para evitar retrasos.</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+						<div class="flex items-start">
+							<i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
+							<div>
+								<p class="font-medium text-yellow-800">Tiempo de Procesamiento</p>
+								<p class="text-yellow-700 text-sm mt-1">
+									Le notificaremos por correo electrónico una vez que su solicitud haya sido aprobada. En ese momento, los fondos serán transferidos a su cuenta.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="flex justify-end space-x-4">
+						<button type="button" id="cancel-withdrawal"
+								class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+							Cancelar
+						</button>
+
+						<button type="submit" class="btn-primary flex items-center" id="confirm-withdrawal">
+							<span>Solicitar Retiro</span>
+							<i class="fas fa-arrow-right ml-2"></i>
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
     <div id="referral-modal" class="modal">
         <div class="modal-content">
             <div class="p-6 border-b border-gray-200">
@@ -1556,12 +1720,10 @@
                     </div>
                 </div>
                 
-                <!-- QR Code para compartir -->
                 <div class="mb-6">
                     <label class="block text-gray-700 mb-2">Código QR para compartir:</label>
                     <div class="flex justify-center">
                         <div id="qr-code" class="w-48 h-48 bg-white p-4 rounded-lg border border-gray-300">
-                            <!-- QR Code será generado dinámicamente -->
                             <div class="text-center text-gray-500 py-12">
                                 <i class="fas fa-qrcode text-3xl mb-2"></i>
                                 <p class="text-sm">Código QR</p>
@@ -1577,9 +1739,7 @@
         </div>
     </div>
 
-    <!-- Firebase Configuration -->
     <script>
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBI4O0d_Mec38FDiuhirujCnX99PFKiXW4",
             authDomain: "projekt-pc.firebaseapp.com",
@@ -1591,18 +1751,14 @@
             measurementId: "G-59YH8W8W1L"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         
-        // Firebase services
         const auth = firebase.auth();
         const db = firebase.database();
         const storage = firebase.storage();
     </script>
 
-    <!-- Application JavaScript -->
     <script>
-        // Global state
         const appState = {
             currentUser: null,
             userData: null,
@@ -1617,7 +1773,6 @@
             referralBonus: 0
         };
 
-        // DOM Elements
         const authSection = document.getElementById('auth-section');
         const dashboardSection = document.getElementById('dashboard-section');
         const loginForm = document.getElementById('login-form');
@@ -1638,14 +1793,12 @@
         const totalReferrals = document.getElementById('total-referrals');
         const performancePercentage = document.getElementById('performance-percentage');
 
-        // KYC Elements
         const kycForm = document.getElementById('kyc-form');
         const kycFullName = document.getElementById('kyc-full-name');
         const kycStatusBadge = document.getElementById('kyc-status-badge');
         const refreshKycStatus = document.getElementById('refresh-kyc-status');
         const submitKycButton = document.getElementById('submit-kyc');
 
-        // KYC File handling
         let kycFiles = {
             id_front: null,
             id_back: null,
@@ -1653,7 +1806,6 @@
             proof_of_address: null
         };
         
-        // Modals
         const depositModal = document.getElementById('deposit-modal');
         const openDepositModalButton = document.getElementById('open-deposit-modal');
         const openDepositModalFromSectionButton = document.getElementById('open-deposit-modal-from-section');
@@ -1677,7 +1829,6 @@
         const referralLink = document.getElementById('referral-link');
         const copyReferralLink = document.getElementById('copy-referral-link');
         
-        // File upload elements
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const filePreview = document.getElementById('file-preview');
@@ -1688,34 +1839,27 @@
         const paymentDetails = document.getElementById('payment-details');
         const submitDepositButton = document.getElementById('submit-deposit');
         
-        // Navigation elements
         const navItems = document.querySelectorAll('.nav-item');
         const sections = document.querySelectorAll('.section');
         
-        // Referral elements
         const referralCode = document.getElementById('referral-code');
         const copyReferralCode = document.getElementById('copy-referral-code');
         const referralsCount = document.getElementById('referrals-count');
         const activateReferralInput = document.getElementById('activate-referral-input');
         const activateReferralButton = document.getElementById('activate-referral-button');
         
-        // Profile form
         const profileForm = document.getElementById('profile-form');
         const changePasswordButton = document.getElementById('change-password');
         const saveInternationalSettingsButton = document.getElementById('save-international-settings');
         
-        // FAQ elements
         const faqQuestions = document.querySelectorAll('.faq-question');
         
-        // Earnings projection
         const earningsProjectionContainer = document.getElementById('earnings-projection-container');
         const earningsProjection = document.getElementById('earnings-projection');
         const toggleProjectionButton = document.getElementById('toggle-projection');
 
-        // Selected file for upload
         let selectedFile = null;
 
-        // Event Listeners
         document.addEventListener('DOMContentLoaded', initApp);
         showRegisterLink.addEventListener('click', showRegisterForm);
         showLoginLink.addEventListener('click', showLoginForm);
@@ -1724,52 +1868,79 @@
         logoutButton.addEventListener('click', handleLogout);
         userMenuButton.addEventListener('click', toggleUserMenu);
         
-        // Deposit modal events
         openDepositModalButton.addEventListener('click', openDepositModal);
         openDepositModalFromSectionButton.addEventListener('click', openDepositModal);
         closeDepositModalButton.addEventListener('click', closeDepositModal);
         cancelDepositButton.addEventListener('click', closeDepositModal);
         depositForm.addEventListener('submit', handleDeposit);
+
+		if (openWithdrawalModalButton) {
+			openWithdrawalModalButton.addEventListener('click', openWithdrawalModal);
+		}
+		if (openWithdrawalModalFromSectionButton) {
+			openWithdrawalModalFromSectionButton.addEventListener('click', openWithdrawalModal);
+		}
+		if (closeWithdrawalModalButton) {
+			closeWithdrawalModalButton.addEventListener('click', closeWithdrawalModal);
+		}
+		if (cancelWithdrawalButton) {
+			cancelWithdrawalButton.addEventListener('click', closeWithdrawalModal);
+		}
+		if (withdrawalForm) {
+			withdrawalForm.addEventListener('submit', handleWithdrawal);
+		}
+
+		if (openReferralModalButton) {
+			openReferralModalButton.addEventListener('click', openReferralModal);
+		}
+		if (closeReferralModalButton) {
+			closeReferralModalButton.addEventListener('click', closeReferralModal);
+		}
+		if (closeReferralModalButton2) {
+			closeReferralModalButton2.addEventListener('click', closeReferralModal);
+		}
+		if (copyReferralLink) {
+			copyReferralLink.addEventListener('click', copyToClipboard);
+		}
+		if (copyReferralCode) {
+			copyReferralCode.addEventListener('click', copyToClipboard);
+		}
+
+		if (dropZone) {
+			dropZone.addEventListener('click', () => fileInput && fileInput.click());
+			dropZone.addEventListener('dragover', handleDragOver);
+			dropZone.addEventListener('dragleave', handleDragLeave);
+			dropZone.addEventListener('drop', handleDrop);
+		}
+
+		if (fileInput) {
+			fileInput.addEventListener('change', handleFileSelect);
+		}
+
+		if (removeFileButton) {
+			removeFileButton.addEventListener('click', removeSelectedFile);
+		}
+
+		if (paymentMethods) {
+			paymentMethods.forEach(method => {
+				if (method) {
+					method.addEventListener('change', updatePaymentDetails);
+				}
+			});
+		}
+
         
-        // Withdrawal modal events
-        openWithdrawalModalButton.addEventListener('click', openWithdrawalModal);
-        openWithdrawalModalFromSectionButton.addEventListener('click', openWithdrawalModal);
-        closeWithdrawalModalButton.addEventListener('click', closeWithdrawalModal);
-        cancelWithdrawalButton.addEventListener('click', closeWithdrawalModal);
-        withdrawalForm.addEventListener('submit', handleWithdrawal);
-        
-        // Referral modal events
-        openReferralModalButton.addEventListener('click', openReferralModal);
-        closeReferralModalButton.addEventListener('click', closeReferralModal);
-        closeReferralModalButton2.addEventListener('click', closeReferralModal);
-        copyReferralLink.addEventListener('click', copyToClipboard);
-        copyReferralCode.addEventListener('click', copyToClipboard);
-        
-        // File upload events
-        dropZone.addEventListener('click', () => fileInput.click());
-        dropZone.addEventListener('dragover', handleDragOver);
-        dropZone.addEventListener('dragleave', handleDragLeave);
-        dropZone.addEventListener('drop', handleDrop);
-        fileInput.addEventListener('change', handleFileSelect);
-        removeFileButton.addEventListener('click', removeSelectedFile);
-        paymentMethods.forEach(method => {
-            method.addEventListener('change', updatePaymentDetails);
-        });
-        
-        // Navigation events
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 const sectionId = item.getAttribute('data-section');
                 switchSection(sectionId);
                 
-                // Update active nav item
                 navItems.forEach(navItem => navItem.classList.remove('active'));
                 item.classList.add('active');
             });
         });
         
-        // Profile form events
         profileForm.addEventListener('submit', handleProfileUpdate);
         if (changePasswordButton) {
             changePasswordButton.addEventListener('click', handlePasswordChange);
@@ -1779,7 +1950,6 @@
             saveInternationalSettingsButton.addEventListener('click', handleInternationalSettings);
         }
         
-        // FAQ events
         faqQuestions.forEach(question => {
             question.addEventListener('click', () => {
                 const answer = question.nextElementSibling;
@@ -1787,91 +1957,74 @@
             });
         });
 
-        // Referral activation
         if (activateReferralButton) {
             activateReferralButton.addEventListener('click', handleReferralActivation);
         }
 
-        // Toggle projection
         if (toggleProjectionButton) {
             toggleProjectionButton.addEventListener('click', () => {
                 earningsProjectionContainer.classList.toggle('visible');
             });
         }
 
-        // Initialize the application
         function initApp() {
-            // Check authentication state
             auth.onAuthStateChanged(user => {
                 if (user) {
-                    // User is signed in
                     appState.currentUser = user;
                     loadUserData();
                     showDashboard();
                     
-                    // Initialize earnings calculation timer
                     startEarningsTimer();
                     
-                    // Initialize KYC
                     setTimeout(() => {
                         initKYC();
                     }, 500);
                 } else {
-                    // User is signed out
                     showAuth();
                     
-                    // Clear earnings timer
                     if (appState.earningsTimer) {
                         clearInterval(appState.earningsTimer);
                         appState.earningsTimer = null;
                     }
                     
-                    // Reset KYC flag
                     window.kycInitialized = false;
                 }
             });
             
-            // Add event listeners for withdrawal methods
             document.querySelectorAll('.withdrawal-method').forEach(method => {
                 method.addEventListener('click', () => {
                     updateWithdrawalDetails();
                 });
             });
             
-            // Initialize withdrawal details
             setTimeout(() => {
                 updateWithdrawalDetails();
             }, 100);
         }
 
-        // Show authentication section
         function showAuth() {
             authSection.classList.remove('hidden');
             dashboardSection.classList.add('hidden');
         }
 
-        // Show dashboard section
         function showDashboard() {
             authSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
             updateDashboard();
         }
 
-        // Show register form
         function showRegisterForm(e) {
             e.preventDefault();
             loginForm.classList.add('hidden');
             registerForm.classList.remove('hidden');
         }
 
-        // Show login form
         function showLoginForm(e) {
             e.preventDefault();
             registerForm.classList.add('hidden');
             loginForm.classList.remove('hidden');
         }
 
-        // Handle user login
         function handleLogin(e) {
             e.preventDefault();
             
@@ -1879,7 +2032,6 @@
             const password = document.getElementById('login-password').value;
             const referralCodeInput = document.getElementById('referral-code-input').value;
             
-            // Validación básica de campos
             if (!email || !password) {
                 showNotification('Por favor completa todos los campos', 'error');
                 return;
@@ -1889,7 +2041,6 @@
             
             auth.signInWithEmailAndPassword(email, password)
                 .then(userCredential => {
-                    // Check if referral code was provided
                     if (referralCodeInput.trim() !== '') {
                         validateAndApplyReferralCode(referralCodeInput, userCredential.user);
                     }
@@ -1923,7 +2074,6 @@
                 });
         }
 
-        // Handle user registration
         function handleRegister(e) {
             e.preventDefault();
             
@@ -1936,32 +2086,27 @@
             const referralCode = document.getElementById('register-referral-code').value;
             const termsAccepted = document.getElementById('register-terms').checked;
             
-            // Validar campos obligatorios
             if (!name || !email || !phone || !country || !password || !confirmPassword) {
                 showNotification('Por favor completa todos los campos obligatorios', 'error');
                 return;
             }
             
-            // Validar formato de email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 showNotification('Por favor ingresa un correo electrónico válido', 'error');
                 return;
             }
             
-            // Validar longitud de contraseña
             if (password.length < 8) {
                 showNotification('La contraseña debe tener al menos 8 caracteres', 'error');
                 return;
             }
             
-            // Validate passwords match
             if (password !== confirmPassword) {
                 showNotification('Las contraseñas no coinciden', 'error');
                 return;
             }
             
-            // Validate terms accepted
             if (!termsAccepted) {
                 showNotification('Debes aceptar los términos y condiciones', 'error');
                 return;
@@ -1969,15 +2114,12 @@
             
             showNotification('Creando cuenta...', 'warning');
             
-            // Create user with Firebase Auth
             auth.createUserWithEmailAndPassword(email, password)
                 .then(userCredential => {
                     const user = userCredential.user;
                     
-                    // Generate unique referral code for the new user
                     const userReferralCode = generateReferralCode();
                     
-                    // Create user data for Realtime Database
                     const userData = {
                         name: name,
                         email: email,
@@ -1997,14 +2139,12 @@
                         updatedAt: Date.now()
                     };
                     
-                    // Save user data to Realtime Database
                     return db.ref('users/' + user.uid).set(userData);
                 })
                 .then(() => {
                     showNotification('¡Cuenta creada exitosamente!', 'success');
                     showLoginForm(e);
                     
-                    // If referral code was provided, validate it
                     if (referralCode.trim() !== '') {
                         validateAndApplyReferralCode(referralCode, auth.currentUser);
                     }
@@ -2034,27 +2174,22 @@
                 });
         }
 
-        // Validate and apply referral code
         function validateAndApplyReferralCode(code, user) {
-            // Find user with this referral code
             db.ref('users').orderByChild('referralCode').equalTo(code).once('value')
                 .then(snapshot => {
                     if (snapshot.exists()) {
                         const referrerData = Object.values(snapshot.val())[0];
                         const referrerId = Object.keys(snapshot.val())[0];
                         
-                        // Add bonus to referrer
                         const referrerBonus = (referrerData.referralBonus || 0) + 25;
                         const referrerReferrals = (referrerData.totalReferrals || 0) + 1;
                         
-                        // Update referrer data
                         db.ref('users/' + referrerId).update({
                             referralBonus: referrerBonus,
                             totalReferrals: referrerReferrals,
                             updatedAt: Date.now()
                         });
                         
-                        // Record the referral
                         const referralId = generateId();
                         const referralData = {
                             referredUserId: user.uid,
@@ -2066,7 +2201,6 @@
                             createdAt: Date.now()
                         };
                         
-                        // Save referral record
                         db.ref('referrals/' + referrerId + '/' + referralId).set(referralData);
                         
                         showNotification('¡Código de referido aplicado correctamente! Recibirás $25 después de tu primer depósito.', 'success');
@@ -2080,18 +2214,14 @@
                 });
         }
 
-        // Handle user logout
         function handleLogout() {
-            // Clear earnings timer
             if (appState.earningsTimer) {
                 clearInterval(appState.earningsTimer);
                 appState.earningsTimer = null;
             }
             
-            // Reset KYC state
             window.kycInitialized = false;
             
-            // Clear KYC files
             kycFiles = {
                 id_front: null,
                 id_back: null,
@@ -2109,12 +2239,10 @@
                 });
         }
 
-        // Toggle user menu
         function toggleUserMenu() {
             userMenu.classList.toggle('hidden');
         }
 
-        // Load user data from Realtime Database
         function loadUserData() {
             if (!appState.currentUser) return;
             
@@ -2125,25 +2253,17 @@
                 if (data) {
                     appState.userData = data;
                     
-                    // Calculate earnings before updating UI
                     calculateDailyEarnings();
                     
-                    // Update UI with updated data
                     updateUIWithUserData();
                     updateDashboard();
                     
-                    // Load user transactions
                     loadUserTransactions();
-                    // Load user deposits
                     loadUserDeposits();
-                    // Load user withdrawals
                     loadUserWithdrawals();
-                    // Load user referrals
                     loadUserReferrals();
-                    // Update KYC status
                     updateKYCStatus();
                     
-                    // Generate earnings projection if there are deposits
                     if (data.totalDeposits > 0) {
                         generateEarningsProjection();
                         earningsProjectionContainer.classList.add('visible');
@@ -2156,7 +2276,6 @@
             });
         }
 
-        // Load user transactions
         function loadUserTransactions() {
             if (!appState.currentUser) return;
             
@@ -2167,13 +2286,11 @@
                 snapshot.forEach((childSnapshot) => {
                     appState.transactions.push({ id: childSnapshot.key, ...childSnapshot.val() });
                 });
-                // Reverse to show newest first
                 appState.transactions.reverse();
                 updateTransactionsList();
             });
         }
 
-        // Load user deposits
         function loadUserDeposits() {
             if (!appState.currentUser) return;
             
@@ -2184,13 +2301,11 @@
                 snapshot.forEach((childSnapshot) => {
                     appState.deposits.push({ id: childSnapshot.key, ...childSnapshot.val() });
                 });
-                // Reverse to show newest first
                 appState.deposits.reverse();
                 updateDepositsList();
             });
         }
 
-        // Load user withdrawals
         function loadUserWithdrawals() {
             if (!appState.currentUser) return;
             
@@ -2201,13 +2316,11 @@
                 snapshot.forEach((childSnapshot) => {
                     appState.withdrawals.push({ id: childSnapshot.key, ...childSnapshot.val() });
                 });
-                // Reverse to show newest first
                 appState.withdrawals.reverse();
                 updateWithdrawalsList();
             });
         }
 
-        // Load user referrals
         function loadUserReferrals() {
             if (!appState.currentUser) return;
             
@@ -2222,25 +2335,21 @@
             });
         }
 
-        // Update UI with user data
         function updateUIWithUserData() {
             if (!appState.userData) return;
             
             userName.textContent = appState.userData.name;
             dashboardUserName.textContent = appState.userData.name;
             
-            // Update KYC status
             kycStatus.textContent = `KYC ${appState.userData.kycStatus === 'verified' ? 'Verificado' : 'Pendiente'}`;
             kycStatus.className = `kyc-status ${appState.userData.kycStatus === 'verified' ? 'kyc-verified' : 'kyc-pending'}`;
             
-            // Update referral code
             if (appState.userData.referralCode) {
                 referralCode.textContent = appState.userData.referralCode;
                 modalReferralCode.textContent = appState.userData.referralCode;
                 referralLink.value = `${window.location.origin}?ref=${appState.userData.referralCode}`;
             }
             
-            // Update profile form
             document.getElementById('profile-name').value = appState.userData.name || '';
             document.getElementById('profile-email').value = appState.userData.email || '';
             document.getElementById('profile-phone').value = appState.userData.phone || '';
@@ -2248,40 +2357,32 @@
             document.getElementById('profile-document-type').value = appState.userData.documentType || '';
             document.getElementById('profile-document-number').value = appState.userData.documentNumber || '';
             
-            // Update international settings
             document.getElementById('international-bank-name').value = appState.userData.internationalBankName || '';
             document.getElementById('swift-code').value = appState.userData.swiftCode || '';
             document.getElementById('iban-number').value = appState.userData.ibanNumber || '';
         }
 
-        // Update dashboard with financial data
         function updateDashboard() {
             if (!appState.userData) return;
             
-            // Calculate totals
             const totalDepositsValue = appState.userData.totalDeposits || 0;
             const totalEarningsValue = appState.userData.totalEarnings || 0;
             const totalBalanceValue = totalDepositsValue + totalEarningsValue + (appState.userData.referralBonus || 0);
             
-            // Format values with 2 decimals
             totalBalance.textContent = `$${totalBalanceValue.toFixed(2)}`;
             totalDeposits.textContent = `$${totalDepositsValue.toFixed(2)}`;
             totalEarnings.textContent = `$${totalEarningsValue.toFixed(2)}`;
             totalReferrals.textContent = appState.userData.totalReferrals || '0';
             
-            // Calculate performance percentage
             let performancePercentageValue = 0;
             if (totalDepositsValue > 0) {
                 performancePercentageValue = (totalEarningsValue / totalDepositsValue * 100).toFixed(2);
             }
             
-            // Update performance percentage
             performancePercentage.textContent = `+${performancePercentageValue}% desde el inicio`;
             
-            // Update available balance for withdrawals
             availableBalance.textContent = `$${totalBalanceValue.toFixed(2)}`;
             
-            // Update performance section
             const performanceEarningsElement = document.getElementById('performance-earnings');
             const performanceTotalElement = document.getElementById('performance-total');
             const performanceCapitalElement = document.getElementById('performance-capital');
@@ -2300,64 +2401,50 @@
             }
             
             if (dailyEarningsElement) {
-                // Calculate daily earnings (12.5% monthly / 30 days = 0.4167% daily)
                 const dailyRate = 0.125 / 30;
                 const dailyEarnings = totalDepositsValue * dailyRate;
                 dailyEarningsElement.textContent = `$${dailyEarnings.toFixed(2)}`;
             }
             
-            // Update referrals count
             referralsCount.textContent = appState.userData.totalReferrals || '0';
             
-            // Initialize performance chart
-            setTimeout(() => {
-                if (document.getElementById('performance-chart')) {
-                    initPerformanceChart();
+			setTimeout(() => {
+				if (document.getElementById('performance-chart')) {
+					initPerformanceChart();
+					setupChartPeriodButtons();
                 }
             }, 500);
         }
 
-        // Calculate daily earnings automatically
         function calculateDailyEarnings() {
             if (!appState.userData) return;
             
             const userData = appState.userData;
             const totalDeposits = userData.totalDeposits || 0;
             
-            // Only calculate if there are deposits
             if (totalDeposits <= 0) return;
             
-            // Get last calculation date
             const lastCalculation = userData.lastEarningsCalculation || userData.createdAt || Date.now();
             const now = Date.now();
             const timeDiff = now - lastCalculation;
-            const daysDiff = timeDiff / (1000 * 60 * 60 * 24); // Convert milliseconds to days
+            const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
             
-            // If at least 1 day has passed, calculate earnings
             if (daysDiff >= 1) {
-                // Earnings rate: 12.5% monthly = 0.4167% daily
                 const dailyRate = 0.125 / 30;
-                
-                // Calculate earnings for elapsed days
                 const earnings = totalDeposits * dailyRate * daysDiff;
-                
-                // Update user data
                 const newEarnings = (userData.totalEarnings || 0) + earnings;
                 
-                // Update in Firebase
                 db.ref('users/' + appState.currentUser.uid).update({
                     totalEarnings: newEarnings,
                     lastEarningsCalculation: now,
                     updatedAt: now
                 })
                 .then(() => {
-                    // Update local state
                     appState.userData.totalEarnings = newEarnings;
                     appState.userData.lastEarningsCalculation = now;
                     
                     console.log(`Earnings calculated: $${earnings.toFixed(2)} for ${daysDiff.toFixed(2)} days`);
                     
-                    // Update dashboard
                     updateDashboard();
                 })
                 .catch(error => {
@@ -2366,33 +2453,27 @@
             }
         }
 
-        // Start earnings timer for automatic updates
         function startEarningsTimer() {
-            // Update every hour
             appState.earningsTimer = setInterval(() => {
                 if (appState.currentUser && appState.userData) {
                     calculateDailyEarnings();
                 }
-            }, 60 * 60 * 1000); // 1 hour
+            }, 60 * 60 * 1000);
             
-            // Update every minute for demo (can be changed to every hour in production)
             setInterval(() => {
                 if (appState.currentUser && appState.userData) {
-                    // Only update UI, don't recalculate earnings
                     updateDashboard();
                 }
-            }, 60 * 1000); // 1 minute for demo
+            }, 60 * 1000);
         }
 
-        // Generate earnings projection table
         function generateEarningsProjection() {
             if (!earningsProjection) return;
             
             const totalDeposits = appState.userData?.totalDeposits || 0;
             const currentEarnings = appState.userData?.totalEarnings || 0;
-            const dailyRate = 0.125 / 30; // 0.4167% daily
+            const dailyRate = 0.125 / 30;
             
-            // If no deposits, show message
             if (totalDeposits <= 0) {
                 earningsProjection.innerHTML = `
                     <div class="text-center py-4 text-gray-500">
@@ -2405,13 +2486,11 @@
             let html = '';
             let accumulatedEarnings = currentEarnings;
             
-            // Generate projection for 30 days
             for (let day = 1; day <= 30; day++) {
                 const dailyEarnings = totalDeposits * dailyRate;
                 accumulatedEarnings += dailyEarnings;
                 const totalBalance = totalDeposits + accumulatedEarnings;
                 
-                // Highlight current day
                 const isToday = day === 1;
                 const rowClass = isToday ? 'bg-blue-50' : '';
                 
@@ -2444,217 +2523,203 @@
             `;
         }
 
-        // Initialize performance chart
-        function initPerformanceChart() {
-            const ctx = document.getElementById('performance-chart');
-            if (!ctx) return;
-            
-            // Destroy existing chart if exists
-            if (appState.performanceChart instanceof Chart) {
-                appState.performanceChart.destroy();
-            }
-            
-            // Get user data for chart
-            const userData = appState.userData;
-            const totalDeposits = userData?.totalDeposits || 0;
-            const totalEarnings = userData?.totalEarnings || 0;
-            const currentBalance = totalDeposits + totalEarnings;
-            
-            // Generate labels for last 7 days
-            const labels = [];
-            const today = new Date();
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(today.getDate() - i);
-                labels.push(date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' }));
-            }
-            
-            // Generate data for chart (simulated growth)
-            const depositsData = [];
-            const earningsData = [];
-            const balanceData = [];
-            
-            let currentDeposit = totalDeposits > 0 ? totalDeposits * 0.1 : 100; // Start with 10% of total or 100
-            let currentEarning = 0;
-            
-            for (let i = 0; i < 7; i++) {
-                // Simulate deposit growth
-                if (i < 4 && totalDeposits > 0) {
-                    currentDeposit += (totalDeposits - currentDeposit) * 0.25;
-                } else if (totalDeposits > 0) {
-                    currentDeposit = totalDeposits;
-                } else {
-                    currentDeposit = 0;
-                }
-                
-                // Simulate earnings growth (starts after day 2)
-                if (i > 1 && currentDeposit > 0) {
-                    currentEarning += currentDeposit * (0.125 / 30) * (i - 1);
-                }
-                
-                depositsData.push(currentDeposit);
-                earningsData.push(currentEarning);
-                balanceData.push(currentDeposit + currentEarning);
-            }
-            
-            // Ensure final values match actual data
-            if (totalDeposits > 0) {
-                depositsData[6] = totalDeposits;
-                earningsData[6] = totalEarnings;
-                balanceData[6] = currentBalance;
-            }
-            
-            // Create chart
-            appState.performanceChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Depósitos',
-                            data: depositsData,
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 3,
-                            pointHoverRadius: 6
-                        },
-                        {
-                            label: 'Ganancias',
-                            data: earningsData,
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 3,
-                            pointHoverRadius: 6
-                        },
-                        {
-                            label: 'Balance Total',
-                            data: balanceData,
-                            borderColor: '#8b5cf6',
-                            backgroundColor: 'transparent',
-                            borderWidth: 3,
-                            borderDash: [5, 5],
-                            tension: 0.4,
-                            pointRadius: 3,
-                            pointHoverRadius: 8,
-                            pointBackgroundColor: '#8b5cf6',
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 2
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                            titleColor: '#1f2937',
-                            bodyColor: '#1f2937',
-                            borderColor: '#e5e7eb',
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            padding: 12,
-                            boxPadding: 6,
-                            usePointStyle: true,
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += new Intl.NumberFormat('es-ES', {
-                                            style: 'currency',
-                                            currency: 'USD',
-                                            minimumFractionDigits: 2
-                                        }).format(context.parsed.y);
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: {
-                                display: false,
-                                drawBorder: false
-                            },
-                            ticks: {
-                                maxTicksLimit: 7,
-                                color: '#6b7280',
-                                font: {
-                                    size: 11
-                                }
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            suggestedMax: totalDeposits > 0 ? currentBalance * 1.2 : 1000,
-                            grid: {
-                                color: 'rgba(229, 231, 235, 0.5)',
-                                drawBorder: false
-                            },
-                            ticks: {
-                                color: '#6b7280',
-                                font: {
-                                    size: 11
-                                },
-                                callback: function(value) {
-                                    if (value >= 1000) {
-                                        return '$' + (value / 1000).toFixed(1) + 'k';
-                                    }
-                                    return '$' + value;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            
-            // Update chart stats
-            const totalReturn = totalDeposits > 0 ? ((currentBalance - totalDeposits) / totalDeposits * 100).toFixed(2) : 0;
-            const dailyReturn = (0.125 / 30 * 100).toFixed(2);
-            const monthlyProjection = totalDeposits * 0.125;
-            
-            document.getElementById('chart-total-return').textContent = `+${totalReturn}%`;
-            document.getElementById('chart-daily-return').textContent = `+${dailyReturn}%`;
-            document.getElementById('chart-monthly-rate').textContent = `12.5%`;
-            document.getElementById('chart-monthly-projection').textContent = `$${monthlyProjection.toFixed(2)}`;
-            
-            // Calculate investment time
-            const createdAt = appState.userData?.createdAt || Date.now();
-            const investmentDays = Math.floor((Date.now() - createdAt) / (1000 * 60 * 60 * 24));
-            document.getElementById('chart-investment-time').textContent = `${investmentDays} días`;
-            
-            // Add event listeners for period buttons
-            document.querySelectorAll('.chart-period-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    // Update active class
-                    document.querySelectorAll('.chart-period-btn').forEach(b => {
-                        b.classList.remove('bg-blue-100', 'text-blue-600', 'font-medium');
-                        b.classList.add('bg-gray-100', 'text-gray-700');
-                    });
-                    this.classList.remove('bg-gray-100', 'text-gray-700');
-                    this.classList.add('bg-blue-100', 'text-blue-600', 'font-medium');
-                });
-            });
-        }
+		function initPerformanceChart() {
+			const ctx = document.getElementById('performance-chart');
+			if (!ctx) return;
+			
+			if (appState.performanceChart instanceof Chart) {
+				appState.performanceChart.destroy();
+			}
+			
+			const userData = appState.userData;
+			const totalDeposits = userData?.totalDeposits || 0;
+			const totalEarnings = userData?.totalEarnings || 0;
+			const currentBalance = totalDeposits + totalEarnings;
+			
+			const labels = [];
+			const today = new Date();
+			for (let i = 6; i >= 0; i--) {
+				const date = new Date();
+				date.setDate(today.getDate() - i);
+				labels.push(date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' }));
+			}
+			
+			const depositsData = [];
+			const earningsData = [];
+			const balanceData = [];
+			
+			let currentDeposit = totalDeposits > 0 ? totalDeposits * 0.1 : 100;
+			let currentEarning = 0;
+			
+			for (let i = 0; i < 7; i++) {
+				if (i < 4 && totalDeposits > 0) {
+					currentDeposit += (totalDeposits - currentDeposit) * 0.25;
+				} else if (totalDeposits > 0) {
+					currentDeposit = totalDeposits;
+				} else {
+					currentDeposit = 0;
+				}
+				
+				if (i > 1 && currentDeposit > 0) {
+					currentEarning += currentDeposit * (0.125 / 30) * (i - 1);
+				}
+				
+				depositsData.push(currentDeposit);
+				earningsData.push(currentEarning);
+				balanceData.push(currentDeposit + currentEarning);
+			}
+			
+			if (totalDeposits > 0) {
+				depositsData[6] = totalDeposits;
+				earningsData[6] = totalEarnings;
+				balanceData[6] = currentBalance;
+			}
+			
+			appState.performanceChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: labels,
+					datasets: [
+						{
+							label: 'Depósitos',
+							data: depositsData,
+							borderColor: '#3b82f6',
+							backgroundColor: 'rgba(59, 130, 246, 0.1)',
+							borderWidth: 2,
+							fill: true,
+							tension: 0.4,
+							pointRadius: 3,
+							pointHoverRadius: 6
+						},
+						{
+							label: 'Ganancias',
+							data: earningsData,
+							borderColor: '#10b981',
+							backgroundColor: 'rgba(16, 185, 129, 0.1)',
+							borderWidth: 2,
+							fill: true,
+							tension: 0.4,
+							pointRadius: 3,
+							pointHoverRadius: 6
+						},
+						{
+							label: 'Balance Total',
+							data: balanceData,
+							borderColor: '#8b5cf6',
+							backgroundColor: 'transparent',
+							borderWidth: 3,
+							borderDash: [5, 5],
+							tension: 0.4,
+							pointRadius: 3,
+							pointHoverRadius: 8,
+							pointBackgroundColor: '#8b5cf6',
+							pointBorderColor: '#ffffff',
+							pointBorderWidth: 2
+						}
+					]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					interaction: {
+						mode: 'index',
+						intersect: false,
+					},
+					plugins: {
+						legend: {
+							display: false
+						},
+						tooltip: {
+							backgroundColor: 'rgba(255, 255, 255, 0.95)',
+							titleColor: '#1f2937',
+							bodyColor: '#1f2937',
+							borderColor: '#e5e7eb',
+							borderWidth: 1,
+							cornerRadius: 8,
+							padding: 12,
+							boxPadding: 6,
+							usePointStyle: true,
+							callbacks: {
+								label: function(context) {
+									let label = context.dataset.label || '';
+									if (label) {
+										label += ': ';
+									}
+									if (context.parsed.y !== null) {
+										label += new Intl.NumberFormat('es-ES', {
+											style: 'currency',
+											currency: 'USD',
+											minimumFractionDigits: 2
+										}).format(context.parsed.y);
+									}
+									return label;
+								}
+							}
+						}
+					},
+					scales: {
+						x: {
+							grid: {
+								display: false,
+								drawBorder: false
+							},
+							ticks: {
+								maxTicksLimit: 7,
+								color: '#6b7280',
+								font: {
+									size: 11
+								}
+							}
+						},
+						y: {
+							beginAtZero: true,
+							suggestedMax: totalDeposits > 0 ? currentBalance * 1.2 : 1000,
+							grid: {
+								color: 'rgba(229, 231, 235, 0.5)',
+								drawBorder: false
+							},
+							ticks: {
+								color: '#6b7280',
+								font: {
+									size: 11
+								},
+								callback: function(value) {
+									if (value >= 1000) {
+										return '$' + (value / 1000).toFixed(1) + 'k';
+									}
+								 return '$' + value;
+								}
+							}
+						}
+					}
+				}
+			});
+			
+			const totalReturn = totalDeposits > 0 ? ((currentBalance - totalDeposits) / totalDeposits * 100).toFixed(2) : 0;
+			const dailyReturn = (0.125 / 30 * 100).toFixed(2);
+			const monthlyProjection = totalDeposits * 0.125;
+			
+			document.getElementById('chart-total-return').textContent = `+${totalReturn}%`;
+			document.getElementById('chart-daily-return').textContent = `+${dailyReturn}%`;
+			document.getElementById('chart-monthly-rate').textContent = `12.5%`;
+			document.getElementById('chart-monthly-projection').textContent = `$${monthlyProjection.toFixed(2)}`;
+			
+			const createdAt = appState.userData?.createdAt || Date.now();
+			const investmentDays = Math.floor((Date.now() - createdAt) / (1000 * 60 * 60 * 24));
+			document.getElementById('chart-investment-time').textContent = `${investmentDays} días`;
+			
+			document.querySelectorAll('.chart-period-btn').forEach(btn => {
+				btn.addEventListener('click', function() {
+					document.querySelectorAll('.chart-period-btn').forEach(b => {
+						b.classList.remove('bg-blue-100', 'text-blue-600', 'font-medium');
+						b.classList.add('bg-gray-100', 'text-gray-700');
+					});
+					this.classList.remove('bg-gray-100', 'text-gray-700');
+					this.classList.add('bg-blue-100', 'text-blue-600', 'font-medium');
+				});
+			});
+		}
 
-        // Update transactions list
         function updateTransactionsList() {
             const transactionsList = document.getElementById('transactions-list');
             
@@ -2704,7 +2769,6 @@
             transactionsList.innerHTML = transactionsHTML;
         }
 
-        // Update deposits list
         function updateDepositsList() {
             const depositsList = document.getElementById('deposits-list');
             
@@ -2748,7 +2812,6 @@
             depositsList.innerHTML = depositsHTML;
         }
 
-        // Update withdrawals list
         function updateWithdrawalsList() {
             const withdrawalsList = document.getElementById('withdrawals-list');
             
@@ -2792,7 +2855,6 @@
             withdrawalsList.innerHTML = withdrawalsHTML;
         }
 
-        // Update referrals list
         function updateReferralsList() {
             const referralsBonusList = document.getElementById('referrals-bonus-list');
             
@@ -2838,7 +2900,6 @@
             if (activeSection) {
                 activeSection.classList.add('active');
                 
-                // If accessing dashboard section, initialize chart
                 if (sectionId === 'dashboard') {
                     setTimeout(() => {
                         if (!appState.performanceChart && document.getElementById('performance-chart')) {
@@ -2847,14 +2908,12 @@
                     }, 300);
                 }
                 
-                // If accessing performance section
                 if (sectionId === 'performance') {
                     setTimeout(() => {
                         generateEarningsProjection();
                     }, 300);
                 }
                 
-                // If accessing KYC section
                 if (sectionId === 'kyc-verification') {
                     console.log('Accediendo a sección KYC');
                     if (!window.kycInitialized) {
@@ -2868,47 +2927,59 @@
             }
         }
 
-        // Open deposit modal
         function openDepositModal() {
             depositModal.classList.add('active');
             resetDepositForm();
         }
 
-        // Close deposit modal
         function closeDepositModal() {
             depositModal.classList.remove('active');
             resetDepositForm();
         }
 
-        // Reset deposit form
         function resetDepositForm() {
             depositForm.reset();
             removeSelectedFile();
             updatePaymentDetails();
         }
 
-        // Open withdrawal modal
-        function openWithdrawalModal() {
-            if (!appState.userData || appState.userData.balance <= 0) {
-                showNotification('No tienes saldo disponible para retirar', 'error');
-                return;
-            }
-            
-            withdrawalModal.classList.add('active');
-            availableBalance.textContent = `$${(appState.userData.balance || 0).toFixed(2)}`;
-            
-            // Initialize withdrawal details
-            updateWithdrawalDetails();
-        }
+		function openWithdrawalModal() {
+			if (!appState.userData) {
+				showNotification('Cargando datos de usuario...', 'warning');
+				return;
+			}
+			
+			const totalDeposits = appState.userData.totalDeposits || 0;
+			const totalEarnings = appState.userData.totalEarnings || 0;
+			const referralBonus = appState.userData.referralBonus || 0;
+			
+			const availableBalanceCalc = totalDeposits + totalEarnings + referralBonus;
+			
+			if (availableBalanceCalc <= 0) {
+				showNotification('No tienes saldo disponible para retirar', 'error');
+				return;
+			}
+			
+			withdrawalModal.classList.add('active');
+			availableBalance.textContent = `$${availableBalanceCalc.toFixed(2)}`;
+			
+			updateWithdrawalDetails();
+			
+			withdrawalForm.reset();
+		}
 
-        // Close withdrawal modal
-        function closeWithdrawalModal() {
-            withdrawalModal.classList.remove('active');
-            withdrawalForm.reset();
-            updateWithdrawalDetails();
-        }
+		function closeWithdrawalModal() {
+			withdrawalModal.classList.remove('active');
+			withdrawalForm.reset();
+			updateWithdrawalDetails();
+			
+			const submitButton = document.getElementById('confirm-withdrawal');
+			if (submitButton) {
+				submitButton.disabled = false;
+				submitButton.innerHTML = '<span>Solicitar Retiro</span><i class="fas fa-arrow-right ml-2"></i>';
+			}
+		}
 
-        // Open referral modal
         function openReferralModal() {
             if (!appState.userData || !appState.userData.referralCode) {
                 showNotification('Cargando información de referidos...', 'warning');
@@ -2918,24 +2989,20 @@
             referralModal.classList.add('active');
         }
 
-        // Close referral modal
         function closeReferralModal() {
             referralModal.classList.remove('active');
         }
 
-        // Handle file selection
         function handleFileSelect(e) {
             const file = e.target.files[0];
             processSelectedFile(file);
         }
 
-        // Handle drag over event
         function handleDragOver(e) {
             e.preventDefault();
             dropZone.classList.add('active');
         }
 
-        // Handle drag leave event
         function handleDragLeave(e) {
             e.preventDefault();
             if (!dropZone.contains(e.relatedTarget)) {
@@ -2943,7 +3010,6 @@
             }
         }
 
-        // Handle drop event
         function handleDrop(e) {
             e.preventDefault();
             dropZone.classList.remove('active');
@@ -2954,19 +3020,16 @@
             }
         }
 
-        // Process selected file
         function processSelectedFile(file) {
             if (!file) return;
             
-            // Validate file type
             const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
             if (!allowedTypes.includes(file.type)) {
                 showNotification('Formato de archivo no permitido. Use PDF, JPG o PNG.', 'error');
                 return;
             }
             
-            // Validate file size (5 MB max)
-            const maxSize = 5 * 1024 * 1024; // 5 MB in bytes
+            const maxSize = 5 * 1024 * 1024;
             if (file.size > maxSize) {
                 showNotification('El archivo es demasiado grande. El tamaño máximo es 5 MB.', 'error');
                 return;
@@ -2974,7 +3037,6 @@
             
             selectedFile = file;
             
-            // Display file preview
             fileName.textContent = file.name;
             fileSize.textContent = formatFileSize(file.size);
             filePreview.classList.remove('hidden');
@@ -2982,14 +3044,12 @@
             showNotification('Archivo seleccionado correctamente', 'success');
         }
 
-        // Remove selected file
         function removeSelectedFile() {
             selectedFile = null;
             fileInput.value = '';
             filePreview.classList.add('hidden');
         }
 
-        // Update payment details based on selected method
         function updatePaymentDetails() {
             const selectedMethod = document.querySelector('input[name="payment-method"]:checked');
             
@@ -3041,7 +3101,6 @@
             paymentDetails.innerHTML = detailsHTML;
         }
 
-        // Handle deposit submission
         function handleDeposit(e) {
             e.preventDefault();
             
@@ -3061,14 +3120,12 @@
             
             const method = methodElement.value;
             
-            // Validate amount
             if (!amount || isNaN(amount) || amount < 100) {
                 showNotification('El monto mínimo de depósito es $100 USD', 'error');
                 amountInput.focus();
                 return;
             }
             
-            // Validate file
             if (!selectedFile) {
                 showNotification('Debes subir un comprobante de pago', 'error');
                 return;
@@ -3076,19 +3133,15 @@
             
             showNotification('Procesando depósito...', 'warning');
             
-            // Disable submit button to prevent multiple submissions
             const submitButton = document.getElementById('submit-deposit');
             submitButton.disabled = true;
             submitButton.innerHTML = '<span>Procesando...</span><i class="fas fa-spinner fa-spin ml-2"></i>';
             
-            // Generate unique ID for deposit
             const depositId = generateId();
             
-            // Get current user data
             const currentBalance = appState.userData?.balance || 0;
             const currentDeposits = appState.userData?.totalDeposits || 0;
             
-            // Create deposit data for Realtime Database
             const depositData = {
                 amount: amount,
                 method: method,
@@ -3099,22 +3152,18 @@
                 updatedAt: Date.now()
             };
             
-            // Update user data in Firebase
             const userUpdates = {
                 balance: currentBalance + amount,
                 totalDeposits: currentDeposits + amount,
                 updatedAt: Date.now(),
-                lastEarningsCalculation: Date.now() // Reset earnings calculation
+                lastEarningsCalculation: Date.now()
             };
             
-            // First update user, then save deposit
             db.ref('users/' + appState.currentUser.uid).update(userUpdates)
                 .then(() => {
-                    // Save deposit
                     return db.ref('deposits/' + appState.currentUser.uid + '/' + depositId).set(depositData);
                 })
                 .then(() => {
-                    // Create transaction record
                     const transactionData = {
                         type: 'deposit',
                         amount: amount,
@@ -3127,7 +3176,6 @@
                     return db.ref('transactions/' + appState.currentUser.uid).push(transactionData);
                 })
                 .then(() => {
-                    // Upload file to Firebase Storage
                     if (selectedFile) {
                         const fileExtension = selectedFile.name.split('.').pop();
                         const fileName = `deposit_${depositId}.${fileExtension}`;
@@ -3139,7 +3187,6 @@
                     showNotification('¡Depósito enviado correctamente! Será revisado por nuestro equipo.', 'success');
                     closeDepositModal();
                     
-                    // Reset submit button
                     submitButton.disabled = false;
                     submitButton.innerHTML = '<span>Confirmar Depósito</span><i class="fas fa-arrow-right ml-2"></i>';
                 })
@@ -3147,239 +3194,249 @@
                     console.error('Error saving deposit:', error);
                     showNotification('Error al guardar el depósito: ' + error.message, 'error');
                     
-                    // Reset submit button
                     submitButton.disabled = false;
                     submitButton.innerHTML = '<span>Confirmar Depósito</span><i class="fas fa-arrow-right ml-2"></i>';
                 });
         }
 
-        // Handle withdrawal submission
-        function handleWithdrawal(e) {
-            e.preventDefault();
-            
-            if (!appState.currentUser) {
-                showNotification('Debes iniciar sesión para solicitar un retiro', 'error');
-                return;
-            }
-            
-            const amountInput = document.getElementById('withdrawal-amount');
-            const amount = parseFloat(amountInput.value);
-            const methodElement = document.querySelector('input[name="withdrawal-method"]:checked');
-            
-            if (!methodElement) {
-                showNotification('Por favor selecciona un método de retiro', 'error');
-                return;
-            }
-            
-            const method = methodElement.value;
-            
-            // Validate amount
-            if (!amount || isNaN(amount) || amount < 10) {
-                showNotification('El monto mínimo de retiro es $10 USD', 'error');
-                amountInput.focus();
-                return;
-            }
-            
-            // Validate available balance
-            if (amount > appState.userData.balance) {
-                showNotification('No tienes suficiente saldo disponible', 'error');
-                amountInput.focus();
-                return;
-            }
-            
-            // Validate details based on method
-            let details = {};
-            let valid = true;
-            let errorMessage = '';
-            
-            if (method === 'bank') {
-                const bankName = document.getElementById('bank-name').value;
-                const accountNumber = document.getElementById('account-number').value;
-                const accountHolder = document.getElementById('account-holder').value;
-                const accountType = document.getElementById('account-type').value;
-                
-                if (!bankName || !accountNumber || !accountHolder || !accountType) {
-                    errorMessage = 'Por favor completa todos los campos requeridos de información bancaria';
-                    valid = false;
-                }
-                
-                if (valid) {
-                    details = {
-                        bankName: bankName,
-                        accountNumber: accountNumber,
-                        accountHolder: accountHolder,
-                        accountType: accountType
-                    };
-                }
-                
-            } else if (method === 'paypal') {
-                const paypalEmail = document.getElementById('paypal-email').value;
-                
-                if (!paypalEmail) {
-                    errorMessage = 'Por favor completa la información de PayPal';
-                    valid = false;
-                }
-                
-                // Validate email format
-                if (valid) {
-                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailRegex.test(paypalEmail)) {
-                        errorMessage = 'Por favor ingresa un correo electrónico válido para PayPal';
-                        valid = false;
-                    }
-                }
-                
-                if (valid) {
-                    details = {
-                        paypalEmail: paypalEmail
-                    };
-                }
-                
-            } else if (method === 'crypto') {
-                const currency = document.getElementById('crypto-currency').value;
-                const walletAddress = document.getElementById('wallet-address').value;
-                
-                if (!currency || !walletAddress) {
-                    errorMessage = 'Por favor completa todos los campos requeridos para criptomonedas';
-                    valid = false;
-                }
-                
-                // Validate minimum address length
-                if (valid && walletAddress.length < 10) {
-                    errorMessage = 'La dirección de la billetera es demasiado corta. Verifica que sea correcta.';
-                    valid = false;
-                }
-                
-                if (valid) {
-                    details = {
-                        currency: currency,
-                        walletAddress: walletAddress
-                    };
-                }
-            } else if (method === 'international') {
-                const bankName = document.getElementById('international-bank-name').value;
-                const swiftBic = document.getElementById('swift-bic').value;
-                const ibanNumber = document.getElementById('iban-number').value;
-                const accountHolder = document.getElementById('international-account-holder').value;
-                
-                if (!bankName || !swiftBic || !ibanNumber || !accountHolder) {
-                    errorMessage = 'Por favor completa todos los campos requeridos para transferencia internacional';
-                    valid = false;
-                }
-                
-                if (valid) {
-                    details = {
-                        bankName: bankName,
-                        swiftBic: swiftBic,
-                        ibanNumber: ibanNumber,
-                        accountHolder: accountHolder,
-                        address: document.getElementById('international-address').value || ''
-                    };
-                }
-            }
-            
-            if (!valid) {
-                showNotification(errorMessage, 'error');
-                return;
-            }
-            
-            showNotification('Procesando solicitud de retiro...', 'warning');
-            
-            // Disable submit button
-            const submitButton = document.getElementById('submit-withdrawal');
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<span>Procesando...</span><i class="fas fa-spinner fa-spin ml-2"></i>';
-            
-            // Generate unique ID
-            const withdrawalId = generateId();
-            
-            // Calculate fee based on method
-            let withdrawalFee = 0;
-            let netAmount = amount;
-            
-            if (method === 'international') {
-                // International transfer fee: 5% with minimum $20
-                const feePercentage = 0.05;
-                const minFee = 20;
-                const calculatedFee = amount * feePercentage;
-                withdrawalFee = Math.max(calculatedFee, minFee);
-                netAmount = amount - withdrawalFee;
-            } else if (method === 'crypto') {
-                // Crypto fee: 2% with minimum $5
-                const feePercentage = 0.02;
-                const minFee = 5;
-                const calculatedFee = amount * feePercentage;
-                withdrawalFee = Math.max(calculatedFee, minFee);
-                netAmount = amount - withdrawalFee;
-            } else {
-                // Local bank/PayPal fee: 2% with minimum $5
-                const feePercentage = 0.02;
-                const minFee = 5;
-                const calculatedFee = amount * feePercentage;
-                withdrawalFee = Math.max(calculatedFee, minFee);
-                netAmount = amount - withdrawalFee;
-            }
-            
-            // Get current balance
-            const currentBalance = appState.userData.balance || 0;
-            
-            // Create data for Realtime Database
-            const withdrawalData = {
-                amount: amount,
-                netAmount: netAmount,
-                fee: withdrawalFee,
-                method: method,
-                details: details,
-                status: 'pending',
-                userId: appState.currentUser.uid,
-                userEmail: appState.currentUser.email,
-                createdAt: Date.now(),
-                updatedAt: Date.now()
-            };
-            
-            // Update user balance first
-            db.ref('users/' + appState.currentUser.uid).update({
-                balance: currentBalance - amount,
-                updatedAt: Date.now()
-            })
-            .then(() => {
-                // Save withdrawal
-                return db.ref('withdrawals/' + appState.currentUser.uid + '/' + withdrawalId).set(withdrawalData);
-            })
-            .then(() => {
-                // Create transaction record
-                const transactionData = {
-                    type: 'withdrawal',
-                    amount: -amount,
-                    method: method,
-                    description: `Retiro #${withdrawalId.substring(0, 8)} (${method})`,
-                    fee: withdrawalFee,
-                    netAmount: netAmount,
-                    status: 'pending',
-                    createdAt: Date.now()
-                };
-                
-                return db.ref('transactions/' + appState.currentUser.uid).push(transactionData);
-            })
-            .then(() => {
-                showNotification('¡Solicitud de retiro enviada correctamente! Será procesada en 3-5 días hábiles.', 'success');
-                closeWithdrawalModal();
-                
-                // Reset submit button
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<span>Solicitar Retiro</span><i class="fas fa-arrow-right ml-2"></i>';
-            })
-            .catch(error => {
-                console.error('Error saving withdrawal:', error);
-                showNotification('Error al guardar la solicitud de retiro: ' + error.message, 'error');
-                
-                // Reset submit button
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<span>Solicitar Retiro</span><i class="fas fa-arrow-right ml-2"></i>';
-            });
-        }
+		function handleWithdrawal(e) {
+			e.preventDefault();
+			
+			console.log('Iniciando solicitud de retiro...');
+			
+			if (!appState.currentUser) {
+				showNotification('Debes iniciar sesión para solicitar un retiro', 'error');
+				return;
+			}
+			
+			const amountInput = document.getElementById('withdrawal-amount');
+			const amount = parseFloat(amountInput.value);
+			const methodElement = document.querySelector('input[name="withdrawal-method"]:checked');
+			
+			if (!methodElement) {
+				showNotification('Por favor selecciona un método de retiro', 'error');
+				return;
+			}
+			
+			const method = methodElement.value;
+			
+			if (!amount || isNaN(amount) || amount < 10) {
+				showNotification('El monto mínimo de retiro es $10 USD', 'error');
+				amountInput.focus();
+				return;
+			}
+			
+			const totalDeposits = appState.userData?.totalDeposits || 0;
+			const totalEarnings = appState.userData?.totalEarnings || 0;
+			const referralBonus = appState.userData?.referralBonus || 0;
+			const currentBalance = totalDeposits + totalEarnings + referralBonus;
+			
+			console.log('Cálculo de balance:', {
+				totalDeposits,
+				totalEarnings,
+				referralBonus,
+				currentBalance,
+				amount
+			});
+			
+			if (amount > currentBalance) {
+				showNotification(`No tienes suficiente saldo disponible. Saldo: $${currentBalance.toFixed(2)}`, 'error');
+				amountInput.focus();
+				return;
+			}
+			
+			let details = {};
+			let valid = true;
+			let errorMessage = '';
+			let firstInvalidField = null;
+			
+			if (method === 'bank') {
+				const bankName = document.getElementById('bank-name').value;
+				const accountNumber = document.getElementById('account-number').value;
+				const accountHolder = document.getElementById('account-holder').value;
+				const accountType = document.getElementById('account-type').value;
+				
+				if (!bankName || !accountNumber || !accountHolder || !accountType) {
+					errorMessage = 'Por favor completa todos los campos requeridos de información bancaria';
+					valid = false;
+					firstInvalidField = document.getElementById('bank-name');
+				}
+				
+				if (valid) {
+					details = {
+						bankName: bankName,
+						accountNumber: accountNumber,
+						accountHolder: accountHolder,
+						accountType: accountType
+					};
+				}
+				
+			} else if (method === 'paypal') {
+				const paypalEmail = document.getElementById('paypal-email');
+				if (!paypalEmail || !paypalEmail.value.trim()) {
+					errorMessage = 'Por favor ingresa el correo electrónico de PayPal';
+					valid = false;
+					firstInvalidField = paypalEmail;
+				} else {
+					const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+					if (!emailRegex.test(paypalEmail.value)) {
+						errorMessage = 'Por favor ingresa un correo electrónico válido para PayPal';
+						valid = false;
+						firstInvalidField = paypalEmail;
+					}
+				}
+				
+				if (valid) {
+					details = {
+						paypalEmail: paypalEmail.value
+					};
+				}
+				
+			} else if (method === 'crypto') {
+				const cryptoWallet = document.getElementById('crypto-wallet').value;
+				const cryptoNetwork = document.getElementById('crypto-network').value;
+				
+				if (!cryptoWallet || !cryptoNetwork) {
+					errorMessage = 'Por favor completa todos los campos requeridos para criptomonedas';
+					valid = false;
+					firstInvalidField = document.getElementById('crypto-wallet');
+				}
+				
+				if (valid && cryptoWallet.length < 10) {
+					errorMessage = 'La dirección de la billetera es demasiado corta. Verifica que sea correcta.';
+					valid = false;
+					firstInvalidField = document.getElementById('crypto-wallet');
+				}
+				
+				if (valid) {
+					details = {
+						walletAddress: cryptoWallet,
+						network: cryptoNetwork
+					};
+				}
+			} else if (method === 'international') {
+				const bankCountry = document.getElementById('international-bank-country').value;
+				const bankName = document.getElementById('international-bank-name').value;
+				const accountType = document.getElementById('international-account-type').value;
+				const currency = document.getElementById('international-currency').value;
+				const accountNumber = document.getElementById('international-account-number').value;
+				const routingNumber = document.getElementById('international-routing-number').value;
+				const swiftCode = document.getElementById('international-swift-code').value;
+				const accountHolder = document.getElementById('international-account-holder').value;
+				
+				if (!bankCountry || !bankName || !accountType || !currency || !accountNumber || !routingNumber || !swiftCode || !accountHolder) {
+					errorMessage = 'Por favor completa todos los campos requeridos para transferencia internacional';
+					valid = false;
+					firstInvalidField = document.getElementById('international-bank-country');
+				}
+				
+				if (valid) {
+					details = {
+						bankCountry: bankCountry,
+						bankName: bankName,
+						accountType: accountType,
+						currency: currency,
+						accountNumber: accountNumber,
+						routingNumber: routingNumber,
+						swiftCode: swiftCode,
+						accountHolder: accountHolder,
+						bankAddress: document.getElementById('international-bank-address')?.value || ''
+					};
+				}
+			} else {
+				errorMessage = 'Método de retiro no válido';
+				valid = false;
+			}
+			
+			if (!valid) {
+				showNotification(errorMessage, 'error');
+				if (firstInvalidField) {
+					firstInvalidField.focus();
+				}
+				return;
+			}
+			
+			showNotification('Procesando solicitud de retiro...', 'warning');
+			
+			const submitButton = document.getElementById('confirm-withdrawal');
+			if (submitButton) {
+				submitButton.disabled = true;
+				submitButton.innerHTML = '<span>Procesando...</span><i class="fas fa-spinner fa-spin ml-2"></i>';
+			}
+			
+			const withdrawalId = generateId();
+			
+			let withdrawalFee = 0;
+			let netAmount = amount;
+			
+			if (method === 'international') {
+				withdrawalFee = Math.max(amount * 0.05, 20);
+				netAmount = amount - withdrawalFee;
+			} else if (method === 'crypto') {
+				withdrawalFee = Math.max(amount * 0.02, 5);
+				netAmount = amount - withdrawalFee;
+			} else {
+				withdrawalFee = Math.max(amount * 0.02, 5);
+				netAmount = amount - withdrawalFee;
+			}
+			
+			console.log('Datos del retiro:', {
+				amount: amount,
+				netAmount: netAmount,
+				fee: withdrawalFee,
+				method: method,
+				details: details
+			});
+			
+			const withdrawalData = {
+				amount: amount,
+				netAmount: netAmount,
+				fee: withdrawalFee,
+				method: method,
+				details: details,
+				status: 'pending',
+				userId: appState.currentUser.uid,
+				userEmail: appState.currentUser.email,
+				userName: appState.userData?.name || appState.currentUser.email,
+				createdAt: Date.now(),
+				updatedAt: Date.now()
+			};
+			
+			db.ref('withdrawals/' + appState.currentUser.uid + '/' + withdrawalId).set(withdrawalData)
+				.then(() => {
+					console.log('Retiro guardado en Firebase');
+					
+					const transactionData = {
+						type: 'withdrawal',
+						amount: -amount,
+						method: method,
+						description: `Retiro #${withdrawalId.substring(0, 8)} (${method})`,
+						fee: withdrawalFee,
+						netAmount: netAmount,
+						status: 'pending',
+						createdAt: Date.now()
+					};
+					
+					return db.ref('transactions/' + appState.currentUser.uid).push(transactionData);
+				})
+				.then(() => {
+					console.log('Transacción registrada en Firebase');
+					
+					showNotification('¡Solicitud de retiro enviada correctamente! Será procesada en 3-5 días hábiles.', 'success');
+					
+					closeWithdrawalModal();
+				})
+				.catch(error => {
+					console.error('Error saving withdrawal:', error);
+					showNotification('Error al guardar la solicitud de retiro: ' + error.message, 'error');
+					
+					if (submitButton) {
+						submitButton.disabled = false;
+						submitButton.innerHTML = '<span>Solicitar Retiro</span><i class="fas fa-arrow-right ml-2"></i>';
+					}
+				});
+		}
 
-        // Handle profile update
         function handleProfileUpdate(e) {
             e.preventDefault();
             
@@ -3392,13 +3449,11 @@
             const documentType = document.getElementById('profile-document-type').value;
             const documentNumber = document.getElementById('profile-document-number').value.trim();
             
-            // Validar campos
             if (!name || !email || !phone || !country) {
                 showNotification('Por favor completa todos los campos obligatorios', 'error');
                 return;
             }
             
-            // Validar formato de email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 showNotification('Por favor ingresa un correo electrónico válido', 'error');
@@ -3407,7 +3462,6 @@
             
             showNotification('Actualizando perfil...', 'warning');
             
-            // Update user data in Realtime Database
             const updates = {
                 name: name,
                 email: email,
@@ -3421,7 +3475,6 @@
             db.ref('users/' + appState.currentUser.uid).update(updates)
                 .then(() => {
                     showNotification('Perfil actualizado correctamente', 'success');
-                    // Update UI
                     updateUIWithUserData();
                 })
                 .catch(error => {
@@ -3430,7 +3483,6 @@
                 });
         }
 
-        // Handle password change
         function handlePasswordChange() {
             const currentPassword = document.getElementById('current-password').value;
             const newPassword = document.getElementById('new-password').value;
@@ -3453,7 +3505,6 @@
             
             showNotification('Cambiando contraseña...', 'warning');
             
-            // Reauthenticate user
             const user = auth.currentUser;
             const credential = firebase.auth.EmailAuthProvider.credential(
                 user.email,
@@ -3462,12 +3513,10 @@
             
             user.reauthenticateWithCredential(credential)
                 .then(() => {
-                    // Update password
                     return user.updatePassword(newPassword);
                 })
                 .then(() => {
                     showNotification('Contraseña cambiada correctamente', 'success');
-                    // Clear form
                     document.getElementById('current-password').value = '';
                     document.getElementById('new-password').value = '';
                     document.getElementById('confirm-new-password').value = '';
@@ -3491,7 +3540,6 @@
                 });
         }
 
-        // Handle international settings
         function handleInternationalSettings() {
             const bankName = document.getElementById('international-bank-name').value.trim();
             const swiftCode = document.getElementById('swift-code').value.trim();
@@ -3504,7 +3552,6 @@
             
             showNotification('Guardando configuración internacional...', 'warning');
             
-            // Update user data in Realtime Database
             const updates = {
                 internationalBankName: bankName,
                 swiftCode: swiftCode,
@@ -3522,7 +3569,6 @@
                 });
         }
 
-        // Handle referral activation
         function handleReferralActivation() {
             const code = activateReferralInput.value.trim();
             
@@ -3538,29 +3584,24 @@
             
             showNotification('Validando código de referido...', 'warning');
             
-            // Find user with this referral code
             db.ref('users').orderByChild('referralCode').equalTo(code).once('value')
                 .then(snapshot => {
                     if (snapshot.exists()) {
                         const referrerData = Object.values(snapshot.val())[0];
                         const referrerId = Object.keys(snapshot.val())[0];
                         
-                        // Update current user with referral info
                         return db.ref('users/' + appState.currentUser.uid).update({
                             referredBy: code,
                             updatedAt: Date.now()
                         }).then(() => {
-                            // Add bonus to referrer
                             const referrerBonus = (referrerData.referralBonus || 0) + 25;
                             const referrerReferrals = (referrerData.totalReferrals || 0) + 1;
                             
-                            // Update referrer data
                             return db.ref('users/' + referrerId).update({
                                 referralBonus: referrerBonus,
                                 totalReferrals: referrerReferrals,
                                 updatedAt: Date.now()
                             }).then(() => {
-                                // Record the referral
                                 const referralId = generateId();
                                 const referralData = {
                                     referredUserId: appState.currentUser.uid,
@@ -3572,7 +3613,6 @@
                                     createdAt: Date.now()
                                 };
                                 
-                                // Save referral record
                                 return db.ref('referrals/' + referrerId + '/' + referralId).set(referralData);
                             });
                         });
@@ -3590,7 +3630,6 @@
                 });
         }
 
-        // Copy to clipboard
         function copyToClipboard(e) {
             let textToCopy = '';
             
@@ -3614,7 +3653,6 @@
                 .catch(err => {
                     console.error('Error copying text: ', err);
                     
-                    // Fallback for old browsers
                     const textArea = document.createElement('textarea');
                     textArea.value = textToCopy;
                     document.body.appendChild(textArea);
@@ -3631,26 +3669,21 @@
                 });
         }
 
-        // Initialize KYC functionality
         function initKYC() {
             console.log('Inicializando funcionalidad KYC...');
             
-            // Check if we're in the dashboard section
             if (!dashboardSection || dashboardSection.classList.contains('hidden')) {
                 console.log('Dashboard no está visible, posponiendo inicialización KYC');
                 return;
             }
             
-            // Avoid multiple initialization
             if (window.kycInitialized === true) {
                 console.log('KYC ya está inicializado, omitiendo...');
                 return;
             }
             
-            // Mark as initialized
             window.kycInitialized = true;
             
-            // Event listeners for KYC form
             if (kycForm) {
                 kycForm.removeEventListener('submit', handleKYCSubmit);
                 kycForm.addEventListener('submit', handleKYCSubmit);
@@ -3661,7 +3694,6 @@
                 refreshKycStatus.addEventListener('click', updateKYCStatus);
             }
             
-            // Event listeners for file uploads
             const dropZones = document.querySelectorAll('.kyc-drop-zone');
             
             dropZones.forEach(dropZone => {
@@ -3670,7 +3702,6 @@
                 
                 if (!fileInput) return;
                 
-                // Create named functions to be able to remove them
                 const clickHandler = (e) => {
                     e.stopPropagation();
                     e.preventDefault();
@@ -3710,14 +3741,12 @@
                     }
                 };
                 
-                // Remove previous listeners
                 dropZone.removeEventListener('click', clickHandler);
                 dropZone.removeEventListener('dragover', dragOverHandler);
                 dropZone.removeEventListener('dragleave', dragLeaveHandler);
                 dropZone.removeEventListener('drop', dropHandler);
                 fileInput.removeEventListener('change', fileChangeHandler);
                 
-                // Add new listeners
                 dropZone.addEventListener('click', clickHandler, true);
                 dropZone.addEventListener('dragover', dragOverHandler, true);
                 dropZone.addEventListener('dragleave', dragLeaveHandler, true);
@@ -3725,44 +3754,36 @@
                 fileInput.addEventListener('change', fileChangeHandler, true);
             });
             
-            // Initialize KYC status when user is logged in
             if (appState.currentUser) {
                 updateKYCStatus();
             }
         }
 
-        // Process KYC file
         function processKYCFile(file, docType) {
-            // Check if user is logged in
             if (!appState.currentUser) {
                 showNotification('Debes iniciar sesión para subir documentos', 'error');
                 return;
             }
             
-            // Validate file type
             const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
             if (!allowedTypes.includes(file.type)) {
                 showNotification(`Formato de archivo no permitido para ${getDocTypeName(docType)}. Use JPG, PNG o PDF.`, 'error');
                 return;
             }
             
-            // Validate file size (5 MB max)
             const maxSize = 5 * 1024 * 1024;
             if (file.size > maxSize) {
                 showNotification(`El archivo es demasiado grande. El tamaño máximo es 5 MB para ${getDocTypeName(docType)}.`, 'error');
                 return;
             }
             
-            // Store file
             kycFiles[docType] = file;
             
-            // Show preview
             showKYCFilePreview(file, docType);
             
             showNotification(`Documento ${getDocTypeName(docType)} cargado correctamente`, 'success');
         }
 
-        // Get document type name
         function getDocTypeName(docType) {
             const names = {
                 'id_front': 'Documento Frente',
@@ -3773,7 +3794,6 @@
             return names[docType] || docType;
         }
 
-        // Show KYC file preview
         function showKYCFilePreview(file, docType) {
             const previewContainer = document.querySelector(`.kyc-file-preview[data-doc-type="${docType}"]`);
             if (!previewContainer) return;
@@ -3836,7 +3856,6 @@
                 previewContainer.innerHTML = previewHTML;
                 previewContainer.classList.remove('hidden');
                 
-                // Add event listeners to preview buttons
                 const viewButton = previewContainer.querySelector('.view-kyc-file');
                 const removeButton = previewContainer.querySelector('.remove-kyc-file');
                 
@@ -3852,7 +3871,6 @@
             reader.readAsDataURL(file);
         }
 
-        // View KYC file
         function viewKYCFile(docType) {
             const file = kycFiles[docType];
             if (!file) return;
@@ -3861,7 +3879,6 @@
             window.open(fileURL, '_blank');
         }
 
-        // Remove KYC file
         function removeKYCFile(docType) {
             kycFiles[docType] = null;
             const previewContainer = document.querySelector(`.kyc-file-preview[data-doc-type="${docType}"]`);
@@ -3870,7 +3887,6 @@
                 previewContainer.classList.add('hidden');
             }
             
-            // Reset file input
             const fileInput = document.querySelector(`.kyc-file-input[data-doc-type="${docType}"]`);
             if (fileInput) {
                 fileInput.value = '';
@@ -3879,26 +3895,22 @@
             showNotification(`Documento ${getDocTypeName(docType)} eliminado`, 'success');
         }
 
-        // Update KYC status
         function updateKYCStatus() {
             if (!appState.userData) return;
             
             const userKycStatus = appState.userData.kycStatus || 'pending';
             const kycData = appState.userData.kycData || {};
             
-            // Update badge in sidebar
             if (kycStatus) {
                 kycStatus.textContent = `KYC ${userKycStatus === 'verified' ? 'Verificado' : userKycStatus === 'rejected' ? 'Rechazado' : 'Pendiente'}`;
                 kycStatus.className = `kyc-status ${userKycStatus === 'verified' ? 'kyc-verified' : userKycStatus === 'rejected' ? 'kyc-rejected' : 'kyc-pending'}`;
             }
             
-            // Update badge in KYC section
             if (kycStatusBadge) {
                 kycStatusBadge.textContent = `KYC ${userKycStatus === 'verified' ? 'Verificado' : userKycStatus === 'rejected' ? 'Rechazado' : 'Pendiente'}`;
                 kycStatusBadge.className = `kyc-status ${userKycStatus === 'verified' ? 'kyc-verified' : userKycStatus === 'rejected' ? 'kyc-rejected' : 'kyc-pending'}`;
             }
             
-            // Auto-fill form if user has submitted KYC before
             if (kycData.fullName && kycFullName) {
                 kycFullName.value = kycData.fullName;
                 document.getElementById('kyc-birthdate').value = kycData.birthdate || '';
@@ -3907,11 +3919,9 @@
                 document.getElementById('kyc-id-country').value = kycData.idCountry || '';
                 document.getElementById('kyc-address').value = kycData.address || '';
             } else if (kycFullName && appState.userData.name) {
-                // Auto-fill name from user profile
                 kycFullName.value = appState.userData.name || '';
             }
             
-            // Disable form if already verified or rejected
             if (kycForm && (userKycStatus === 'verified' || userKycStatus === 'rejected')) {
                 kycForm.querySelectorAll('input, select, textarea, button').forEach(el => {
                     el.disabled = true;
@@ -3931,7 +3941,6 @@
             }
         }
 
-        // Handle KYC form submission
         function handleKYCSubmit(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -3941,7 +3950,6 @@
                 return;
             }
             
-            // Validate required fields
             const fullName = kycFullName ? kycFullName.value.trim() : '';
             const birthdate = document.getElementById('kyc-birthdate') ? document.getElementById('kyc-birthdate').value : '';
             const idType = document.getElementById('kyc-id-type') ? document.getElementById('kyc-id-type').value : '';
@@ -3954,7 +3962,6 @@
                 return;
             }
             
-            // Validate required documents
             if (!kycFiles.id_front || !kycFiles.id_back || !kycFiles.selfie) {
                 showNotification('Debes subir todos los documentos requeridos (frente, reverso y selfie)', 'error');
                 return;
@@ -3962,13 +3969,11 @@
             
             showNotification('Enviando verificación KYC...', 'warning');
             
-            // Disable submit button
             if (submitKycButton) {
                 submitKycButton.disabled = true;
                 submitKycButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Enviando...';
             }
             
-            // Create KYC data object
             const kycData = {
                 fullName: fullName,
                 birthdate: birthdate,
@@ -3981,7 +3986,6 @@
                 updatedAt: Date.now()
             };
             
-            // First, save KYC data to user profile
             db.ref('users/' + appState.currentUser.uid).update({
                 kycData: kycData,
                 kycStatus: 'pending',
@@ -3990,7 +3994,6 @@
             .then(() => {
                 showNotification('¡Verificación KYC enviada correctamente! Será revisada por nuestro equipo en 24-48 horas.', 'success');
                 
-                // Reset form and files
                 if (kycForm) {
                     kycForm.reset();
                 }
@@ -4003,7 +4006,6 @@
                     }
                 });
                 
-                // Update status
                 updateKYCStatus();
             })
             .catch(error => {
@@ -4011,7 +4013,6 @@
                 showNotification('Error al enviar la verificación KYC: ' + error.message, 'error');
             })
             .finally(() => {
-                // Re-enable submit button
                 if (submitKycButton) {
                     submitKycButton.disabled = false;
                     submitKycButton.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Enviar para Verificación';
@@ -4019,7 +4020,6 @@
             });
         }
 
-        // Update withdrawal details based on selected method
         function updateWithdrawalDetails() {
             const selectedMethod = document.querySelector('input[name="withdrawal-method"]:checked');
             
@@ -4027,35 +4027,29 @@
             
             const methodValue = selectedMethod.value;
             
-            // Hide all details
             document.querySelectorAll('.method-details').forEach(detail => {
                 detail.classList.add('hidden');
             });
             
-            // Remove selected class from all
             document.querySelectorAll('.payment-method.withdrawal-method').forEach(el => {
                 el.classList.remove('selected');
             });
             
-            // Show selected method details and add selected class
             const selectedElement = selectedMethod.closest('.payment-method');
             if (selectedElement) {
                 selectedElement.classList.add('selected');
             }
             
-            // Show corresponding details
             const detailsElement = document.getElementById(`${methodValue}-details`);
             if (detailsElement) {
                 detailsElement.classList.remove('hidden');
             }
         }
 
-        // Generate a unique ID
         function generateId() {
             return 'id_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
         }
 
-        // Generate a unique referral code
         function generateReferralCode() {
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let result = '';
@@ -4065,7 +4059,6 @@
             return result;
         }
 
-        // Format file size
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -4074,12 +4067,10 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // Format date
         function formatDate(timestamp) {
             if (!timestamp) return '';
             const date = new Date(timestamp);
             
-            // Format: 15 Ene 2024, 14:30
             const day = date.getDate();
             const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
             const month = monthNames[date.getMonth()];
@@ -4090,7 +4081,6 @@
             return `${day} ${month} ${year}, ${hours}:${minutes}`;
         }
 
-        // Show notification
         function showNotification(message, type = 'info') {
             const notificationsContainer = document.getElementById('notifications-container');
             const notificationId = 'notification-' + Date.now();
@@ -4107,12 +4097,10 @@
             
             notificationsContainer.appendChild(notification);
             
-            // Show notification
             setTimeout(() => {
                 notification.classList.add('show');
             }, 10);
             
-            // Hide and remove notification after 5 seconds
             setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => {
@@ -4123,7 +4111,6 @@
             }, 5000);
         }
 
-        // Close notification when clicking on it
         document.addEventListener('click', (e) => {
             if (e.target.closest('.notification')) {
                 const notification = e.target.closest('.notification');
@@ -4136,9 +4123,7 @@
             }
         });
 
-        // Initialize withdrawal details
         document.addEventListener('DOMContentLoaded', function() {
-            // Add event listeners for withdrawal method buttons
             document.querySelectorAll('.payment-method.withdrawal-method').forEach(method => {
                 method.addEventListener('click', function() {
                     const radio = this.querySelector('input[type="radio"]');
@@ -4149,14 +4134,12 @@
                 });
             });
             
-            // Initialize with bank selected by default
             const bankRadio = document.getElementById('withdrawal-bank');
             if (bankRadio) {
                 bankRadio.checked = true;
                 setTimeout(updateWithdrawalDetails, 100);
             }
             
-            // Verify KYC elements
             console.log('Verificando elementos KYC...');
             
             const kycElements = {
@@ -4174,6 +4157,21 @@
                 }
             }
         });
+
+        function setupChartPeriodButtons() {
+            document.querySelectorAll('.chart-period-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.chart-period-btn').forEach(b => {
+                        b.classList.remove('bg-blue-100', 'text-blue-600', 'font-medium');
+                        b.classList.add('bg-gray-100', 'text-gray-700');
+                    });
+                    this.classList.remove('bg-gray-100', 'text-gray-700');
+                    this.classList.add('bg-blue-100', 'text-blue-600', 'font-medium');
+                    
+                    initPerformanceChart();
+                });
+            });
+        }
     </script>
 </body>
 </html>

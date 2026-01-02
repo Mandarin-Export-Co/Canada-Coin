@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canada Coin - Tarjetas</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #1e40af;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+            --gold-color: #fbbf24;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .banking-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .banking-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            min-height: calc(100vh - 200px);
+            overflow: hidden;
+        }
+        
+        .banking-tab {
+            position: relative;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: #4b5563;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .banking-tab:hover {
+            color: var(--primary-color);
+            background: rgba(30, 64, 175, 0.05);
+        }
+        
+        .banking-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: linear-gradient(to bottom, rgba(30, 64, 175, 0.1), transparent);
+        }
+        
+        .banking-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            color: white;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification-toast.show {
+            transform: translateX(0);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        
+        .modal-banking {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-banking.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content-banking {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-banking.active .modal-content-banking {
+            transform: scale(1);
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .card-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            color: white;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .card-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-item.locked {
+            filter: grayscale(0.5);
+            opacity: 0.8;
+        }
+        
+        .card-chip {
+            width: 50px;
+            height: 40px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-chip::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.3) 50%, transparent 55%);
+        }
+        
+        .history-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        
+        .history-item:hover {
+            background: #f8fafc;
+        }
+        
+        .history-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="notifications-container"></div>
+    
+    <!-- Header -->
+    <header class="banking-header sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Primera fila: Logo y usuario -->
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-coins text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">Canada Coin</h1>
+                            <p class="text-xs text-gray-500">Banca Digital</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Perfil de usuario -->
+                    <div class="relative">
+                        <button id="user-profile-button" 
+                                class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition">
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div class="hidden md:block text-left">
+                                <p id="user-name" class="font-semibold text-gray-900">Usuario</p>
+                                <p class="text-xs text-gray-500">Ver perfil</p>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-500 text-sm"></i>
+                        </button>
+                        
+                        <!-- Dropdown usuario -->
+                        <div id="user-profile-dropdown" class="dropdown-menu">
+                            <div class="p-4 border-b border-gray-200">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p id="dropdown-user-name" class="font-bold text-gray-900">Usuario</p>
+                                        <p id="dropdown-user-email" class="text-sm text-gray-500">usuario@email.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="py-2">
+                                <a href="profile.html" class="dropdown-item">
+                                    <i class="fas fa-user text-gray-400 w-6"></i>
+                                    Mi Perfil
+                                </a>
+                                <a href="security.html" class="dropdown-item">
+                                    <i class="fas fa-shield-alt text-gray-400 w-6"></i>
+                                    Seguridad
+                                </a>
+                                <a href="settings.html" class="dropdown-item">
+                                    <i class="fas fa-cog text-gray-400 w-6"></i>
+                                    Configuración
+                                </a>
+                                <hr class="my-2">
+                                <a href="#" id="logout-button" class="dropdown-item text-red-600">
+                                    <i class="fas fa-sign-out-alt text-red-400 w-6"></i>
+                                    Cerrar Sesión
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Segunda fila: Navegación por pestañas -->
+            <div class="border-t border-gray-200">
+                <nav class="flex overflow-x-auto">
+                    <a href="index.html" class="banking-tab">
+                        <i class="fas fa-home mr-2"></i>Resumen
+                    </a>
+                    <a href="investments.html" class="banking-tab">
+                        <i class="fas fa-chart-line mr-2"></i>Inversiones
+                    </a>
+                    <a href="deposits.html" class="banking-tab">
+                        <i class="fas fa-arrow-up mr-2"></i>Depósitos
+                    </a>
+                    <a href="withdrawals.html" class="banking-tab">
+                        <i class="fas fa-arrow-down mr-2"></i>Retiros
+                    </a>
+                    <a href="transfers.html" class="banking-tab">
+                        <i class="fas fa-exchange-alt mr-2"></i>Transferencias
+                    </a>
+                    <a href="cards.html" class="banking-tab active">
+                        <i class="fas fa-credit-card mr-2"></i>Tarjetas
+                    </a>
+                    <a href="referrals.html" class="banking-tab">
+                        <i class="fas fa-users mr-2"></i>Referidos
+                    </a>
+                    <a href="support.html" class="banking-tab">
+                        <i class="fas fa-headset mr-2"></i>Soporte
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Contenido Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="banking-content">
+            <div class="p-6">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Tarjetas</h2>
+                    <p class="text-gray-600">Gestiona tus tarjetas digitales y físicas</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2">
+                        <!-- Tarjetas Activas -->
+                        <div class="mb-8">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold text-gray-900">Tarjetas Activas</h3>
+                                <button id="request-new-card-btn" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-4 py-2 rounded-lg hover:opacity-90 text-sm">
+                                    <i class="fas fa-plus mr-2"></i>Solicitar Nueva
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="cards-container">
+                                <!-- Tarjetas se cargarán aquí -->
+                                <div class="col-span-2 text-center py-12">
+                                    <i class="fas fa-credit-card text-4xl text-gray-300 mb-4"></i>
+                                    <p class="text-gray-500">No tienes tarjetas activas</p>
+                                    <p class="text-sm text-gray-400 mt-2">Solicita tu primera tarjeta digital</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Historial de Tarjetas -->
+                        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                            <div class="p-6 border-b border-gray-200">
+                                <h3 class="text-lg font-bold text-gray-900">Historial de Tarjetas</h3>
+                            </div>
+                            <div id="card-history" class="divide-y divide-gray-100">
+                                <div class="text-center py-12">
+                                    <i class="fas fa-history text-4xl text-gray-300 mb-4"></i>
+                                    <p class="text-gray-500">No hay historial de tarjetas</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <!-- Gestión -->
+                        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-6">Gestión</h3>
+                            <div class="space-y-4">
+                                <button class="w-full flex items-center justify-between p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition" id="lock-card-btn">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-lock text-blue-600 mr-3"></i>
+                                        <div class="text-left">
+                                            <span class="font-medium">Bloquear Tarjeta</span>
+                                            <p class="text-xs text-gray-500">Suspender temporalmente</p>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-gray-400"></i>
+                                </button>
+                                
+                                <button class="w-full flex items-center justify-between p-3 bg-green-50 rounded-lg hover:bg-green-100 transition" id="unlock-card-btn">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-unlock text-green-600 mr-3"></i>
+                                        <div class="text-left">
+                                            <span class="font-medium">Desbloquear Tarjeta</span>
+                                            <p class="text-xs text-gray-500">Reactivar tarjeta</p>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-gray-400"></i>
+                                </button>
+                                
+                                <button class="w-full flex items-center justify-between p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition" id="change-pin-btn">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-key text-purple-600 mr-3"></i>
+                                        <div class="text-left">
+                                            <span class="font-medium">Cambiar PIN</span>
+                                            <p class="text-xs text-gray-500">Actualizar código de seguridad</p>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-gray-400"></i>
+                                </button>
+                                
+                                <button class="w-full flex items-center justify-between p-3 bg-red-50 rounded-lg hover:bg-red-100 transition" id="cancel-card-btn">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-trash-alt text-red-600 mr-3"></i>
+                                        <div class="text-left">
+                                            <span class="font-medium">Cancelar Tarjeta</span>
+                                            <p class="text-xs text-gray-500">Eliminar permanentemente</p>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-gray-400"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Estado -->
+                        <div class="bg-white rounded-xl border border-gray-200 p-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-6">Estado</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-sm text-gray-600">Solicitudes Pendientes</p>
+                                    <p id="pending-count" class="text-2xl font-bold text-orange-600">0</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Tarjetas Activas</p>
+                                    <p id="active-count" class="text-2xl font-bold text-green-600">0</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Tarjetas Bloqueadas</p>
+                                    <p id="blocked-count" class="text-2xl font-bold text-red-600">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Información -->
+                        <div class="bg-blue-50 rounded-xl border border-blue-200 p-6 mt-6">
+                            <h3 class="text-lg font-bold text-blue-900 mb-3">
+                                <i class="fas fa-info-circle mr-2"></i>Información
+                            </h3>
+                            <ul class="space-y-3 text-sm text-blue-800">
+                                <li class="flex items-start">
+                                    <i class="fas fa-check-circle text-blue-600 mt-1 mr-2"></i>
+                                    <span>Las tarjetas digitales son gratuitas</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check-circle text-blue-600 mt-1 mr-2"></i>
+                                    <span>Activación inmediata después de la aprobación</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check-circle text-blue-600 mt-1 mr-2"></i>
+                                    <span>Puedes bloquear/desbloquear en cualquier momento</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Modal de Nueva Tarjeta -->
+    <div id="new-card-modal" class="modal-banking">
+        <div class="modal-content-banking">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-900">Solicitar Nueva Tarjeta</h2>
+                    <button id="close-card-modal" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <form id="new-card-form">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Tarjeta</label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="card-type" value="digital" class="sr-only peer" checked>
+                                    <div class="p-4 border-2 border-gray-300 rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50 transition">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                                                <i class="fas fa-mobile-alt text-white"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium">Digital</p>
+                                                <p class="text-xs text-gray-600">Inmediata • Gratis</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                                
+                                <label class="relative cursor-pointer">
+                                    <input type="radio" name="card-type" value="physical" class="sr-only peer">
+                                    <div class="p-4 border-2 border-gray-300 rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50 transition">
+                                        <div class="flex items-center">
+                                            <div class="w-10 h-10 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
+                                                <i class="fas fa-credit-card text-white"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium">Física</p>
+                                                <p class="text-xs text-gray-600">Envío en 7-10 días • $10</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre en la Tarjeta</label>
+                            <input type="text" id="card-holder" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ej: Juan Pérez" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Límite Diario Sugerido</label>
+                            <select id="card-limit" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="1000">$1,000</option>
+                                <option value="2500" selected>$2,500</option>
+                                <option value="5000">$5,000</option>
+                                <option value="10000">$10,000</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Puedes ajustar este límite posteriormente</p>
+                        </div>
+                        
+                        <div id="physical-card-details" class="hidden">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Dirección de Envío</label>
+                                <textarea id="card-address" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" rows="3" placeholder="Dirección completa para el envío"></textarea>
+                            </div>
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-exclamation-circle text-yellow-600 mt-0.5 mr-2"></i>
+                                    <div>
+                                        <p class="text-sm text-yellow-800 font-medium">Tarjeta Física</p>
+                                        <p class="text-xs text-yellow-700 mt-1">Costo de emisión: $10 • Tiempo de entrega: 7-10 días hábiles</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-4 pt-4">
+                            <button type="button" id="cancel-card" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-8 py-3 rounded-lg hover:opacity-90 transition">
+                                <i class="fas fa-paper-plane mr-2"></i>Solicitar Tarjeta
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Confirmación -->
+    <div id="confirmation-modal" class="modal-banking">
+        <div class="modal-content-banking">
+            <div class="p-6">
+                <div class="text-center">
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+                        <i class="fas fa-exclamation-triangle text-blue-600 text-xl"></i>
+                    </div>
+                    <h3 id="confirmation-title" class="text-lg font-medium text-gray-900 mb-2">Confirmar acción</h3>
+                    <p id="confirmation-message" class="text-sm text-gray-500 mb-6">
+                        ¿Estás seguro de que deseas realizar esta acción?
+                    </p>
+                    <div class="flex justify-center space-x-4">
+                        <button type="button" id="cancel-confirmation" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                            Cancelar
+                        </button>
+                        <button type="button" id="confirm-action" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:opacity-90 transition">
+                            Confirmar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para Ver/Cambiar PIN -->
+    <div id="pin-modal" class="modal-banking">
+        <div class="modal-content-banking">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-900">PIN de Tarjeta</h2>
+                    <button id="close-pin-modal" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <div id="pin-card-info" class="mb-6">
+                    <!-- Información de la tarjeta seleccionada -->
+                </div>
+                
+                <form id="pin-form">
+                    <div class="space-y-6">
+                        <!-- Mostrar número de tarjeta completo -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Número de Tarjeta
+                            </label>
+                            <div class="flex items-center">
+                                <input type="text" id="display-card-number" 
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 font-mono"
+                                       readonly>
+                                <button type="button" id="copy-card-number" 
+                                        class="ml-2 p-2 text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button type="button" id="toggle-card-number" 
+                                        class="ml-2 p-2 text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Mostrar PIN actual -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                PIN Actual
+                            </label>
+                            <div class="flex items-center">
+                                <input type="password" id="current-pin" 
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg font-mono" 
+                                       value="••••" readonly>
+                                <button type="button" id="toggle-current-pin" 
+                                        class="ml-2 p-2 text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" id="show-current-pin" 
+                                        class="ml-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700">
+                                    Ver PIN
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Cambiar PIN -->
+                        <div id="change-pin-section" class="hidden">
+                            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-yellow-700">
+                                            El PIN es tu código de seguridad. Nunca lo compartas con nadie.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Nuevo PIN
+                                </label>
+                                <input type="password" id="new-pin" 
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg font-mono"
+                                       placeholder="Nuevo PIN de 4 dígitos"
+                                       maxlength="4"
+                                       pattern="\d{4}">
+                                <p class="text-xs text-gray-500 mt-1">Debe ser exactamente 4 dígitos numéricos</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Confirmar Nuevo PIN
+                                </label>
+                                <input type="password" id="confirm-new-pin" 
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg font-mono"
+                                       placeholder="Confirmar nuevo PIN"
+                                       maxlength="4"
+                                       pattern="\d{4}">
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between pt-4">
+                            <button type="button" id="toggle-change-pin" 
+                                    class="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700">
+                                <i class="fas fa-key mr-2"></i>Cambiar PIN
+                            </button>
+                            
+                            <div id="change-pin-buttons" class="hidden space-x-2">
+                                <button type="button" id="cancel-change-pin" 
+                                        class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                    Cancelar
+                                </button>
+                                <button type="submit" id="submit-change-pin" 
+                                        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:opacity-90">
+                                    <i class="fas fa-save mr-2"></i>Guardar PIN
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBI4O0d_Mec38FDiuhirujCnX99PFKiXW4",
+            authDomain: "projekt-pc.firebaseapp.com",
+            databaseURL: "https://projekt-pc-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "projekt-pc",
+            storageBucket: "projekt-pc.appspot.com",
+            messagingSenderId: "90098431634",
+            appId: "1:90098431634:web:7cb61800d03533c2a6984b",
+            measurementId: "G-59YH8W8W1L"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // Application State
+        const bankingApp = {
+            currentUser: null,
+            userData: null,
+            userCards: [],
+            userRequests: [],
+            selectedCard: null,
+            currentAction: null
+        };
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', initCards);
+        
+        function initCards() {
+            auth.onAuthStateChanged(user => {
+                if (!user) {
+                    window.location.href = 'index.html';
+                } else {
+                    bankingApp.currentUser = user;
+                    loadUserData();
+                    setupEventListeners();
+                    loadUserCards();
+                    loadUserRequests();
+                    loadCardHistory();
+                }
+            });
+        }
+        
+        function loadUserData() {
+            const userRef = db.ref('users/' + bankingApp.currentUser.uid);
+            
+            userRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    bankingApp.userData = data;
+                    
+                    // Update UI
+                    document.getElementById('user-name').textContent = data.name || 'Usuario';
+                    document.getElementById('dropdown-user-name').textContent = data.name || 'Usuario';
+                    document.getElementById('dropdown-user-email').textContent = data.email || bankingApp.currentUser.email;
+                }
+            });
+        }
+        
+        function loadUserCards() {
+            const cardsRef = db.ref('user_cards/' + bankingApp.currentUser.uid);
+            
+            cardsRef.on('value', (snapshot) => {
+                bankingApp.userCards = [];
+                const container = document.getElementById('cards-container');
+                
+                if (!snapshot.exists()) {
+                    container.innerHTML = `
+                        <div class="col-span-2 text-center py-12">
+                            <i class="fas fa-credit-card text-4xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500">No tienes tarjetas activas</p>
+                            <p class="text-sm text-gray-400 mt-2">Solicita tu primera tarjeta digital</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                snapshot.forEach((cardSnap) => {
+                    bankingApp.userCards.push({
+                        id: cardSnap.key,
+                        ...cardSnap.val()
+                    });
+                });
+                
+                updateCardsDisplay();
+                updateCounts();
+            });
+        }
+        
+        function loadUserRequests() {
+            const requestsRef = db.ref('card_requests/' + bankingApp.currentUser.uid);
+            
+            requestsRef.on('value', (snapshot) => {
+                bankingApp.userRequests = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach((requestSnap) => {
+                        bankingApp.userRequests.push({
+                            id: requestSnap.key,
+                            ...requestSnap.val()
+                        });
+                    });
+                }
+                updateCounts();
+            });
+        }
+        
+        function loadCardHistory() {
+            const historyRef = db.ref('card_history/' + bankingApp.currentUser.uid);
+            
+            historyRef.orderByChild('timestamp').limitToLast(10).on('value', (snapshot) => {
+                const historyContainer = document.getElementById('card-history');
+                const historyItems = [];
+                
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        historyItems.unshift({
+                            id: child.key,
+                            ...child.val()
+                        });
+                    });
+                }
+                
+                updateCardHistory(historyItems);
+            });
+        }
+        
+        function updateCardsDisplay() {
+            const container = document.getElementById('cards-container');
+            
+            if (bankingApp.userCards.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 text-center py-12">
+                        <i class="fas fa-credit-card text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">No tienes tarjetas activas</p>
+                        <p class="text-sm text-gray-400 mt-2">Solicita tu primera tarjeta digital</p>
+                        <button id="request-first-card" class="mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-6 py-3 rounded-lg hover:opacity-90">
+                            <i class="fas fa-plus mr-2"></i>Solicitar Tarjeta
+                        </button>
+                    </div>
+                `;
+                
+                if (document.getElementById('request-first-card')) {
+                    document.getElementById('request-first-card').addEventListener('click', () => {
+                        openModal(document.getElementById('new-card-modal'));
+                    });
+                }
+                
+                return;
+            }
+            
+            let html = '';
+            bankingApp.userCards.forEach(card => {
+                const isLocked = card.status === 'blocked' || card.status === 'suspended';
+                const cardClass = isLocked ? 'card-item locked' : 'card-item';
+                
+                // Formatear número de tarjeta
+                const cardNumber = card.cardNumber ? card.cardNumber : '';
+                const displayNumber = cardNumber ? `•••• •••• •••• ${cardNumber.slice(-4)}` : '•••• •••• •••• 0000';
+                
+                // Determinar colores según tipo de tarjeta
+                const isPhysical = card.type === 'physical';
+                const cardIcon = isPhysical ? 'fa-credit-card' : 'fa-mobile-alt';
+                const cardTypeText = isPhysical ? 'Física' : 'Digital';
+                const cardStatus = isLocked ? 'Bloqueada' : 'Activa';
+                
+                html += `
+                    <div class="${cardClass}" data-card-id="${card.id}">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-blue-100 text-sm">${cardTypeText} • ${cardStatus}</p>
+                                <p class="text-white text-xl font-bold tracking-wider mt-1">${displayNumber}</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="bg-white/20 rounded-lg px-3 py-1 inline-block">
+                                    <p class="text-white text-sm">Válida hasta</p>
+                                    <p class="text-white font-bold">${card.expiryDate || '12/26'}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center mt-6">
+                            <div>
+                                <div class="card-chip mb-2"></div>
+                                <p class="text-blue-100 text-sm">Titular</p>
+                                <p class="text-white font-medium">${card.holderName || bankingApp.userData?.name || 'Usuario'}</p>
+                            </div>
+                            <div class="text-right">
+                                <i class="fas ${cardIcon} text-white text-2xl"></i>
+                                <div class="mt-4">
+                                    <p class="text-blue-100 text-sm">Límite diario</p>
+                                    <p class="text-white font-bold">$${card.limit ? card.limit.toLocaleString() : '2,500'}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${isLocked ? `
+                        <div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <div class="bg-white/90 rounded-lg px-4 py-2">
+                                <p class="text-red-600 font-bold">
+                                    <i class="fas fa-lock mr-2"></i>BLOQUEADA
+                                </p>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            
+            // Añadir event listeners a las tarjetas
+            document.querySelectorAll('.card-item').forEach(card => {
+                card.addEventListener('click', function() {
+                    const cardId = this.getAttribute('data-card-id');
+                    const selectedCard = bankingApp.userCards.find(c => c.id === cardId);
+                    
+                    if (selectedCard) {
+                        bankingApp.selectedCard = selectedCard;
+                        showNotification(`Tarjeta ${selectedCard.cardNumber ? '••••' + selectedCard.cardNumber.slice(-4) : ''} seleccionada`, 'info');
+                    }
+                });
+            });
+        }
+        
+        function updateCardHistory(historyItems) {
+            const historyContainer = document.getElementById('card-history');
+            
+            if (historyItems.length === 0) {
+                historyContainer.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-history text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">No hay historial de tarjetas</p>
+                        <p class="text-sm text-gray-400 mt-2">Tus solicitudes y acciones aparecerán aquí</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            historyItems.forEach(item => {
+                const iconClass = item.action === 'request' ? 'fa-paper-plane text-blue-600 bg-blue-100' : 
+                                item.action === 'lock' ? 'fa-lock text-red-600 bg-red-100' :
+                                item.action === 'unlock' ? 'fa-unlock text-green-600 bg-green-100' :
+                                item.action === 'approval' ? 'fa-check-circle text-green-600 bg-green-100' :
+                                'fa-credit-card text-purple-600 bg-purple-100';
+                
+                const actionText = item.action === 'request' ? 'Solicitud enviada' : 
+                                 item.action === 'lock' ? 'Tarjeta bloqueada' :
+                                 item.action === 'unlock' ? 'Tarjeta desbloqueada' :
+                                 item.action === 'approval' ? 'Solicitud aprobada' : 'Actualización';
+                
+                const statusColor = item.status === 'approved' ? 'text-green-600' : 
+                                  item.status === 'pending' ? 'text-yellow-600' : 
+                                  item.status === 'rejected' ? 'text-red-600' : 'text-gray-600';
+                
+                const statusText = item.status === 'approved' ? 'Aprobado' : 
+                                 item.status === 'pending' ? 'Pendiente' : 
+                                 item.status === 'rejected' ? 'Rechazado' : 'Completado';
+                
+                html += `
+                    <div class="history-item">
+                        <div class="history-icon ${iconClass.split(' ')[2]}">
+                            <i class="fas ${iconClass.split(' ')[0]}"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <p class="font-medium">${actionText}</p>
+                                <p class="text-sm font-medium ${statusColor}">${statusText}</p>
+                            </div>
+                            <p class="text-sm text-gray-500">${formatDate(item.timestamp || Date.now())}</p>
+                            ${item.type ? `<p class="text-xs text-gray-400 mt-1">Tipo: ${item.type === 'digital' ? 'Digital' : 'Física'}</p>` : ''}
+                            ${item.limit ? `<p class="text-xs text-gray-400">Límite: $${item.limit}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            historyContainer.innerHTML = html;
+        }
+        
+        function updateCounts() {
+            const activeCount = bankingApp.userCards.filter(c => c.status === 'active').length;
+            const blockedCount = bankingApp.userCards.filter(c => c.status === 'blocked' || c.status === 'suspended').length;
+            const pendingCount = bankingApp.userRequests.filter(r => r.status === 'pending').length;
+            
+            document.getElementById('active-count').textContent = activeCount;
+            document.getElementById('blocked-count').textContent = blockedCount;
+            document.getElementById('pending-count').textContent = pendingCount;
+        }
+        
+        function setupEventListeners() {
+            // User dropdown
+            const userProfileButton = document.getElementById('user-profile-button');
+            const userProfileDropdown = document.getElementById('user-profile-dropdown');
+            
+            userProfileButton.addEventListener('click', () => {
+                userProfileDropdown.classList.toggle('active');
+            });
+            
+            // Logout
+            document.getElementById('logout-button').addEventListener('click', handleLogout);
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!userProfileButton.contains(e.target) && !userProfileDropdown.contains(e.target)) {
+                    userProfileDropdown.classList.remove('active');
+                }
+            });
+            
+            // Solicitar nueva tarjeta
+            document.getElementById('request-new-card-btn').addEventListener('click', () => {
+                openModal(document.getElementById('new-card-modal'));
+            });
+            
+            // Cambiar tipo de tarjeta (digital/física)
+            document.querySelectorAll('input[name="card-type"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const physicalDetails = document.getElementById('physical-card-details');
+                    const cardAddressInput = document.getElementById('card-address');
+                    
+                    if (this.value === 'physical') {
+                        physicalDetails.classList.remove('hidden');
+                        cardAddressInput.required = true;
+                        cardAddressInput.placeholder = "Dirección completa para el envío (calle, número, ciudad, código postal, país)";
+                    } else {
+                        physicalDetails.classList.add('hidden');
+                        cardAddressInput.required = false;
+                        cardAddressInput.value = '';
+                        cardAddressInput.placeholder = "Dirección completa para el envío";
+                    }
+                });
+            });
+            
+            // Formulario de nueva tarjeta
+            document.getElementById('new-card-form').addEventListener('submit', handleNewCardRequest);
+            document.getElementById('close-card-modal').addEventListener('click', () => {
+                closeModal(document.getElementById('new-card-modal'));
+            });
+            document.getElementById('cancel-card').addEventListener('click', () => {
+                closeModal(document.getElementById('new-card-modal'));
+            });
+            
+            // Botones de gestión - CORREGIDOS
+            document.getElementById('lock-card-btn').addEventListener('click', () => {
+                if (bankingApp.selectedCard) {
+                    if (bankingApp.selectedCard.status === 'active') {
+                        showConfirmation('Bloquear Tarjeta', 
+                            `¿Estás seguro de bloquear la tarjeta •••• ${bankingApp.selectedCard.cardNumber ? bankingApp.selectedCard.cardNumber.slice(-4) : '0000'}?<br>No podrás realizar compras hasta que la desbloquees.`, 
+                            'lock');
+                    } else {
+                        showNotification('Esta tarjeta ya está bloqueada', 'warning');
+                    }
+                } else {
+                    showNotification('Primero selecciona una tarjeta haciendo clic sobre ella', 'warning');
+                }
+            });
+            
+            document.getElementById('unlock-card-btn').addEventListener('click', () => {
+                if (bankingApp.selectedCard && (bankingApp.selectedCard.status === 'blocked' || bankingApp.selectedCard.status === 'suspended')) {
+                    showConfirmation('Desbloquear Tarjeta', 
+                        `¿Estás seguro de desbloquear la tarjeta •••• ${bankingApp.selectedCard.cardNumber ? bankingApp.selectedCard.cardNumber.slice(-4) : '0000'}?<br>La tarjeta volverá a estar activa para compras.`, 
+                        'unlock');
+                } else {
+                    showNotification('Primero selecciona una tarjeta bloqueada', 'warning');
+                }
+            });
+            
+            // Botón de cambiar PIN - NUEVA FUNCIONALIDAD
+            document.getElementById('change-pin-btn').addEventListener('click', () => {
+                if (bankingApp.selectedCard) {
+                    openPinModal();
+                } else {
+                    showNotification('Primero selecciona una tarjeta haciendo clic sobre ella', 'warning');
+                }
+            });
+            
+            document.getElementById('cancel-card-btn').addEventListener('click', () => {
+                if (bankingApp.selectedCard) {
+                    showConfirmation('Cancelar Tarjeta', 
+                        `¿Estás seguro de cancelar permanentemente la tarjeta •••• ${bankingApp.selectedCard.cardNumber ? bankingApp.selectedCard.cardNumber.slice(-4) : '0000'}?<br>Esta acción no se puede deshacer y eliminará la tarjeta de tu cuenta.`, 
+                        'cancel');
+                } else {
+                    showNotification('Primero selecciona una tarjeta', 'warning');
+                }
+            });
+            
+            // Modal de confirmación
+            document.getElementById('cancel-confirmation').addEventListener('click', () => {
+                closeModal(document.getElementById('confirmation-modal'));
+            });
+            
+            document.getElementById('confirm-action').addEventListener('click', handleCardAction);
+            
+            // Event listeners para modal de PIN - NUEVO
+            document.getElementById('close-pin-modal').addEventListener('click', () => {
+                closeModal(document.getElementById('pin-modal'));
+            });
+            
+            document.getElementById('toggle-change-pin').addEventListener('click', toggleChangePinForm);
+            document.getElementById('cancel-change-pin').addEventListener('click', cancelChangePin);
+            document.getElementById('show-current-pin').addEventListener('click', showCurrentPin);
+            document.getElementById('toggle-card-number').addEventListener('click', toggleCardNumberVisibility);
+            document.getElementById('toggle-current-pin').addEventListener('click', toggleCurrentPinVisibility);
+            document.getElementById('copy-card-number').addEventListener('click', copyCardNumber);
+            document.getElementById('pin-form').addEventListener('submit', handlePinChange);
+        }
+        
+        async function handleNewCardRequest(e) {
+            e.preventDefault();
+            
+            const cardType = document.querySelector('input[name="card-type"]:checked').value;
+            const cardHolder = document.getElementById('card-holder').value;
+            const cardLimit = document.getElementById('card-limit').value;
+            
+            // Validación básica
+            if (!cardHolder.trim()) {
+                showNotification('Por favor, ingresa el nombre del titular', 'error');
+                return;
+            }
+            
+            // Validar tarjeta física
+            if (cardType === 'physical') {
+                const cardAddress = document.getElementById('card-address').value;
+                if (!cardAddress.trim()) {
+                    showNotification('Por favor, ingresa la dirección de envío', 'error');
+                    return;
+                }
+            }
+            
+            showNotification('Enviando solicitud...', 'info');
+            
+            try {
+                const requestId = 'request_' + Date.now();
+                
+                // Obtener datos del usuario desde Firebase
+                const userSnapshot = await db.ref('users/' + bankingApp.currentUser.uid).once('value');
+                const userData = userSnapshot.val();
+                
+                if (!userData) {
+                    showNotification('No se encontraron datos del usuario', 'error');
+                    return;
+                }
+                
+                // Datos de la solicitud
+                const requestData = {
+                    type: cardType,
+                    holderName: cardHolder.trim(),
+                    limit: parseInt(cardLimit),
+                    status: 'pending',
+                    requestedAt: Date.now(),
+                    userId: bankingApp.currentUser.uid,
+                    userEmail: bankingApp.currentUser.email || '',
+                    userName: userData.name || 'Usuario',
+                    userPhone: userData.phone || '',
+                    userCountry: userData.country || '',
+                    reviewed: false,
+                    reviewedBy: '',
+                    reviewDate: null,
+                    fee: 0,
+                    shippingStatus: 'not_applicable'
+                };
+                
+                // Si es tarjeta física, añadir dirección
+                if (cardType === 'physical') {
+                    const cardAddress = document.getElementById('card-address').value;
+                    requestData.shippingAddress = cardAddress.trim();
+                    requestData.fee = 10;
+                    requestData.shippingStatus = 'pending';
+                }
+                
+                // Datos para admin
+                const adminRequestData = {
+                    ...requestData,
+                    requestId: requestId,
+                    adminView: true,
+                    processed: false,
+                    adminEmail: 'vinicio@geomira.se'
+                };
+                
+                // 1. Guardar en card_requests del usuario
+                const userRequestRef = db.ref('card_requests/' + bankingApp.currentUser.uid + '/' + requestId);
+                await userRequestRef.set(requestData);
+                
+                // 2. Guardar en admin_pending_requests para que el admin lo vea
+                const adminRequestRef = db.ref('admin_pending_requests/' + requestId);
+                await adminRequestRef.set(adminRequestData);
+                
+                // 3. Añadir al historial del usuario
+                const historyRef = db.ref('card_history/' + bankingApp.currentUser.uid + '/' + requestId);
+                await historyRef.set({
+                    action: 'request',
+                    type: cardType,
+                    timestamp: Date.now(),
+                    status: 'pending',
+                    limit: parseInt(cardLimit),
+                    requestId: requestId
+                });
+                
+                showNotification('✅ Solicitud enviada correctamente. Será revisada por el administrador.', 'success');
+                closeModal(document.getElementById('new-card-modal'));
+                document.getElementById('new-card-form').reset();
+                
+                // Resetear detalles de tarjeta física
+                document.getElementById('physical-card-details').classList.add('hidden');
+                
+            } catch (error) {
+                console.error('Error al enviar solicitud:', error);
+                showNotification(`❌ Error al enviar la solicitud: ${error.message}`, 'error');
+            }
+        }
+        
+        function showConfirmation(title, message, action) {
+            bankingApp.currentAction = action;
+            
+            document.getElementById('confirmation-title').textContent = title;
+            document.getElementById('confirmation-message').innerHTML = message;
+            openModal(document.getElementById('confirmation-modal'));
+        }
+        
+        async function handleCardAction() {
+            closeModal(document.getElementById('confirmation-modal'));
+            
+            if (!bankingApp.selectedCard) {
+                showNotification('No hay tarjeta seleccionada', 'error');
+                return;
+            }
+            
+            try {
+                switch (bankingApp.currentAction) {
+                    case 'lock':
+                        // CORRECCIÓN: En lugar de intentar escribir directamente, creamos una solicitud para el admin
+                        const lockRequestId = 'lock_req_' + Date.now();
+                        const lockRequestData = {
+                            action: 'lock_card',
+                            cardId: bankingApp.selectedCard.id,
+                            cardNumber: bankingApp.selectedCard.cardNumber || '',
+                            cardLastFour: bankingApp.selectedCard.cardNumber ? bankingApp.selectedCard.cardNumber.slice(-4) : '0000',
+                            userId: bankingApp.currentUser.uid,
+                            userName: bankingApp.userData?.name || 'Usuario',
+                            userEmail: bankingApp.currentUser.email,
+                            timestamp: Date.now(),
+                            status: 'pending',
+                            currentStatus: bankingApp.selectedCard.status,
+                            requestedStatus: 'blocked',
+                            requiresAdminReview: true
+                        };
+                        
+                        await db.ref(`admin_pending_requests/${lockRequestId}`).set(lockRequestData);
+                        
+                        // Añadir al historial
+                        await db.ref(`card_history/${bankingApp.currentUser.uid}/${lockRequestId}`).set({
+                            action: 'lock_request',
+                            timestamp: Date.now(),
+                            status: 'pending',
+                            cardId: bankingApp.selectedCard.id,
+                            requestId: lockRequestId
+                        });
+                        
+                        showNotification('✅ Solicitud de bloqueo enviada al administrador', 'success');
+                        break;
+                        
+                    case 'unlock':
+                        // CORRECCIÓN: Crear solicitud para el admin
+                        const unlockRequestId = 'unlock_req_' + Date.now();
+                        const unlockRequestData = {
+                            action: 'unlock_card',
+                            cardId: bankingApp.selectedCard.id,
+                            cardNumber: bankingApp.selectedCard.cardNumber || '',
+                            cardLastFour: bankingApp.selectedCard.cardNumber ? bankingApp.selectedCard.cardNumber.slice(-4) : '0000',
+                            userId: bankingApp.currentUser.uid,
+                            userName: bankingApp.userData?.name || 'Usuario',
+                            userEmail: bankingApp.currentUser.email,
+                            timestamp: Date.now(),
+                            status: 'pending',
+                            currentStatus: bankingApp.selectedCard.status,
+                            requestedStatus: 'active',
+                            requiresAdminReview: true
+                        };
+                        
+                        await db.ref(`admin_pending_requests/${unlockRequestId}`).set(unlockRequestData);
+                        
+                        // Añadir al historial
+                        await db.ref(`card_history/${bankingApp.currentUser.uid}/${unlockRequestId}`).set({
+                            action: 'unlock_request',
+                            timestamp: Date.now(),
+                            status: 'pending',
+                            cardId: bankingApp.selectedCard.id,
+                            requestId: unlockRequestId
+                        });
+                        
+                        showNotification('✅ Solicitud de desbloqueo enviada al administrador', 'success');
+                        break;
+                        
+                    case 'cancel':
+                        // Crear solicitud de cancelación para el administrador
+                        const cancelId = 'cancel_' + Date.now();
+                        const cancelData = {
+                            action: 'cancel_card',
+                            cardId: bankingApp.selectedCard.id,
+                            cardNumber: bankingApp.selectedCard.cardNumber || '',
+                            cardLastFour: bankingApp.selectedCard.cardNumber ? bankingApp.selectedCard.cardNumber.slice(-4) : '0000',
+                            userId: bankingApp.currentUser.uid,
+                            userName: bankingApp.userData?.name || 'Usuario',
+                            userEmail: bankingApp.currentUser.email,
+                            timestamp: Date.now(),
+                            status: 'pending',
+                            requiresAdminReview: true
+                        };
+                        
+                        await db.ref(`admin_pending_requests/${cancelId}`).set(cancelData);
+                        
+                        // Añadir al historial
+                        await db.ref(`card_history/${bankingApp.currentUser.uid}/${cancelId}`).set({
+                            action: 'cancel_request',
+                            timestamp: Date.now(),
+                            status: 'pending',
+                            cardId: bankingApp.selectedCard.id,
+                            requestId: cancelId
+                        });
+                        
+                        showNotification('✅ Solicitud de cancelación enviada al administrador', 'success');
+                        break;
+                }
+                
+                // Actualizar datos
+                setTimeout(() => {
+                    loadUserCards();
+                    loadUserRequests();
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error en la acción:', error);
+                showNotification(`❌ Error al procesar la acción: ${error.message}`, 'error');
+            }
+        }
+        
+        // FUNCIONES PARA MANEJAR EL PIN - NUEVAS
+        
+        function openPinModal() {
+            if (!bankingApp.selectedCard) {
+                showNotification('No hay tarjeta seleccionada', 'error');
+                return;
+            }
+            
+            const modal = document.getElementById('pin-modal');
+            const cardInfo = document.getElementById('pin-card-info');
+            const cardNumberInput = document.getElementById('display-card-number');
+            
+            // Mostrar información de la tarjeta
+            const cardNumber = bankingApp.selectedCard.cardNumber || '';
+            const displayNumber = cardNumber ? formatCardNumberForDisplay(cardNumber, false) : '•••• •••• •••• ••••';
+            
+            cardInfo.innerHTML = `
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-medium text-gray-900">${bankingApp.selectedCard.holderName || bankingApp.userData?.name || 'Usuario'}</p>
+                            <p class="text-sm text-gray-600">${bankingApp.selectedCard.type === 'physical' ? 'Tarjeta Física' : 'Tarjeta Digital'}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-600">Válida hasta</p>
+                            <p class="font-bold text-gray-900">${bankingApp.selectedCard.expiryDate || '12/26'}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Configurar número de tarjeta (oculto por defecto)
+            cardNumberInput.value = displayNumber;
+            
+            // Resetear formulario
+            resetPinForm();
+            
+            openModal(modal);
+        }
+        
+        function formatCardNumberForDisplay(cardNumber, showFull = false) {
+            if (!cardNumber) return '•••• •••• •••• ••••';
+            
+            if (showFull) {
+                // Mostrar completo con espacios cada 4 dígitos
+                return cardNumber.replace(/(\d{4})(?=\d)/g, '$1 ');
+            } else {
+                // Mostrar solo últimos 4 dígitos
+                const lastFour = cardNumber.slice(-4);
+                return `•••• •••• •••• ${lastFour}`;
+            }
+        }
+        
+        function resetPinForm() {
+            document.getElementById('current-pin').value = '••••';
+            document.getElementById('current-pin').type = 'password';
+            document.getElementById('new-pin').value = '';
+            document.getElementById('confirm-new-pin').value = '';
+            document.getElementById('change-pin-section').classList.add('hidden');
+            document.getElementById('toggle-change-pin').classList.remove('hidden');
+            document.getElementById('change-pin-buttons').classList.add('hidden');
+            
+            // Resetear botones de visibilidad
+            const toggleCardBtn = document.getElementById('toggle-card-number');
+            const togglePinBtn = document.getElementById('toggle-current-pin');
+            
+            toggleCardBtn.innerHTML = '<i class="fas fa-eye"></i>';
+            togglePinBtn.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+        
+        function toggleChangePinForm() {
+            const changeSection = document.getElementById('change-pin-section');
+            const toggleBtn = document.getElementById('toggle-change-pin');
+            const changeButtons = document.getElementById('change-pin-buttons');
+            
+            if (changeSection.classList.contains('hidden')) {
+                changeSection.classList.remove('hidden');
+                toggleBtn.classList.add('hidden');
+                changeButtons.classList.remove('hidden');
+            } else {
+                changeSection.classList.add('hidden');
+                toggleBtn.classList.remove('hidden');
+                changeButtons.classList.add('hidden');
+            }
+        }
+        
+        function cancelChangePin() {
+            resetPinForm();
+        }
+        
+        function showCurrentPin() {
+            if (!bankingApp.selectedCard || !bankingApp.selectedCard.cvv) {
+                showNotification('No hay información de PIN disponible para esta tarjeta', 'warning');
+                return;
+            }
+            
+            const currentPinInput = document.getElementById('current-pin');
+            currentPinInput.value = bankingApp.selectedCard.cvv || 'No disponible';
+            currentPinInput.type = 'text';
+            
+            showNotification('PIN mostrado. Por seguridad, cierra esta ventana después de memorizarlo.', 'info');
+        }
+        
+        function toggleCardNumberVisibility() {
+            const cardNumberInput = document.getElementById('display-card-number');
+            const toggleBtn = document.getElementById('toggle-card-number');
+            
+            if (!bankingApp.selectedCard || !bankingApp.selectedCard.cardNumber) {
+                showNotification('No hay número de tarjeta disponible', 'warning');
+                return;
+            }
+            
+            if (cardNumberInput.value.includes('••••')) {
+                // Mostrar completo
+                cardNumberInput.value = formatCardNumberForDisplay(bankingApp.selectedCard.cardNumber, true);
+                toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                showNotification('Número de tarjeta visible. Por seguridad, oculta después de memorizarlo.', 'info');
+            } else {
+                // Ocultar
+                cardNumberInput.value = formatCardNumberForDisplay(bankingApp.selectedCard.cardNumber, false);
+                toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        }
+        
+        function toggleCurrentPinVisibility() {
+            const currentPinInput = document.getElementById('current-pin');
+            const toggleBtn = document.getElementById('toggle-current-pin');
+            
+            if (currentPinInput.type === 'password') {
+                if (currentPinInput.value === '••••' && bankingApp.selectedCard.cvv) {
+                    currentPinInput.value = bankingApp.selectedCard.cvv;
+                }
+                currentPinInput.type = 'text';
+                toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                currentPinInput.value = '••••';
+                currentPinInput.type = 'password';
+                toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        }
+        
+        function copyCardNumber() {
+            if (!bankingApp.selectedCard || !bankingApp.selectedCard.cardNumber) {
+                showNotification('No hay número de tarjeta para copiar', 'warning');
+                return;
+            }
+            
+            const cardNumber = bankingApp.selectedCard.cardNumber;
+            navigator.clipboard.writeText(cardNumber)
+                .then(() => {
+                    showNotification('Número de tarjeta copiado al portapapeles', 'success');
+                })
+                .catch(err => {
+                    console.error('Error al copiar:', err);
+                    showNotification('Error al copiar el número', 'error');
+                });
+        }
+        
+        async function handlePinChange(e) {
+            e.preventDefault();
+            
+            if (!bankingApp.selectedCard) {
+                showNotification('No hay tarjeta seleccionada', 'error');
+                return;
+            }
+            
+            const newPin = document.getElementById('new-pin').value;
+            const confirmPin = document.getElementById('confirm-new-pin').value;
+            
+            // Validaciones
+            if (!newPin || !confirmPin) {
+                showNotification('Por favor, completa ambos campos de PIN', 'error');
+                return;
+            }
+            
+            if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
+                showNotification('El PIN debe tener exactamente 4 dígitos numéricos', 'error');
+                return;
+            }
+            
+            if (newPin !== confirmPin) {
+                showNotification('Los PINs no coinciden', 'error');
+                return;
+            }
+            
+            // Validar que no sea el mismo PIN actual
+            if (bankingApp.selectedCard.cvv === newPin) {
+                showNotification('El nuevo PIN no puede ser igual al actual', 'warning');
+                return;
+            }
+            
+            showNotification('Solicitando cambio de PIN...', 'info');
+            
+            try {
+                // En lugar de intentar escribir directamente, crear solicitud para el admin
+                const pinChangeId = 'pin_change_' + Date.now();
+                const pinChangeData = {
+                    action: 'change_pin',
+                    cardId: bankingApp.selectedCard.id,
+                    cardNumber: bankingApp.selectedCard.cardNumber || '',
+                    cardLastFour: bankingApp.selectedCard.cardNumber ? bankingApp.selectedCard.cardNumber.slice(-4) : '0000',
+                    userId: bankingApp.currentUser.uid,
+                    userName: bankingApp.userData?.name || 'Usuario',
+                    userEmail: bankingApp.currentUser.email,
+                    timestamp: Date.now(),
+                    status: 'pending',
+                    newPin: newPin,
+                    requiresAdminReview: true
+                };
+                
+                await db.ref(`admin_pending_requests/${pinChangeId}`).set(pinChangeData);
+                
+                // Registrar en historial
+                const historyId = 'pin_change_' + Date.now();
+                await db.ref(`card_history/${bankingApp.currentUser.uid}/${historyId}`).set({
+                    action: 'pin_change_request',
+                    cardId: bankingApp.selectedCard.id,
+                    timestamp: Date.now(),
+                    status: 'pending',
+                    requestId: pinChangeId
+                });
+                
+                showNotification('✅ Solicitud de cambio de PIN enviada al administrador', 'success');
+                
+                // Resetear formulario y cerrar modal después de 2 segundos
+                setTimeout(() => {
+                    resetPinForm();
+                    closeModal(document.getElementById('pin-modal'));
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error al solicitar cambio de PIN:', error);
+                showNotification(`❌ Error al solicitar cambio de PIN: ${error.message}`, 'error');
+            }
+        }
+        
+        function handleLogout(e) {
+            e.preventDefault();
+            
+            auth.signOut()
+                .then(() => {
+                    showNotification('Sesión cerrada correctamente', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    showNotification('Error al cerrar sesión', 'error');
+                });
+        }
+        
+        function openModal(modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal(modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            // Si menos de 24 horas, mostrar tiempo relativo
+            if (diff < 24 * 60 * 60 * 1000) {
+                if (diff < 60 * 1000) return 'Hace un momento';
+                if (diff < 60 * 60 * 1000) return `Hace ${Math.floor(diff / (60 * 1000))} minutos`;
+                return `Hace ${Math.floor(diff / (60 * 60 * 1000))} horas`;
+            }
+            
+            // De lo contrario mostrar fecha
+            return date.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notifications-container');
+            const notification = document.createElement('div');
+            notification.className = `notification-toast ${type}`;
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-yellow-500',
+                info: 'bg-blue-500'
+            };
+            
+            notification.innerHTML = `
+                <div class="notification-icon ${colors[type]} text-white rounded-lg">
+                    <i class="fas ${icons[type]}"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="font-medium">${message}</p>
+                </div>
+                <button class="ml-4 text-gray-400 hover:text-gray-600 close-notification">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Mostrar notificación
+            setTimeout(() => notification.classList.add('show'), 10);
+            
+            // Auto eliminar después de 5 segundos
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+            
+            // Botón de cerrar
+            notification.querySelector('.close-notification').addEventListener('click', () => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            });
+        }
+    </script>
+</body>
+</html>

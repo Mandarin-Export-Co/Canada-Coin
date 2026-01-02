@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canada Coin - Portal de Inversiones</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary-blue: #1e40af;
+            --secondary-blue: #3b82f6;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --profit-gold: #fbbf24;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+        }
+        
+        .profit-badge {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #1e293b;
+            font-weight: bold;
+        }
+        
+        .investment-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .investment-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary-blue);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .progress-bar {
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-green), var(--secondary-blue));
+            transition: width 0.5s ease;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: var(--success-green);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 1001;
+        }
+        
+        .notification.show {
+            display: flex;
+            animation: slideInRight 0.3s ease;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .banking-tab {
+            position: relative;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+        
+        .banking-tab:hover {
+            color: var(--secondary-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .banking-tab.active {
+            color: var(--secondary-blue);
+            border-bottom-color: var(--secondary-blue);
+            background: linear-gradient(to bottom, rgba(59, 130, 246, 0.1), transparent);
+        }
+        
+        .amount-input {
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .amount-input:focus {
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .plan-selector {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .plan-selector:hover {
+            transform: scale(1.02);
+        }
+        
+        .plan-selector.selected {
+            border-color: var(--secondary-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .profit-amount {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #f1f5f9;
+            transition: background 0.3s ease;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .banking-header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border-bottom: 3px solid var(--primary-blue);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-message">Operación completada</span>
+    </div>
+    
+    <div id="investmentModal" class="modal-overlay">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Crear Nueva Inversión</h2>
+                <button id="closeModal" class="text-gray-400 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="investmentForm">
+                <div class="mb-6 p-4 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg">
+                    <p class="text-sm text-gray-300 mb-1">Saldo Disponible</p>
+                    <p id="availableBalance" class="text-2xl font-bold text-green-400">$0.00</p>
+                    <p class="text-xs text-gray-400 mt-2">Para invertir necesitas realizar un depósito primero</p>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Monto a Invertir (USD)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 transform -translate-y-1/2">$</span>
+                        <input type="number" id="amount" 
+                               class="amount-input w-full pl-10 pr-4 py-3 rounded-lg"
+                               min="100" max="100000"
+                               placeholder="1000"
+                               required>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2">Mínimo: $100 | Máximo: $100,000</p>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Selecciona un Plan</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="planSelector"></div>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Duración</label>
+                    <select id="duration" class="amount-input w-full px-4 py-3 rounded-lg">
+                        <option value="30">30 días</option>
+                        <option value="90">90 días</option>
+                        <option value="180">180 días</option>
+                        <option value="365">365 días</option>
+                    </select>
+                </div>
+                
+                <div class="glass-card p-4 mb-6">
+                    <h3 class="font-bold mb-3">Resumen de Inversión</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span>Monto Invertido:</span>
+                            <span id="summaryAmount" class="font-bold">$0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Tasa Anual:</span>
+                            <span id="summaryRate" class="text-green-400">0%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Tasa Mensual:</span>
+                            <span id="summaryMonthlyRate" class="text-blue-400">0%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Ganancia Estimada (30 días):</span>
+                            <span id="summaryProfit" class="profit-amount">$0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Retiro Total al Vencimiento:</span>
+                            <span id="summaryTotal" class="text-xl font-bold text-green-400">$0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-4">
+                    <button type="button" id="cancelBtn" 
+                            class="flex-1 py-3 px-6 border border-gray-600 rounded-lg hover:bg-gray-700 transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 py-3 px-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg font-bold hover:opacity-90 transition">
+                        Confirmar Inversión
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <header class="banking-header sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-coins text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-white">Canada Coin</h1>
+                            <p class="text-xs text-gray-300">Banca Digital</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="hidden md:block">
+                        <div class="text-right">
+                            <p class="text-xs text-gray-300">Saldo Disponible</p>
+                            <p id="headerBalance" class="font-bold text-green-400">$0.00</p>
+                        </div>
+                    </div>
+                    
+                    <div class="relative">
+                        <button id="user-profile-button" 
+                                class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-800 transition">
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div class="hidden md:block text-left">
+                                <p id="user-name" class="font-semibold text-white">Usuario</p>
+                                <p class="text-xs text-gray-300">Ver perfil</p>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-300 text-sm"></i>
+                        </button>
+                        
+                        <div id="user-profile-dropdown" class="dropdown-menu">
+                            <div class="p-4 border-b border-gray-700">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p id="dropdown-user-name" class="font-bold text-white">Usuario</p>
+                                        <p id="dropdown-user-email" class="text-sm text-gray-300">usuario@email.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="py-2">
+                                <a href="profile.html" class="dropdown-item">
+                                    <i class="fas fa-user text-gray-400 w-6"></i>
+                                    Mi Perfil
+                                </a>
+                                <a href="security.html" class="dropdown-item">
+                                    <i class="fas fa-shield-alt text-gray-400 w-6"></i>
+                                    Seguridad
+                                </a>
+                                <a href="settings.html" class="dropdown-item">
+                                    <i class="fas fa-cog text-gray-400 w-6"></i>
+                                    Configuración
+                                </a>
+                                <hr class="my-2 border-gray-700">
+                                <a href="#" id="logout-button" class="dropdown-item text-red-400">
+                                    <i class="fas fa-sign-out-alt text-red-400 w-6"></i>
+                                    Cerrar Sesión
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700">
+                <nav class="flex overflow-x-auto">
+                    <a href="index.html" class="banking-tab">
+                        <i class="fas fa-home mr-2"></i>Resumen
+                    </a>
+                    <a href="investments.html" class="banking-tab active">
+                        <i class="fas fa-chart-line mr-2"></i>Inversiones
+                    </a>
+                    <a href="deposits.html" class="banking-tab">
+                        <i class="fas fa-arrow-up mr-2"></i>Depósitos
+                    </a>
+                    <a href="withdrawals.html" class="banking-tab">
+                        <i class="fas fa-arrow-down mr-2"></i>Retiros
+                    </a>
+                    <a href="transfers.html" class="banking-tab">
+                        <i class="fas fa-exchange-alt mr-2"></i>Transferencias
+                    </a>
+                    <a href="cards.html" class="banking-tab">
+                        <i class="fas fa-credit-card mr-2"></i>Tarjetas
+                    </a>
+                    <a href="referrals.html" class="banking-tab">
+                        <i class="fas fa-users mr-2"></i>Referidos
+                    </a>
+                    <a href="support.html" class="banking-tab">
+                        <i class="fas fa-headset mr-2"></i>Soporte
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="glass-card">
+            <div class="p-6">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-white mb-2">Portal de Inversiones</h2>
+                    <p class="text-gray-300">Gestiona y monitorea tus planes de inversión</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2">
+                        <div class="glass-card p-6 mb-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-lg font-bold text-white">Rendimiento de Inversiones</h3>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg">1M</button>
+                                    <button class="px-3 py-1 text-sm bg-gray-700 text-gray-300 rounded-lg">6M</button>
+                                    <button class="px-3 py-1 text-sm bg-gray-700 text-gray-300 rounded-lg">1A</button>
+                                    <button class="px-3 py-1 text-sm bg-gray-700 text-gray-300 rounded-lg">Todo</button>
+                                </div>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-lg font-bold text-white">Inversiones Activas</h3>
+                            </div>
+                            
+                            <div id="activeInvestments">
+                                <div class="text-center py-12">
+                                    <i class="fas fa-chart-line text-5xl text-gray-600 mb-4"></i>
+                                    <h3 class="text-xl font-bold text-white mb-2">No tienes inversiones activas</h3>
+                                    <p class="text-gray-400 mb-6">Comienza a invertir y genera rendimientos</p>
+                                    <button id="createInvestmentBtn" 
+                                            class="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-3 rounded-lg font-bold hover:opacity-90 transition">
+                                        <i class="fas fa-plus mr-2"></i>Crear Inversión
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="glass-card p-6 mb-6">
+                            <h3 class="text-lg font-bold text-white mb-6">Estadísticas</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-sm text-gray-300">Saldo Disponible</p>
+                                    <p id="sidebarBalance" class="text-2xl font-bold text-green-400">$0</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-300">Inversión Total</p>
+                                    <p id="totalInvested" class="text-2xl font-bold text-blue-400">$0</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-300">Ganancias Totales</p>
+                                    <p id="totalEarnings" class="text-2xl font-bold text-yellow-400">$0</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card p-6">
+                            <h3 class="text-lg font-bold text-white mb-6">Planes Disponibles</h3>
+                            <div class="space-y-4">
+                                <div class="plan-selector p-4 border border-gray-700 rounded-lg" data-plan="basic">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h3 class="font-bold text-white">Plan Básico</h3>
+                                            <p class="text-sm text-gray-400">Perfecto para comenzar</p>
+                                        </div>
+                                        <span class="profit-badge px-3 py-1 rounded-full text-xs">4% anual</span>
+                                    </div>
+                                    <p class="text-sm mb-1 text-gray-300">Mínimo: <span class="font-bold">$100</span> hasta $999</p>
+                                    <p class="text-xs text-gray-400 mb-3">Retiros mensuales disponibles</p>
+                                    <div class="text-xs text-gray-400">
+                                        <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                                        Tasa mensual: 0.33%
+                                    </div>
+                                </div>
+                                
+                                <div class="plan-selector p-4 border border-gray-700 rounded-lg" data-plan="premium">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h3 class="font-bold text-white">Plan Premium</h3>
+                                            <p class="text-sm text-gray-400">Más rentabilidad</p>
+                                        </div>
+                                        <span class="profit-badge px-3 py-1 rounded-full text-xs">5% anual</span>
+                                    </div>
+                                    <p class="text-sm mb-1 text-gray-300">Mínimo: <span class="font-bold">$1,000</span> hasta $4,999</p>
+                                    <p class="text-xs text-gray-400 mb-3">Retiros mensuales disponibles</p>
+                                    <div class="text-xs text-gray-400">
+                                        <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                                        Tasa mensual: 0.42%
+                                    </div>
+                                </div>
+                                
+                                <div class="plan-selector p-4 border border-gray-700 rounded-lg" data-plan="vip">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h3 class="font-bold text-white">Plan VIP</h3>
+                                            <p class="text-sm text-gray-400">Máxima rentabilidad</p>
+                                        </div>
+                                        <span class="profit-badge px-3 py-1 rounded-full text-xs">6% anual</span>
+                                    </div>
+                                    <p class="text-sm mb-1 text-gray-300">Mínimo: <span class="font-bold">$5,000</span></p>
+                                    <p class="text-xs text-gray-400 mb-3">Asesor personal incluido</p>
+                                    <div class="text-xs text-gray-400">
+                                        <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                                        Tasa mensual: 0.5%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card p-6 mt-6">
+                            <h3 class="text-lg font-bold text-white mb-6">Detalles</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-sm text-gray-300">Inversiones Activas</p>
+                                    <p id="activeCount" class="text-2xl font-bold">0</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-300">Días Invertidos</p>
+                                    <p id="totalDays" class="text-2xl font-bold text-blue-400">0</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-300">Próximo Pago</p>
+                                    <p id="nextPayment" class="text-2xl font-bold text-green-400">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBI4O0d_Mec38FDiuhirujCnX99PFKiXW4",
+            authDomain: "projekt-pc.firebaseapp.com",
+            databaseURL: "https://projekt-pc-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "projekt-pc",
+            storageBucket: "projekt-pc.appspot.com",
+            messagingSenderId: "90098431634",
+            appId: "1:90098431634:web:7cb61800d03533c2a6984b",
+            measurementId: "G-59YH8W8W1L"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        const auth = firebase.auth();
+        const db = firebase.database();
+        
+        const PLANS = {
+            basic: { 
+                name: "Básico", 
+                annualRate: 4, 
+                monthlyRate: 4/12, 
+                min: 100, 
+                max: 999,
+                description: "Perfecto para comenzar",
+                features: ["Retiros mensuales disponibles"]
+            },
+            premium: { 
+                name: "Premium", 
+                annualRate: 5, 
+                monthlyRate: 5/12, 
+                min: 1000, 
+                max: 4999,
+                description: "Más rentabilidad",
+                features: ["Retiros mensuales disponibles"]
+            },
+            vip: { 
+                name: "VIP", 
+                annualRate: 6, 
+                monthlyRate: 6/12, 
+                min: 5000, 
+                max: null,
+                description: "Máxima rentabilidad",
+                features: ["Asesor personal incluido"]
+            }
+        };
+
+        let currentUser = null;
+        let investments = [];
+        let selectedPlan = 'premium';
+        let userBalance = 0;
+        let userData = null;
+        let balanceRef = null;
+        let investmentsRef = null;
+        let appInitialized = false;
+
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        async function initApp() {
+            if (appInitialized) return;
+            
+            try {
+                auth.onAuthStateChanged(async (user) => {
+                    if (!user) {
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                    
+                    currentUser = user;
+                    appInitialized = true;
+                    
+                    await Promise.all([
+                        loadUserData(),
+                        loadUserBalance(),
+                        loadInvestments()
+                    ]);
+                    
+                    setupEventListeners();
+                    initCharts();
+                    renderPlanSelector();
+                });
+            } catch (error) {
+                console.error('Error en initApp:', error);
+                showNotification('Error al inicializar la aplicación', 'error');
+                appInitialized = false;
+            }
+        }
+
+        async function loadUserData() {
+            try {
+                const userRef = db.ref('users/' + currentUser.uid);
+                userRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        userData = data;
+                        document.getElementById('user-name').textContent = data.name || 'Usuario';
+                        document.getElementById('dropdown-user-name').textContent = data.name || 'Usuario';
+                        document.getElementById('dropdown-user-email').textContent = data.email || 'usuario@email.com';
+                    } else {
+                        initializeUserData();
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                showNotification('Error al cargar datos del usuario', 'error');
+            }
+        }
+
+        async function initializeUserData() {
+            try {
+                const userData = {
+                    name: currentUser.displayName || 'Usuario',
+                    email: currentUser.email,
+                    balance: 0,
+                    totalDeposits: 0,
+                    totalInvestments: 0,
+                    createdAt: Date.now()
+                };
+                
+                await db.ref('users/' + currentUser.uid).set(userData);
+            } catch (error) {
+                console.error('Error al inicializar datos de usuario:', error);
+            }
+        }
+
+        async function loadUserBalance() {
+            try {
+                if (balanceRef) {
+                    balanceRef.off();
+                }
+                
+                balanceRef = db.ref('users/' + currentUser.uid + '/balance');
+                balanceRef.on('value', (snapshot) => {
+                    const balance = parseFloat(snapshot.val()) || 0;
+                    userBalance = balance;
+                    updateBalanceUI(balance);
+                }, (error) => {
+                    console.error('Error en listener de balance:', error);
+                });
+            } catch (error) {
+                console.error('Error loading user balance:', error);
+                showNotification('Error al cargar saldo', 'error');
+            }
+        }
+
+        function updateBalanceUI(balance) {
+            document.getElementById('headerBalance').textContent = `$${balance.toFixed(2)}`;
+            document.getElementById('sidebarBalance').textContent = `$${balance.toFixed(2)}`;
+            document.getElementById('availableBalance').textContent = `$${balance.toFixed(2)}`;
+            
+            if (balance < 100) {
+                const balanceInfo = document.getElementById('availableBalance').nextElementSibling;
+                if (balanceInfo) {
+                    balanceInfo.innerHTML = 
+                        '<span class="text-yellow-400">Depósito mínimo requerido: $100</span>';
+                }
+            }
+        }
+
+        async function loadInvestments() {
+            try {
+                if (investmentsRef) {
+                    investmentsRef.off();
+                }
+                
+                investmentsRef = db.ref('investments/' + currentUser.uid);
+                investmentsRef.on('value', (snapshot) => {
+                    investments = [];
+                    if (snapshot.exists()) {
+                        snapshot.forEach((childSnapshot) => {
+                            const investment = childSnapshot.val();
+                            if (investment.status === 'active') {
+                                investments.push({
+                                    id: childSnapshot.key,
+                                    ...investment
+                                });
+                            }
+                        });
+                    }
+                    
+                    updateInvestmentsUI();
+                    updateStatistics();
+                }, (error) => {
+                    console.error('Error en listener de inversiones:', error);
+                    showNotification('Error al cargar inversiones', 'error');
+                });
+            } catch (error) {
+                console.error('Error loading investments:', error);
+                showNotification('Error al cargar inversiones', 'error');
+            }
+        }
+
+        function updateInvestmentsUI() {
+            const container = document.getElementById('activeInvestments');
+            
+            if (!investments || investments.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-chart-line text-5xl text-gray-600 mb-4"></i>
+                        <h3 class="text-xl font-bold text-white mb-2">No tienes inversiones activas</h3>
+                        <p class="text-gray-400 mb-6">Comienza a invertir y genera rendimientos</p>
+                        <button id="startInvestingBtn" 
+                                class="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-3 rounded-lg font-bold hover:opacity-90 transition">
+                            Crear Inversión
+                        </button>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    const startBtn = document.getElementById('startInvestingBtn');
+                    if (startBtn) {
+                        startBtn.addEventListener('click', openInvestmentModal);
+                    }
+                }, 100);
+                
+                return;
+            }
+            
+            let html = '<div class="space-y-4">';
+            
+            investments.forEach(investment => {
+                try {
+                    const created = new Date(investment.createdAt);
+                    const ends = new Date(investment.endDate);
+                    const now = new Date();
+                    const progress = Math.min(100, ((now - created) / (ends - created)) * 100);
+                    
+                    const daysPassed = Math.max(0, Math.floor((now - created) / (1000 * 60 * 60 * 24)));
+                    const monthlyRate = investment.monthlyRate || (5/12);
+                    const earnings = investment.amount * (monthlyRate / 100) * (daysPassed / 30);
+                    
+                    html += `
+                        <div class="investment-card glass-card p-5 rounded-xl">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="font-bold text-lg text-white">${investment.planType || 'Premium'}</h3>
+                                    <p class="text-sm text-gray-400">Iniciado: ${created.toLocaleDateString('es-ES')}</p>
+                                </div>
+                                <span class="px-3 py-1 bg-green-900 text-green-300 rounded-full text-sm">
+                                    ${investment.status || 'Activo'}
+                                </span>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-gray-300">Inversión:</span>
+                                    <span class="font-bold text-white">$${(investment.amount || 0).toFixed(2)}</span>
+                                </div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-gray-300">Tasa Anual:</span>
+                                    <span class="text-green-400 font-bold">${investment.annualRate || 5}%</span>
+                                </div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-gray-300">Tasa Mensual:</span>
+                                    <span class="text-blue-400 font-bold">${(investment.monthlyRate || (5/12)).toFixed(2)}%</span>
+                                </div>
+                                <div class="flex justify-between mb-3">
+                                    <span class="text-gray-300">Ganancias:</span>
+                                    <span class="profit-amount">$${earnings.toFixed(2)}</span>
+                                </div>
+                                
+                                <div class="progress-bar bg-gray-700">
+                                    <div class="progress-fill" style="width: ${progress}%"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                    <span>${created.toLocaleDateString('es-ES')}</span>
+                                    <span>Vence: ${ends.toLocaleDateString('es-ES')}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <button onclick="reinvestInvestment('${investment.id}')" 
+                                        class="flex-1 py-2 px-4 bg-blue-600 rounded-lg hover:bg-blue-700 transition text-sm">
+                                    Reinvertir
+                                </button>
+                                <button onclick="showInvestmentDetails('${investment.id}')" 
+                                        class="flex-1 py-2 px-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition text-sm">
+                                    Detalles
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } catch (error) {
+                    console.error('Error al procesar inversión:', investment, error);
+                }
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function updateStatistics() {
+            if (!investments || investments.length === 0) {
+                document.getElementById('totalInvested').textContent = '$0';
+                document.getElementById('totalEarnings').textContent = '$0';
+                document.getElementById('activeCount').textContent = '0';
+                document.getElementById('totalDays').textContent = '0';
+                document.getElementById('nextPayment').textContent = '-';
+                return;
+            }
+            
+            let totalInvested = 0;
+            let totalEarnings = 0;
+            let totalDays = 0;
+            let nextPayment = Infinity;
+            
+            const now = new Date();
+            
+            investments.forEach(inv => {
+                try {
+                    totalInvested += inv.amount || 0;
+                    
+                    const created = new Date(inv.createdAt);
+                    const daysPassed = Math.max(0, Math.floor((now - created) / (1000 * 60 * 60 * 24)));
+                    totalDays += daysPassed;
+                    
+                    const monthlyRate = inv.monthlyRate || (5/12);
+                    const earnings = (inv.amount || 0) * (monthlyRate / 100) * (daysPassed / 30);
+                    totalEarnings += earnings;
+                    
+                    const nextPaymentDate = new Date(created);
+                    nextPaymentDate.setDate(nextPaymentDate.getDate() + Math.ceil(daysPassed / 30) * 30);
+                    if (nextPaymentDate > now && nextPaymentDate.getTime() < nextPayment) {
+                        nextPayment = nextPaymentDate.getTime();
+                    }
+                } catch (error) {
+                    console.error('Error al procesar estadísticas de inversión:', inv, error);
+                }
+            });
+            
+            document.getElementById('totalInvested').textContent = `$${totalInvested.toFixed(2)}`;
+            document.getElementById('totalEarnings').textContent = `$${totalEarnings.toFixed(2)}`;
+            document.getElementById('activeCount').textContent = investments.length;
+            document.getElementById('totalDays').textContent = Math.max(...investments.map(i => {
+                try {
+                    const created = new Date(i.createdAt);
+                    return Math.max(0, Math.floor((now - created) / (1000 * 60 * 60 * 24)));
+                } catch (e) {
+                    return 0;
+                }
+            }));
+            
+            if (nextPayment !== Infinity) {
+                const nextDate = new Date(nextPayment);
+                document.getElementById('nextPayment').textContent = nextDate.toLocaleDateString('es-ES');
+            }
+        }
+
+        function initCharts() {
+            const ctx = document.getElementById('performanceChart');
+            if (!ctx) return;
+            
+            const labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'];
+            let data = [1000];
+            
+            if (investments && investments.length) {
+                const totalInvested = investments.reduce((sum, inv) => sum + (inv.amount || 0), 0);
+                const avgMonthlyRate = investments.reduce((sum, inv) => sum + (inv.monthlyRate || (5/12)), 0) / investments.length;
+                
+                for (let i = 1; i < labels.length; i++) {
+                    const prevValue = data[i-1];
+                    const growth = prevValue * (avgMonthlyRate / 100);
+                    data.push(prevValue + growth);
+                }
+            } else {
+                for (let i = 1; i < labels.length; i++) {
+                    data.push(data[i-1] * 1.0042);
+                }
+            }
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Valor Total',
+                        data: data,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `$${context.parsed.y.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(0);
+                                },
+                                color: '#94a3b8'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderPlanSelector() {
+            const container = document.getElementById('planSelector');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            Object.entries(PLANS).forEach(([key, plan]) => {
+                const div = document.createElement('div');
+                div.className = `plan-selector p-4 border border-gray-700 rounded-lg cursor-pointer ${key === selectedPlan ? 'selected' : ''}`;
+                div.dataset.plan = key;
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-bold text-white">${plan.name}</h3>
+                            <p class="text-sm text-gray-400">${plan.description}</p>
+                        </div>
+                        <span class="profit-badge px-3 py-1 rounded-full text-xs">${plan.annualRate}% anual</span>
+                    </div>
+                    <p class="text-sm mb-1 text-gray-300">
+                        Mínimo: <span class="font-bold">$${plan.min}</span> 
+                        ${plan.max ? `hasta $${plan.max}` : ''}
+                    </p>
+                    <p class="text-xs text-gray-400 mb-3">${plan.features[0]}</p>
+                    <div class="text-xs text-gray-400">
+                        <i class="fas fa-chart-line text-blue-400 mr-2"></i>
+                        Tasa mensual: ${plan.monthlyRate.toFixed(2)}%
+                    </div>
+                `;
+                
+                div.addEventListener('click', () => {
+                    document.querySelectorAll('.plan-selector').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    div.classList.add('selected');
+                    selectedPlan = key;
+                    updateInvestmentSummary();
+                });
+                
+                container.appendChild(div);
+            });
+        }
+
+        function setupEventListeners() {
+            const userProfileButton = document.getElementById('user-profile-button');
+            const userProfileDropdown = document.getElementById('user-profile-dropdown');
+            
+            if (userProfileButton) {
+                userProfileButton.addEventListener('click', () => {
+                    userProfileDropdown.classList.toggle('active');
+                });
+            }
+            
+            const logoutBtn = document.getElementById('logout-button');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', handleLogout);
+            }
+            
+            const createInvestmentBtn = document.getElementById('createInvestmentBtn');
+            if (createInvestmentBtn) {
+                createInvestmentBtn.addEventListener('click', openInvestmentModal);
+            }
+            
+            setTimeout(() => {
+                const startInvestingBtn = document.getElementById('startInvestingBtn');
+                if (startInvestingBtn) {
+                    startInvestingBtn.addEventListener('click', openInvestmentModal);
+                }
+            }, 100);
+            
+            const closeModalBtn = document.getElementById('closeModal');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const investmentModal = document.getElementById('investmentModal');
+            
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', () => closeInvestmentModal());
+            }
+            
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => closeInvestmentModal());
+            }
+            
+            if (investmentModal) {
+                investmentModal.addEventListener('click', (e) => {
+                    if (e.target === investmentModal) {
+                        closeInvestmentModal();
+                    }
+                });
+            }
+            
+            const form = document.getElementById('investmentForm');
+            if (form) {
+                form.addEventListener('submit', handleInvestmentSubmit);
+            }
+            
+            const amountInput = document.getElementById('amount');
+            if (amountInput) {
+                amountInput.addEventListener('input', updateInvestmentSummary);
+            }
+            
+            const durationSelect = document.getElementById('duration');
+            if (durationSelect) {
+                durationSelect.addEventListener('change', updateInvestmentSummary);
+            }
+            
+            document.addEventListener('click', (e) => {
+                if (userProfileButton && userProfileDropdown && 
+                    !userProfileButton.contains(e.target) && 
+                    !userProfileDropdown.contains(e.target)) {
+                    userProfileDropdown.classList.remove('active');
+                }
+            });
+        }
+
+        function openInvestmentModal() {
+            if (!currentUser) {
+                showNotification('Debes iniciar sesión para invertir', 'error');
+                return;
+            }
+            
+            if (userBalance < 100) {
+                showNotification('Necesitas un saldo mínimo de $100 para invertir. Realiza un depósito primero.', 'warning');
+                window.location.href = 'deposits.html';
+                return;
+            }
+            
+            const modal = document.getElementById('investmentModal');
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                updateInvestmentSummary();
+            }
+        }
+
+        function closeInvestmentModal() {
+            const modal = document.getElementById('investmentModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                const form = document.getElementById('investmentForm');
+                if (form) form.reset();
+            }
+        }
+
+        function updateInvestmentSummary() {
+            const amountInput = document.getElementById('amount');
+            if (!amountInput) return;
+            
+            const amount = parseFloat(amountInput.value) || 0;
+            const duration = parseInt(document.getElementById('duration')?.value) || 30;
+            const plan = PLANS[selectedPlan];
+            
+            if (!plan) return;
+            
+            if (amount > 0) {
+                if (amount < plan.min) {
+                    document.getElementById('summaryAmount').textContent = `$${amount}`;
+                    document.getElementById('summaryRate').textContent = `${plan.annualRate}%`;
+                    document.getElementById('summaryMonthlyRate').textContent = `${plan.monthlyRate.toFixed(2)}%`;
+                    document.getElementById('summaryProfit').textContent = `Mínimo: $${plan.min}`;
+                    document.getElementById('summaryTotal').textContent = '-';
+                    return;
+                }
+                
+                if (plan.max && amount > plan.max) {
+                    document.getElementById('summaryAmount').textContent = `$${amount}`;
+                    document.getElementById('summaryRate').textContent = `${plan.annualRate}%`;
+                    document.getElementById('summaryMonthlyRate').textContent = `${plan.monthlyRate.toFixed(2)}%`;
+                    document.getElementById('summaryProfit').textContent = `Máximo: $${plan.max}`;
+                    document.getElementById('summaryTotal').textContent = '-';
+                    return;
+                }
+                
+                if (amount > userBalance) {
+                    document.getElementById('summaryAmount').textContent = `$${amount}`;
+                    document.getElementById('summaryRate').textContent = `${plan.annualRate}%`;
+                    document.getElementById('summaryMonthlyRate').textContent = `${plan.monthlyRate.toFixed(2)}%`;
+                    document.getElementById('summaryProfit').textContent = `Saldo insuficiente`;
+                    document.getElementById('summaryTotal').textContent = '-';
+                    return;
+                }
+            }
+            
+            const monthlyProfit = amount * (plan.monthlyRate / 100);
+            const totalProfit = monthlyProfit * (duration / 30);
+            const totalWithdrawal = amount + totalProfit;
+            
+            document.getElementById('summaryAmount').textContent = `$${amount.toFixed(2)}`;
+            document.getElementById('summaryRate').textContent = `${plan.annualRate}%`;
+            document.getElementById('summaryMonthlyRate').textContent = `${plan.monthlyRate.toFixed(2)}%`;
+            document.getElementById('summaryProfit').textContent = `$${monthlyProfit.toFixed(2)}`;
+            document.getElementById('summaryTotal').textContent = `$${totalWithdrawal.toFixed(2)}`;
+        }
+
+        async function handleInvestmentSubmit(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                showNotification('Debes iniciar sesión', 'error');
+                return;
+            }
+            
+            const amount = parseFloat(document.getElementById('amount').value);
+            const duration = parseInt(document.getElementById('duration').value);
+            const plan = PLANS[selectedPlan];
+            
+            if (!plan) {
+                showNotification('Por favor selecciona un plan', 'error');
+                return;
+            }
+            
+            if (!amount || amount <= 0) {
+                showNotification('Ingresa un monto válido', 'error');
+                return;
+            }
+            
+            if (amount < plan.min) {
+                showNotification(`El monto mínimo para ${plan.name} es $${plan.min}`, 'error');
+                return;
+            }
+            
+            if (plan.max && amount > plan.max) {
+                showNotification(`El monto máximo para ${plan.name} es $${plan.max}`, 'error');
+                return;
+            }
+            
+            if (amount > 100000) {
+                showNotification('El monto máximo es $100,000', 'error');
+                return;
+            }
+            
+            if (amount > userBalance) {
+                showNotification('Saldo insuficiente. Realiza un depósito primero.', 'error');
+                window.location.href = 'deposits.html';
+                return;
+            }
+            
+            try {
+                const investmentId = 'inv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                const createdAt = Date.now();
+                const endDate = createdAt + (duration * 24 * 60 * 60 * 1000);
+                
+                const investmentData = {
+                    id: investmentId,
+                    amount: amount,
+                    planType: plan.name,
+                    annualRate: plan.annualRate,
+                    monthlyRate: plan.monthlyRate,
+                    duration: duration,
+                    createdAt: createdAt,
+                    endDate: endDate,
+                    status: 'active',
+                    earnings: 0,
+                    userId: currentUser.uid
+                };
+                
+                await db.ref('investments/' + currentUser.uid + '/' + investmentId).set(investmentData);
+                
+                const balanceRef = db.ref('users/' + currentUser.uid + '/balance');
+                await balanceRef.transaction((currentBalance) => {
+                    return (currentBalance || 0) - amount;
+                });
+                
+                const transactionId = 'trans_' + Date.now();
+                const transactionData = {
+                    id: transactionId,
+                    type: 'investment',
+                    amount: amount,
+                    date: Date.now(),
+                    description: `Inversión en plan ${plan.name}`,
+                    status: 'completed',
+                    userId: currentUser.uid
+                };
+                
+                await db.ref('transactions/' + currentUser.uid + '/' + transactionId).set(transactionData);
+                
+                showNotification(`¡Inversión creada exitosamente! $${amount} en plan ${plan.name}`, 'success');
+                closeInvestmentModal();
+                
+                setTimeout(() => {
+                    loadInvestments();
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error creating investment:', error);
+                showNotification('Error al crear la inversión: ' + error.message, 'error');
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notification-message');
+            
+            if (!notification || !messageEl) return;
+            
+            const colors = {
+                success: '#10b981',
+                error: '#ef4444',
+                warning: '#f59e0b',
+                info: '#3b82f6'
+            };
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            notification.style.background = colors[type] || colors.info;
+            messageEl.textContent = message;
+            notification.querySelector('i').className = `fas ${icons[type] || icons.info}`;
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        function handleLogout(e) {
+            e.preventDefault();
+            
+            if (balanceRef) {
+                balanceRef.off();
+                balanceRef = null;
+            }
+            
+            if (investmentsRef) {
+                investmentsRef.off();
+                investmentsRef = null;
+            }
+            
+            appInitialized = false;
+            
+            auth.signOut()
+                .then(() => {
+                    showNotification('Sesión cerrada correctamente', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    showNotification('Error al cerrar sesión', 'error');
+                });
+        }
+
+        function showInvestmentDetails(investmentId) {
+            const investment = investments.find(inv => inv.id === investmentId);
+            if (!investment) {
+                showNotification('Inversión no encontrada', 'error');
+                return;
+            }
+            
+            const modal = document.getElementById('investmentModal');
+            if (modal) {
+                try {
+                    const created = new Date(investment.createdAt);
+                    const ends = new Date(investment.endDate);
+                    const now = new Date();
+                    const daysPassed = Math.max(0, Math.floor((now - created) / (1000 * 60 * 60 * 24)));
+                    const totalDays = Math.max(1, (ends - created) / (1000 * 60 * 60 * 24));
+                    const monthlyRate = investment.monthlyRate || (5/12);
+                    const earnings = investment.amount * (monthlyRate / 100) * (daysPassed / 30);
+                    const totalEarnings = investment.amount * (monthlyRate / 100) * (totalDays / 30);
+                    
+                    const modalContent = `
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold">Detalles de Inversión</h2>
+                            <button onclick="closeInvestmentModal()" class="text-gray-400 hover:text-white text-xl">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="glass-card p-4">
+                                <h3 class="font-bold mb-3">Información General</h3>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span>Plan:</span>
+                                        <span class="font-bold">${investment.planType || 'Premium'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Monto Invertido:</span>
+                                        <span class="font-bold text-green-400">$${(investment.amount || 0).toFixed(2)}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Tasa Anual:</span>
+                                        <span class="font-bold text-blue-400">${investment.annualRate || 5}%</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Tasa Mensual:</span>
+                                        <span class="font-bold text-blue-400">${monthlyRate.toFixed(2)}%</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Fecha de Inicio:</span>
+                                        <span>${created.toLocaleDateString('es-ES')}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Fecha de Vencimiento:</span>
+                                        <span>${ends.toLocaleDateString('es-ES')}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Días Transcurridos:</span>
+                                        <span>${daysPassed} de ${Math.floor(totalDays)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="glass-card p-4">
+                                <h3 class="font-bold mb-3">Ganancias</h3>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span>Ganancias Actuales:</span>
+                                        <span class="profit-amount">$${earnings.toFixed(2)}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Ganancias Totales Estimadas:</span>
+                                        <span class="font-bold text-green-400">$${totalEarnings.toFixed(2)}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Retiro Total Estimado:</span>
+                                        <span class="text-xl font-bold text-green-400">$${((investment.amount || 0) + totalEarnings).toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="glass-card p-4">
+                                <h3 class="font-bold mb-3">Estado</h3>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <span>Estado:</span>
+                                        <span class="px-3 py-1 bg-green-900 text-green-300 rounded-full text-sm">${investment.status || 'Activo'}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Próximo Pago:</span>
+                                        <span>${new Date(created.getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES')}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button onclick="closeInvestmentModal()" 
+                                    class="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg font-bold hover:opacity-90 transition">
+                                Cerrar
+                            </button>
+                        </div>
+                    `;
+                    
+                    modal.querySelector('.modal-content').innerHTML = modalContent;
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                } catch (error) {
+                    console.error('Error al mostrar detalles:', error);
+                    showNotification('Error al cargar detalles de la inversión', 'error');
+                }
+            }
+        }
+
+        function reinvestInvestment(investmentId) {
+            const investment = investments.find(inv => inv.id === investmentId);
+            if (!investment) {
+                showNotification('Inversión no encontrada', 'error');
+                return;
+            }
+            
+            let planType = 'premium';
+            if (investment.planType === 'Básico') planType = 'basic';
+            else if (investment.planType === 'VIP') planType = 'vip';
+            
+            selectedPlan = planType;
+            
+            openInvestmentModal();
+            
+            setTimeout(() => {
+                const amountInput = document.getElementById('amount');
+                if (amountInput) {
+                    amountInput.value = investment.amount || 1000;
+                }
+                
+                document.querySelectorAll('.plan-selector').forEach(el => {
+                    el.classList.remove('selected');
+                    if (el.dataset.plan === planType) {
+                        el.classList.add('selected');
+                    }
+                });
+                updateInvestmentSummary();
+            }, 100);
+        }
+
+        window.reinvestInvestment = reinvestInvestment;
+        window.showInvestmentDetails = showInvestmentDetails;
+        window.closeInvestmentModal = closeInvestmentModal;
+    </script>
+</body>
+</html>

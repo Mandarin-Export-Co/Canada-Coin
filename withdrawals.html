@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canada Coin - Retiros</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #1e40af;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1e3a8a;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background-color: var(--accent-color);
+        }
+        
+        .notification.error {
+            background-color: var(--danger-color);
+        }
+        
+        .notification.warning {
+            background-color: var(--warning-color);
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .kyc-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .kyc-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        
+        .kyc-verified {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .kyc-rejected {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        .transaction-item {
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-amount.positive {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        .transaction-amount.negative {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+        
+        .banking-tab {
+            position: relative;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: #4b5563;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+        
+        .banking-tab:hover {
+            color: var(--primary-color);
+            background: rgba(30, 64, 175, 0.05);
+        }
+        
+        .banking-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: linear-gradient(to bottom, rgba(30, 64, 175, 0.1), transparent);
+        }
+        
+        .method-details {
+            transition: all 0.3s ease;
+            max-height: 1000px;
+            overflow: hidden;
+        }
+
+        .method-details.hidden {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .payment-method {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method:hover {
+            border-color: var(--primary-color);
+            background-color: #f0f7ff;
+        }
+
+        .payment-method.selected {
+            border-color: var(--primary-color);
+            background-color: #e6f0ff;
+            box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(30, 64, 175, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="notifications-container"></div>
+    
+    <section id="auth-section" class="min-h-screen flex items-center justify-center p-4">
+        <div class="card w-full max-w-md p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">Canada Coin</h1>
+                <p class="text-gray-600 mt-2">Plataforma de Gestión de Inversiones</p>
+            </div>
+            
+            <div id="login-form">
+                <h2 class="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label for="login-email" class="block text-gray-700 mb-2">Correo Electrónico</label>
+                        <input type="email" id="login-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="login-password" class="block text-gray-700 mb-2">Contraseña</label>
+                        <input type="password" id="login-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <button type="submit" class="btn-primary w-full mb-4">Iniciar Sesión</button>
+                </form>
+                <p class="text-center text-gray-600">
+                    ¿No tienes una cuenta? 
+                    <a href="index.html" class="text-blue-600 font-medium hover:underline">Regístrate aquí</a>
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <section id="dashboard-section" class="hidden">
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center">
+                        <h1 class="text-2xl font-bold text-gray-900">Canada Coin</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button id="user-menu-button" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
+                                <span id="user-name" class="font-medium">Usuario</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-10">
+                                <a href="index.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100"><i class="fas fa-home mr-2"></i>Dashboard</a>
+                                <a href="profile.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100"><i class="fas fa-cog mr-2"></i>Configuración</a>
+                                <a href="#" id="logout-button" class="block px-4 py-2 text-gray-700 hover:bg-gray-100"><i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Segunda fila: Navegación por pestañas -->
+                <div class="border-t border-gray-200">
+                    <nav class="flex overflow-x-auto">
+                        <a href="index.html" class="banking-tab">
+                            <i class="fas fa-home mr-2"></i>Resumen
+                        </a>
+                        <a href="investments.html" class="banking-tab">
+                            <i class="fas fa-chart-line mr-2"></i>Inversiones
+                        </a>
+                        <a href="deposits.html" class="banking-tab">
+                            <i class="fas fa-arrow-up mr-2"></i>Depósitos
+                        </a>
+                        <a href="withdrawals.html" class="banking-tab active">
+                            <i class="fas fa-arrow-down mr-2"></i>Retiros
+                        </a>
+                        <a href="transfers.html" class="banking-tab">
+                            <i class="fas fa-exchange-alt mr-2"></i>Transferencias
+                        </a>
+                        <a href="cards.html" class="banking-tab">
+                            <i class="fas fa-credit-card mr-2"></i>Tarjetas
+                        </a>
+                        <a href="referrals.html" class="banking-tab">
+                            <i class="fas fa-users mr-2"></i>Referidos
+                        </a>
+                        <a href="support.html" class="banking-tab">
+                            <i class="fas fa-headset mr-2"></i>Soporte
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </header>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2">
+                    <!-- Solicitudes Activas -->
+                    <div class="card mb-6">
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <h2 class="text-xl font-bold">Solicitudes de Retiro</h2>
+                                <button id="open-withdrawal-modal-from-section" class="btn-secondary flex items-center">
+                                    <i class="fas fa-download mr-2"></i> Solicitar Retiro
+                                </button>
+                            </div>
+                        </div>
+                        <div id="withdrawals-list" class="divide-y divide-gray-100">
+                            <div class="text-center py-12">
+                                <div class="loading mx-auto mb-4"></div>
+                                <p class="text-gray-500">Cargando retiros...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Historial -->
+                    <div class="card">
+                        <div class="p-6 border-b border-gray-200">
+                            <h2 class="text-xl font-bold">Historial Completado</h2>
+                        </div>
+                        <div id="withdrawal-history" class="divide-y divide-gray-100">
+                            <div class="text-center py-12">
+                                <div class="loading mx-auto mb-4"></div>
+                                <p class="text-gray-500">Cargando historial...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <!-- Información de Retiros -->
+                    <div class="card p-6 mb-6">
+                        <h3 class="text-lg font-bold text-gray-900 mb-6">Información</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <p class="text-sm text-gray-600 mb-2">Saldo Disponible</p>
+                                <p id="available-withdrawal" class="text-3xl font-bold text-green-600">$0.00</p>
+                            </div>
+                            
+                            <div>
+                                <p class="text-sm text-gray-600 mb-2">Límite Diario</p>
+                                <p class="text-xl font-bold text-blue-600">$5,000</p>
+                            </div>
+                            
+                            <div>
+                                <p class="text-sm text-gray-600 mb-2">Comisión Estándar</p>
+                                <p class="text-xl font-bold text-purple-600">0.5%</p>
+                            </div>
+                            
+                            <div>
+                                <p class="text-sm text-gray-600 mb-2">Tiempo de Procesamiento</p>
+                                <p class="text-lg font-bold text-gray-700">3-5 días hábiles</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Métodos de Retiro -->
+                    <div class="card p-6 mb-6">
+                        <h3 class="text-lg font-bold text-gray-900 mb-6">Métodos de Retiro</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                <i class="fas fa-university text-blue-600 mr-3"></i>
+                                <span class="font-medium">Transferencia Bancaria</span>
+                            </div>
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <i class="fab fa-paypal text-blue-400 mr-3"></i>
+                                <span class="font-medium">PayPal</span>
+                            </div>
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <i class="fas fa-coins text-yellow-600 mr-3"></i>
+                                <span class="font-medium">Criptomonedas</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configuración de Retiros -->
+                    <div class="card p-6 bg-gradient-to-r from-blue-500 to-cyan-600 text-white">
+                        <h3 class="text-lg font-bold mb-4">Configuración</h3>
+                        <p class="text-sm mb-6">Configura tus cuentas para retiros automáticos.</p>
+                        <a href="profile.html" class="w-full block text-center bg-white text-blue-600 font-bold py-3 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-plus mr-2"></i>Agregar Cuenta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal de Retiro -->
+    <div id="withdrawal-modal" class="modal">
+        <div class="modal-content">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold">Solicitar Retiro</h2>
+                    <button id="close-withdrawal-modal" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <form id="withdrawal-form" novalidate>
+                    <div class="mb-6">
+                        <label for="withdrawal-amount" class="block text-gray-700 mb-2">Monto a Retirar (USD)</label>
+                        <input type="number" id="withdrawal-amount" min="10" step="0.01"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="0.00" required>
+                        <p class="text-sm text-gray-500 mt-1">Saldo disponible: <span id="available-balance">$0.00</span></p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-700 mb-2">Método de Retiro</label>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+                                <input type="radio" id="withdrawal-bank" name="withdrawal-method" value="bank" class="hidden" checked>
+                                <label for="withdrawal-bank" class="cursor-pointer">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-university text-blue-600 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium">Banco Local</p>
+                                </label>
+                            </div>
+
+                            <div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+                                <input type="radio" id="withdrawal-paypal" name="withdrawal-method" value="paypal" class="hidden">
+                                <label for="withdrawal-paypal" class="cursor-pointer">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i class="fab fa-paypal text-blue-600 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium">PayPal</p>
+                                </label>
+                            </div>
+
+                            <div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+                                <input type="radio" id="withdrawal-crypto" name="withdrawal-method" value="crypto" class="hidden">
+                                <label for="withdrawal-crypto" class="cursor-pointer">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-coins text-blue-600 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium">Cripto</p>
+                                </label>
+                            </div>
+
+                            <div class="payment-method withdrawal-method border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500">
+                                <input type="radio" id="withdrawal-international" name="withdrawal-method" value="international" class="hidden">
+                                <label for="withdrawal-international" class="cursor-pointer">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                        <i class="fas fa-globe text-blue-600 text-xl"></i>
+                                    </div>
+                                    <p class="font-medium">Banco Internacional</p>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="withdrawal-details" class="mb-6">
+                        <div id="bank-details" class="method-details">
+                            <h3 class="font-bold mb-4 text-gray-800">Información Bancaria Local</h3>
+
+                            <div class="mb-4">
+                                <label for="bank-name" class="block text-gray-700 mb-2">Nombre del Banco *</label>
+                                <input type="text" id="bank-name"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Ej: Banco Nacional" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="account-number" class="block text-gray-700 mb-2">Número de Cuenta *</label>
+                                <input type="text" id="account-number"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Ej: 1234567890" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="account-holder" class="block text-gray-700 mb-2">Nombre del Titular *</label>
+                                <input type="text" id="account-holder"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Nombre completo como aparece en el banco" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="account-type" class="block text-gray-700 mb-2">Tipo de Cuenta *</label>
+                                <select id="account-type"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        required>
+                                    <option value="">Seleccionar tipo</option>
+                                    <option value="checking">Cuenta Corriente</option>
+                                    <option value="savings">Cuenta de Ahorros</option>
+                                    <option value="business">Cuenta Empresarial</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="paypal-details" class="method-details hidden">
+                            <h3 class="font-bold mb-4 text-gray-800">Información de PayPal</h3>
+                            <div class="mb-4">
+                                <label for="paypal-email" class="block text-gray-700 mb-2">Correo Electrónico de PayPal *</label>
+                                <input type="email" id="paypal-email"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="tucorreo@paypal.com" required>
+                            </div>
+                        </div>
+
+                        <div id="crypto-details" class="method-details hidden">
+                            <h3 class="font-bold mb-4 text-gray-800">Información de Criptomonedas</h3>
+
+                            <div class="mb-4">
+                                <label for="crypto-wallet" class="block text-gray-700 mb-2">Dirección de la Billetera *</label>
+                                <input type="text" id="crypto-wallet"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Ej: 0x742d35Cc6634C0532925a3b8D4C9db7c1b7c8e8e" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="crypto-network" class="block text-gray-700 mb-2">Red / Network *</label>
+                                <input type="text" id="crypto-network"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Ej: ERC20, TRC20, BEP20" required>
+                            </div>
+                        </div>
+
+                        <div id="international-details" class="method-details hidden">
+                            <h3 class="font-bold mb-4 text-gray-800">Información Bancaria Internacional</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label for="international-bank-country" class="block text-gray-700 mb-2">País del Banco *</label>
+                                    <select id="international-bank-country" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                        <option value="">Selecciona un país</option>
+                                        <option value="CA">Canadá</option>
+                                        <option value="US">Estados Unidos</option>
+                                        <option value="MX">México</option>
+                                        <option value="ES">España</option>
+                                        <option value="AR">Argentina</option>
+                                        <option value="CL">Chile</option>
+                                        <option value="CO">Colombia</option>
+                                        <option value="PE">Perú</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="international-bank-name" class="block text-gray-700 mb-2">Nombre del Banco *</label>
+                                    <input type="text" id="international-bank-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: Banco Nacional" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="international-account-number" class="block text-gray-700 mb-2">Número de Cuenta *</label>
+                                <input type="text" id="international-account-number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 1234567890" required>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label for="international-routing-number" class="block text-gray-700 mb-2">Número de Ruta/ABA *</label>
+                                    <input type="text" id="international-routing-number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: 021000021" required>
+                                </div>
+                                <div>
+                                    <label for="international-swift-code" class="block text-gray-700 mb-2">Código SWIFT/BIC</label>
+                                    <input type="text" id="international-swift-code" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ej: BOFAUS3N">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="international-account-holder" class="block text-gray-700 mb-2">Nombre del Titular *</label>
+                                <input type="text" id="international-account-holder" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nombre completo como aparece en el banco" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div class="flex items-start">
+                            <i class="fas fa-exclamation-triangle text-yellow-500 mt-1 mr-3"></i>
+                            <div>
+                                <p class="font-medium text-yellow-800">Tiempo de Procesamiento</p>
+                                <p class="text-yellow-700 text-sm mt-1">
+                                    Le notificaremos por correo electrónico una vez que su solicitud haya sido aprobada. En ese momento, los fondos serán transferidos a su cuenta.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="cancel-withdrawal"
+                                class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            Cancelar
+                        </button>
+
+                        <button type="submit" class="btn-primary flex items-center" id="confirm-withdrawal">
+                            <span>Solicitar Retiro</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBI4O0d_Mec38FDiuhirujCnX99PFKiXW4",
+            authDomain: "projekt-pc.firebaseapp.com",
+            databaseURL: "https://projekt-pc-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "projekt-pc",
+            storageBucket: "projekt-pc.appspot.com",
+            messagingSenderId: "90098431634",
+            appId: "1:90098431634:web:7cb61800d03533c2a6984b",
+            measurementId: "G-59YH8W8W1L"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        const appState = {
+            currentUser: null,
+            userData: null,
+            deposits: [],
+            withdrawals: [],
+            withdrawalHistory: [],
+            dailyLimit: 5000
+        };
+
+        // Elementos del DOM
+        const authSection = document.getElementById('auth-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+        const loginForm = document.getElementById('loginForm');
+        const logoutButton = document.getElementById('logout-button');
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userMenu = document.getElementById('user-menu');
+        const userName = document.getElementById('user-name');
+        const availableWithdrawal = document.getElementById('available-withdrawal');
+
+        const withdrawalModal = document.getElementById('withdrawal-modal');
+        const openWithdrawalModalFromSectionButton = document.getElementById('open-withdrawal-modal-from-section');
+        const closeWithdrawalModalButton = document.getElementById('close-withdrawal-modal');
+        const cancelWithdrawalButton = document.getElementById('cancel-withdrawal');
+        const withdrawalForm = document.getElementById('withdrawal-form');
+        const availableBalance = document.getElementById('available-balance');
+
+        document.addEventListener('DOMContentLoaded', initApp);
+        if (loginForm) loginForm.addEventListener('submit', handleLogin);
+        if (logoutButton) logoutButton.addEventListener('click', handleLogout);
+        if (userMenuButton) userMenuButton.addEventListener('click', toggleUserMenu);
+
+        if (openWithdrawalModalFromSectionButton) openWithdrawalModalFromSectionButton.addEventListener('click', openWithdrawalModal);
+        if (closeWithdrawalModalButton) closeWithdrawalModalButton.addEventListener('click', closeWithdrawalModal);
+        if (cancelWithdrawalButton) cancelWithdrawalButton.addEventListener('click', closeWithdrawalModal);
+        if (withdrawalForm) withdrawalForm.addEventListener('submit', handleWithdrawal);
+
+        function initApp() {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    appState.currentUser = user;
+                    loadUserData();
+                    showDashboard();
+                } else {
+                    showAuth();
+                }
+            });
+            
+            document.querySelectorAll('.withdrawal-method').forEach(method => {
+                method.addEventListener('click', () => {
+                    updateWithdrawalDetails();
+                });
+            });
+            
+            // Cerrar menú de usuario al hacer clic fuera de él
+            document.addEventListener('click', (e) => {
+                if (userMenu && !userMenu.classList.contains('hidden') && 
+                    !userMenuButton.contains(e.target) && !userMenu.contains(e.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+        }
+
+        function showAuth() {
+            if (authSection) authSection.classList.remove('hidden');
+            if (dashboardSection) dashboardSection.classList.add('hidden');
+        }
+
+        function showDashboard() {
+            if (authSection) authSection.classList.add('hidden');
+            if (dashboardSection) dashboardSection.classList.remove('hidden');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showNotification('Por favor completa todos los campos', 'error');
+                return;
+            }
+            
+            showNotification('Iniciando sesión...', 'warning');
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    showNotification('¡Inicio de sesión exitoso!', 'success');
+                })
+                .catch(error => {
+                    console.error('Login error:', error);
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                        showNotification('Correo o contraseña incorrectos', 'error');
+                    } else {
+                        showNotification('Error al iniciar sesión', 'error');
+                    }
+                });
+        }
+
+        function handleLogout() {
+            auth.signOut()
+                .then(() => {
+                    showNotification('Sesión cerrada correctamente', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    showNotification('Error al cerrar sesión', 'error');
+                });
+        }
+
+        function toggleUserMenu() {
+            if (userMenu) userMenu.classList.toggle('hidden');
+        }
+
+        function loadUserData() {
+            if (!appState.currentUser) return;
+            
+            const userRef = db.ref('users/' + appState.currentUser.uid);
+            
+            userRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    appState.userData = data;
+                    updateUIWithUserData();
+                    loadUserDeposits();
+                    loadUserWithdrawals();
+                    loadUserTransactions();
+                } else {
+                    initializeUserData();
+                }
+            });
+        }
+
+        function loadUserDeposits() {
+            if (!appState.currentUser) return;
+            
+            const depositsRef = db.ref('deposits/' + appState.currentUser.uid);
+            
+            depositsRef.on('value', (snapshot) => {
+                appState.deposits = [];
+                snapshot.forEach((childSnapshot) => {
+                    const deposit = { id: childSnapshot.key, ...childSnapshot.val() };
+                    appState.deposits.push(deposit);
+                });
+                
+                updateDashboard();
+            });
+        }
+
+        function loadUserWithdrawals() {
+            if (!appState.currentUser) return;
+            
+            const withdrawalsRef = db.ref('withdrawals/' + appState.currentUser.uid);
+            
+            withdrawalsRef.orderByChild('createdAt').on('value', (snapshot) => {
+                appState.withdrawals = [];
+                appState.withdrawalHistory = [];
+                
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const withdrawal = { id: childSnapshot.key, ...childSnapshot.val() };
+                        if (withdrawal.status === 'pending' || withdrawal.status === 'processing') {
+                            appState.withdrawals.push(withdrawal);
+                        } else if (withdrawal.status === 'approved' || withdrawal.status === 'completed') {
+                            appState.withdrawalHistory.push(withdrawal);
+                        }
+                    });
+                    
+                    // Ordenar por fecha más reciente
+                    appState.withdrawals.sort((a, b) => b.createdAt - a.createdAt);
+                    appState.withdrawalHistory.sort((a, b) => b.createdAt - a.createdAt);
+                }
+                
+                updateWithdrawalsList();
+                updateWithdrawalHistoryList();
+                updateDashboard();
+            });
+        }
+
+        function loadUserTransactions() {
+            if (!appState.currentUser) return;
+            
+            const transactionsRef = db.ref('transactions/' + appState.currentUser.uid);
+            
+            transactionsRef.on('value', (snapshot) => {
+                // Esto es para mantener compatibilidad
+                updateDashboard();
+            });
+        }
+
+        function initializeUserData() {
+            if (!appState.currentUser) return;
+            
+            const userRef = db.ref('users/' + appState.currentUser.uid);
+            const defaultData = {
+                name: appState.currentUser.email.split('@')[0] || 'Usuario',
+                email: appState.currentUser.email,
+                balance: 0,
+                totalDeposits: 0,
+                totalEarnings: 0,
+                totalWithdrawals: 0,
+                referralBonus: 0,
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            };
+            
+            userRef.set(defaultData)
+                .then(() => {
+                    appState.userData = defaultData;
+                    updateUIWithUserData();
+                    updateDashboard();
+                })
+                .catch(error => {
+                    console.error('Error initializing user data:', error);
+                });
+        }
+
+        function updateUIWithUserData() {
+            if (!appState.userData) return;
+            
+            if (userName) {
+                userName.textContent = appState.userData.name || appState.currentUser.email || 'Usuario';
+            }
+        }
+
+        function calculateAvailableBalance() {
+            if (!appState.userData) return 0;
+            
+            // Usar el balance directamente del userData que ya está calculado correctamente
+            const userBalance = parseFloat(appState.userData.balance) || 0;
+            
+            // Verificar si hay depósitos no aprobados que aún no están en el balance
+            let pendingDepositsAmount = 0;
+            appState.deposits.forEach(deposit => {
+                if (deposit.status === 'pending') {
+                    pendingDepositsAmount += parseFloat(deposit.amount) || 0;
+                }
+            });
+            
+            // El balance disponible para retirar es el balance del usuario menos los depósitos pendientes
+            const availableForWithdrawal = Math.max(0, userBalance - pendingDepositsAmount);
+            
+            console.log('Cálculo del saldo para retiros:', {
+                userBalance: userBalance,
+                pendingDeposits: pendingDepositsAmount,
+                availableForWithdrawal: availableForWithdrawal
+            });
+            
+            return availableForWithdrawal;
+        }
+
+        function updateDashboard() {
+            if (!appState.userData) return;
+            
+            // Calcular saldo disponible usando la función corregida
+            const availableBalanceValue = calculateAvailableBalance();
+            
+            // Formatear con 2 decimales
+            const formattedBalance = availableBalanceValue.toFixed(2);
+            
+            if (availableWithdrawal) availableWithdrawal.textContent = `$${formattedBalance}`;
+            if (availableBalance) availableBalance.textContent = `$${formattedBalance}`;
+            
+            console.log('Saldo disponible para retiros actualizado:', formattedBalance);
+        }
+
+        function openWithdrawalModal() {
+            if (!appState.userData) {
+                showNotification('Cargando datos de usuario...', 'warning');
+                return;
+            }
+            
+            const availableBalanceCalc = calculateAvailableBalance();
+            
+            if (availableBalanceCalc <= 0) {
+                showNotification('No tienes saldo disponible para retirar', 'error');
+                return;
+            }
+            
+            if (withdrawalModal) withdrawalModal.classList.add('active');
+            if (availableBalance) availableBalance.textContent = `$${availableBalanceCalc.toFixed(2)}`;
+            
+            updateWithdrawalDetails();
+            
+            if (withdrawalForm) {
+                withdrawalForm.reset();
+                const amountInput = document.getElementById('withdrawal-amount');
+                if (amountInput) {
+                    amountInput.min = 10;
+                    amountInput.max = Math.min(availableBalanceCalc, appState.dailyLimit);
+                }
+            }
+        }
+
+        function closeWithdrawalModal() {
+            if (withdrawalModal) withdrawalModal.classList.remove('active');
+            if (withdrawalForm) withdrawalForm.reset();
+            updateWithdrawalDetails();
+            
+            const submitButton = document.getElementById('confirm-withdrawal');
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<span>Solicitar Retiro</span><i class="fas fa-arrow-right ml-2"></i>';
+            }
+        }
+
+        async function handleWithdrawal(e) {
+            e.preventDefault();
+            
+            if (!appState.currentUser) {
+                showNotification('Debes iniciar sesión para solicitar un retiro', 'error');
+                return;
+            }
+            
+            const amountInput = document.getElementById('withdrawal-amount');
+            const amount = parseFloat(amountInput.value);
+            const methodElement = document.querySelector('input[name="withdrawal-method"]:checked');
+            
+            if (!methodElement) {
+                showNotification('Por favor selecciona un método de retiro', 'error');
+                return;
+            }
+            
+            const method = methodElement.value;
+            
+            if (!amount || isNaN(amount) || amount < 10) {
+                showNotification('El monto mínimo de retiro es $10 USD', 'error');
+                amountInput.focus();
+                return;
+            }
+            
+            if (amount > appState.dailyLimit) {
+                showNotification(`El monto máximo por retiro es $${appState.dailyLimit} USD`, 'error');
+                amountInput.focus();
+                return;
+            }
+            
+            const availableBalanceCalc = calculateAvailableBalance();
+            
+            if (amount > availableBalanceCalc) {
+                showNotification(`No tienes suficiente saldo disponible. Saldo: $${availableBalanceCalc.toFixed(2)}`, 'error');
+                amountInput.focus();
+                return;
+            }
+            
+            // Verificar si ya hay retiros pendientes hoy
+            const today = new Date().setHours(0, 0, 0, 0);
+            let totalToday = 0;
+            appState.withdrawals.forEach(withdrawal => {
+                const withdrawalDate = new Date(withdrawal.createdAt);
+                if (withdrawalDate.setHours(0, 0, 0, 0) === today) {
+                    totalToday += parseFloat(withdrawal.amount) || 0;
+                }
+            });
+            
+            if (totalToday + amount > appState.dailyLimit) {
+                showNotification(`Has excedido el límite diario de $${appState.dailyLimit}. Ya has solicitado $${totalToday.toFixed(2)} hoy`, 'error');
+                return;
+            }
+            
+            let details = {};
+            let valid = true;
+            let errorMessage = '';
+            let firstInvalidField = null;
+            
+            if (method === 'bank') {
+                const bankName = document.getElementById('bank-name').value;
+                const accountNumber = document.getElementById('account-number').value;
+                const accountHolder = document.getElementById('account-holder').value;
+                const accountType = document.getElementById('account-type').value;
+                
+                if (!bankName || !accountNumber || !accountHolder || !accountType) {
+                    errorMessage = 'Por favor completa todos los campos requeridos de información bancaria';
+                    valid = false;
+                    firstInvalidField = document.getElementById('bank-name');
+                }
+                
+                if (valid) {
+                    details = {
+                        bankName: bankName,
+                        accountNumber: accountNumber,
+                        accountHolder: accountHolder,
+                        accountType: accountType
+                    };
+                }
+                
+            } else if (method === 'paypal') {
+                const paypalEmail = document.getElementById('paypal-email');
+                if (!paypalEmail || !paypalEmail.value.trim()) {
+                    errorMessage = 'Por favor ingresa el correo electrónico de PayPal';
+                    valid = false;
+                    firstInvalidField = paypalEmail;
+                } else {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(paypalEmail.value)) {
+                        errorMessage = 'Por favor ingresa un correo electrónico válido para PayPal';
+                        valid = false;
+                        firstInvalidField = paypalEmail;
+                    }
+                }
+                
+                if (valid) {
+                    details = {
+                        paypalEmail: paypalEmail.value
+                    };
+                }
+                
+            } else if (method === 'crypto') {
+                const cryptoWallet = document.getElementById('crypto-wallet').value;
+                const cryptoNetwork = document.getElementById('crypto-network').value;
+                
+                if (!cryptoWallet || !cryptoNetwork) {
+                    errorMessage = 'Por favor completa todos los campos requeridos para criptomonedas';
+                    valid = false;
+                    firstInvalidField = document.getElementById('crypto-wallet');
+                }
+                
+                if (valid) {
+                    details = {
+                        walletAddress: cryptoWallet,
+                        network: cryptoNetwork
+                    };
+                }
+            } else if (method === 'international') {
+                const bankCountry = document.getElementById('international-bank-country').value;
+                const bankName = document.getElementById('international-bank-name').value;
+                const accountNumber = document.getElementById('international-account-number').value;
+                const routingNumber = document.getElementById('international-routing-number').value;
+                const accountHolder = document.getElementById('international-account-holder').value;
+                
+                if (!bankCountry || !bankName || !accountNumber || !routingNumber || !accountHolder) {
+                    errorMessage = 'Por favor completa todos los campos requeridos para transferencia internacional';
+                    valid = false;
+                    firstInvalidField = document.getElementById('international-bank-country');
+                }
+                
+                if (valid) {
+                    details = {
+                        bankCountry: bankCountry,
+                        bankName: bankName,
+                        accountNumber: accountNumber,
+                        routingNumber: routingNumber,
+                        swiftCode: document.getElementById('international-swift-code')?.value || '',
+                        accountHolder: accountHolder
+                    };
+                }
+            } else {
+                errorMessage = 'Método de retiro no válido';
+                valid = false;
+            }
+            
+            if (!valid) {
+                showNotification(errorMessage, 'error');
+                if (firstInvalidField) {
+                    firstInvalidField.focus();
+                }
+                return;
+            }
+            
+            showNotification('Procesando solicitud de retiro...', 'warning');
+            
+            const submitButton = document.getElementById('confirm-withdrawal');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span>Procesando...</span><i class="fas fa-spinner fa-spin ml-2"></i>';
+            }
+            
+            const withdrawalId = 'with_' + Date.now();
+            
+            // Calcular comisión según el método (0.5% como solicitaste)
+            let withdrawalFee = 0;
+            let netAmount = amount;
+            
+            if (method === 'international') {
+                withdrawalFee = Math.max(amount * 0.005, 20); // 0.5% mínimo $20
+                netAmount = amount - withdrawalFee;
+            } else if (method === 'crypto') {
+                withdrawalFee = Math.max(amount * 0.005, 5); // 0.5% mínimo $5
+                netAmount = amount - withdrawalFee;
+            } else {
+                withdrawalFee = Math.max(amount * 0.005, 5); // 0.5% mínimo $5
+                netAmount = amount - withdrawalFee;
+            }
+            
+            const withdrawalData = {
+                amount: amount,
+                netAmount: netAmount,
+                fee: withdrawalFee,
+                method: method,
+                details: details,
+                status: 'pending',
+                userId: appState.currentUser.uid,
+                userEmail: appState.currentUser.email,
+                userName: appState.userData?.name || appState.currentUser.email,
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            };
+            
+            try {
+                // Guardar la solicitud de retiro
+                await db.ref('withdrawals/' + appState.currentUser.uid + '/' + withdrawalId).set(withdrawalData);
+                
+                // Actualizar el balance del usuario en tiempo real
+                const currentBalance = parseFloat(appState.userData.balance) || 0;
+                const newBalance = currentBalance - amount;
+                
+                // Actualizar el balance del usuario en Firebase
+                await db.ref('users/' + appState.currentUser.uid).update({
+                    balance: newBalance,
+                    totalWithdrawals: (parseFloat(appState.userData.totalWithdrawals) || 0) + amount,
+                    updatedAt: Date.now()
+                });
+                
+                // Actualizar datos locales
+                appState.userData.balance = newBalance;
+                appState.withdrawals.unshift({ id: withdrawalId, ...withdrawalData });
+                
+                // Guardar la transacción
+                const transactionId = 'tx_' + Date.now();
+                const transactionData = {
+                    type: 'withdrawal',
+                    amount: -amount,
+                    method: method,
+                    description: `Retiro #${withdrawalId.substring(0, 8)} (${method})`,
+                    fee: withdrawalFee,
+                    netAmount: netAmount,
+                    status: 'pending',
+                    createdAt: Date.now()
+                };
+                
+                await db.ref('transactions/' + appState.currentUser.uid + '/' + transactionId).set(transactionData);
+                
+                // Actualizar la UI
+                updateWithdrawalsList();
+                updateDashboard();
+                
+                showNotification('¡Solicitud de retiro enviada correctamente! Será procesada en 3-5 días hábiles.', 'success');
+                
+                setTimeout(() => {
+                    closeWithdrawalModal();
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error saving withdrawal:', error);
+                showNotification('Error al guardar la solicitud de retiro: ' + error.message, 'error');
+                
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<span>Solicitar Retiro</span><i class="fas fa-arrow-right ml-2"></i>';
+                }
+            }
+        }
+
+        function updateWithdrawalDetails() {
+            const selectedMethod = document.querySelector('input[name="withdrawal-method"]:checked');
+            
+            if (!selectedMethod) return;
+            
+            const methodValue = selectedMethod.value;
+            
+            document.querySelectorAll('.method-details').forEach(detail => {
+                detail.classList.add('hidden');
+            });
+            
+            document.querySelectorAll('.payment-method.withdrawal-method').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            const selectedElement = selectedMethod.closest('.payment-method');
+            if (selectedElement) {
+                selectedElement.classList.add('selected');
+            }
+            
+            const detailsElement = document.getElementById(`${methodValue}-details`);
+            if (detailsElement) {
+                detailsElement.classList.remove('hidden');
+            }
+        }
+
+        function updateWithdrawalsList() {
+            const withdrawalsList = document.getElementById('withdrawals-list');
+            
+            if (!appState.withdrawals || appState.withdrawals.length === 0) {
+                withdrawalsList.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-money-bill-wave text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">No hay retiros pendientes</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let withdrawalsHTML = '';
+            
+            appState.withdrawals.forEach(withdrawal => {
+                const date = new Date(withdrawal.createdAt);
+                let statusBadge = '';
+                
+                switch(withdrawal.status) {
+                    case 'pending':
+                        statusBadge = '<span class="kyc-status kyc-pending">Pendiente</span>';
+                        break;
+                    case 'processing':
+                        statusBadge = '<span class="kyc-status kyc-verified">En Proceso</span>';
+                        break;
+                    default:
+                        statusBadge = `<span class="kyc-status kyc-pending">${withdrawal.status}</span>`;
+                }
+                
+                const methodNames = {
+                    'bank': 'Banco',
+                    'paypal': 'PayPal',
+                    'crypto': 'Cripto',
+                    'international': 'Banco Internacional'
+                };
+                
+                withdrawalsHTML += `
+                    <div class="transaction-item">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-arrow-down text-red-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Retiro por ${methodNames[withdrawal.method] || withdrawal.method}</p>
+                                <p class="text-sm text-gray-500">${date.toLocaleDateString('es-ES')}</p>
+                                <p class="text-xs text-gray-500">Neto: $${(withdrawal.netAmount || 0).toFixed(2)} (Comisión: $${(withdrawal.fee || 0).toFixed(2)})</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="transaction-amount negative mr-4">-$${(withdrawal.amount || 0).toFixed(2)}</span>
+                            ${statusBadge}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            withdrawalsList.innerHTML = withdrawalsHTML;
+        }
+
+        function updateWithdrawalHistoryList() {
+            const withdrawalHistory = document.getElementById('withdrawal-history');
+            
+            if (!appState.withdrawalHistory || appState.withdrawalHistory.length === 0) {
+                withdrawalHistory.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-history text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">No hay historial de retiros</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let historyHTML = '';
+            
+            appState.withdrawalHistory.forEach(withdrawal => {
+                const date = new Date(withdrawal.createdAt);
+                let statusBadge = '';
+                
+                switch(withdrawal.status) {
+                    case 'completed':
+                    case 'approved':
+                        statusBadge = '<span class="kyc-status kyc-verified">Completado</span>';
+                        break;
+                    case 'rejected':
+                        statusBadge = '<span class="kyc-status kyc-rejected">Rechazado</span>';
+                        break;
+                    default:
+                        statusBadge = `<span class="kyc-status">${withdrawal.status}</span>`;
+                }
+                
+                const methodNames = {
+                    'bank': 'Banco',
+                    'paypal': 'PayPal',
+                    'crypto': 'Cripto',
+                    'international': 'Banco Internacional'
+                };
+                
+                historyHTML += `
+                    <div class="transaction-item">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 ${withdrawal.status === 'completed' || withdrawal.status === 'approved' ? 'bg-green-100' : 'bg-gray-100'} rounded-full flex items-center justify-center mr-3">
+                                <i class="fas ${withdrawal.status === 'completed' || withdrawal.status === 'approved' ? 'fa-check text-green-600' : 'fa-times text-gray-600'}"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium">Retiro por ${methodNames[withdrawal.method] || withdrawal.method}</p>
+                                <p class="text-sm text-gray-500">${date.toLocaleDateString('es-ES')}</p>
+                                <p class="text-xs text-gray-500">Neto: $${(withdrawal.netAmount || 0).toFixed(2)}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="transaction-amount negative mr-4">-$${(withdrawal.amount || 0).toFixed(2)}</span>
+                            ${statusBadge}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            withdrawalHistory.innerHTML = historyHTML;
+        }
+
+        function showNotification(message, type = 'info') {
+            const notificationsContainer = document.getElementById('notifications-container');
+            const notificationId = 'notification-' + Date.now();
+            
+            const notification = document.createElement('div');
+            notification.id = notificationId;
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            notificationsContainer.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.notification')) {
+                const notification = e.target.closest('.notification');
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.payment-method.withdrawal-method').forEach(method => {
+                method.addEventListener('click', function() {
+                    const radio = this.querySelector('input[type="radio"]');
+                    if (radio) {
+                        radio.checked = true;
+                        updateWithdrawalDetails();
+                    }
+                });
+            });
+            
+            const bankRadio = document.getElementById('withdrawal-bank');
+            if (bankRadio) {
+                bankRadio.checked = true;
+                setTimeout(updateWithdrawalDetails, 100);
+            }
+        });
+    </script>
+</body>
+</html>

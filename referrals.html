@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canada Coin - Referidos</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #1e40af;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+            --gold-color: #fbbf24;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .banking-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .banking-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            min-height: calc(100vh - 200px);
+            overflow: hidden;
+        }
+        
+        .banking-tab {
+            position: relative;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: #4b5563;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .banking-tab:hover {
+            color: var(--primary-color);
+            background: rgba(30, 64, 175, 0.05);
+        }
+        
+        .banking-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: linear-gradient(to bottom, rgba(30, 64, 175, 0.1), transparent);
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification-toast.show {
+            transform: translateX(0);
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 1rem;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #4b5563;
+            transition: background 0.3s ease;
+        }
+        
+        .dropdown-item:hover {
+            background: #f9fafb;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        
+        .referral-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        
+        .referral-item:hover {
+            background: #f8fafc;
+        }
+        
+        .qr-code {
+            width: 120px;
+            height: 120px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Notificaciones -->
+    <div id="notifications-container"></div>
+    
+    <!-- Header Superior -->
+    <header class="banking-header sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Primera fila: Logo y usuario -->
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-coins text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">Canada Coin</h1>
+                            <p class="text-xs text-gray-500">Banca Digital</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Perfil de usuario -->
+                    <div class="relative">
+                        <button id="user-profile-button" 
+                                class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition">
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div class="hidden md:block text-left">
+                                <p id="user-name" class="font-semibold text-gray-900">Usuario</p>
+                                <p class="text-xs text-gray-500">Ver perfil</p>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-500 text-sm"></i>
+                        </button>
+                        
+                        <!-- Dropdown usuario -->
+                        <div id="user-profile-dropdown" class="dropdown-menu">
+                            <div class="p-4 border-b border-gray-200">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p id="dropdown-user-name" class="font-bold text-gray-900">Usuario</p>
+                                        <p id="dropdown-user-email" class="text-sm text-gray-500">usuario@email.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="py-2">
+                                <a href="profile.html" class="dropdown-item">
+                                    <i class="fas fa-user text-gray-400 w-6"></i>
+                                    Mi Perfil
+                                </a>
+                                <a href="security.html" class="dropdown-item">
+                                    <i class="fas fa-shield-alt text-gray-400 w-6"></i>
+                                    Seguridad
+                                </a>
+                                <a href="settings.html" class="dropdown-item">
+                                    <i class="fas fa-cog text-gray-400 w-6"></i>
+                                    Configuración
+                                </a>
+                                <hr class="my-2">
+                                <a href="#" id="logout-button" class="dropdown-item text-red-600">
+                                    <i class="fas fa-sign-out-alt text-red-400 w-6"></i>
+                                    Cerrar Sesión
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Segunda fila: Navegación por pestañas -->
+            <div class="border-t border-gray-200">
+                <nav class="flex overflow-x-auto">
+                    <a href="index.html" class="banking-tab">
+                        <i class="fas fa-home mr-2"></i>Resumen
+                    </a>
+                    <a href="investments.html" class="banking-tab">
+                        <i class="fas fa-chart-line mr-2"></i>Inversiones
+                    </a>
+                    <a href="deposits.html" class="banking-tab">
+                        <i class="fas fa-arrow-up mr-2"></i>Depósitos
+                    </a>
+                    <a href="withdrawals.html" class="banking-tab">
+                        <i class="fas fa-arrow-down mr-2"></i>Retiros
+                    </a>
+                    <a href="transfers.html" class="banking-tab">
+                        <i class="fas fa-exchange-alt mr-2"></i>Transferencias
+                    </a>
+                    <a href="cards.html" class="banking-tab">
+                        <i class="fas fa-credit-card mr-2"></i>Tarjetas
+                    </a>
+                    <a href="referrals.html" class="banking-tab active">
+                        <i class="fas fa-users mr-2"></i>Referidos
+                    </a>
+                    <a href="support.html" class="banking-tab">
+                        <i class="fas fa-headset mr-2"></i>Soporte
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Contenido Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="banking-content">
+            <!-- Pestaña: Referidos -->
+            <div class="p-6">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Programa de Referidos</h2>
+                    <p class="text-gray-600">Invita amigos y gana bonificaciones</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2">
+                        <!-- Tarjeta de Referido -->
+                        <div class="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-8 text-white mb-6">
+                            <div class="flex justify-between items-start mb-8">
+                                <div>
+                                    <h3 class="text-2xl font-bold mb-2">Tu Código Único</h3>
+                                    <p class="text-purple-100">Comparte y gana $25 por cada amigo</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-purple-100">Bonos Ganados</p>
+                                    <p id="total-bonus" class="text-3xl font-bold">$0</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white/20 rounded-xl p-6 mb-6">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm text-purple-100 mb-2">Código de Referido</p>
+                                        <p id="referral-code" class="text-3xl font-bold font-mono">CARGANDO</p>
+                                    </div>
+                                    <button id="copy-referral-code" 
+                                            class="bg-white text-purple-600 font-bold px-6 py-3 rounded-lg hover:bg-gray-100">
+                                        <i class="fas fa-copy mr-2"></i>Copiar
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-4">
+                                <button id="share-whatsapp" class="flex-1 bg-white text-purple-600 font-bold py-3 rounded-lg hover:bg-gray-100">
+                                    <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                                </button>
+                                <button id="share-email" class="flex-1 bg-white text-purple-600 font-bold py-3 rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-envelope mr-2"></i>Email
+                                </button>
+                                <button id="share-general" class="flex-1 bg-white text-purple-600 font-bold py-3 rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-share-alt mr-2"></i>Compartir
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Enlace de Referido -->
+                        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Tu Enlace Personalizado</h3>
+                            <div class="flex">
+                                <input type="text" id="referral-link" 
+                                       class="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500"
+                                       readonly>
+                                <button id="copy-referral-link" 
+                                        class="bg-blue-600 text-white px-4 py-3 rounded-r-lg hover:bg-blue-700">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Comparte este enlace con tus amigos para que se registren</p>
+                        </div>
+                        
+                        <!-- Referidos Activos -->
+                        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                            <div class="p-6 border-b border-gray-200">
+                                <h3 class="text-lg font-bold text-gray-900">Tus Referidos</h3>
+                            </div>
+                            <div id="referrals-list" class="divide-y divide-gray-100">
+                                <div class="text-center py-12">
+                                    <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
+                                    <p class="text-gray-500 mb-4">Aún no tienes referidos</p>
+                                    <p class="text-sm text-gray-500">Comparte tu código para comenzar a ganar</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <!-- Estadísticas -->
+                        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-6">Estadísticas</h3>
+                            <div class="space-y-6">
+                                <div>
+                                    <p class="text-sm text-gray-600">Total Referidos</p>
+                                    <p id="total-referrals" class="text-3xl font-bold text-purple-600">0</p>
+                                </div>
+                                
+                                <div>
+                                    <p class="text-sm text-gray-600">Referidos Activos</p>
+                                    <p id="active-referrals" class="text-3xl font-bold text-green-600">0</p>
+                                </div>
+                                
+                                <div>
+                                    <p class="text-sm text-gray-600">Tasa de Conversión</p>
+                                    <p id="conversion-rate" class="text-3xl font-bold text-blue-600">0%</p>
+                                </div>
+                                
+                                <div>
+                                    <p class="text-sm text-gray-600">Próximo Bono</p>
+                                    <p id="next-bonus" class="text-xl font-bold text-yellow-600">$0</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Código de Referido Existente -->
+                        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">¿Tienes un código?</h3>
+                            <p class="text-sm text-gray-600 mb-4">Actívalo para recibir tu bono de bienvenida</p>
+                            <div class="flex">
+                                <input type="text" id="activate-referral-input" 
+                                       class="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Ingresa código">
+                                <button id="activate-referral-btn" 
+                                        class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-3 rounded-r-lg hover:opacity-90">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Código QR -->
+                        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Código QR</h3>
+                            <p class="text-sm text-gray-600 mb-4">Escanea para registrarte rápido</p>
+                            <div class="qr-code">
+                                <i class="fas fa-qrcode text-4xl text-gray-400"></i>
+                            </div>
+                            <button id="download-qr" class="w-full mt-4 text-center text-blue-600 font-medium hover:text-blue-800">
+                                <i class="fas fa-download mr-2"></i>Descargar QR
+                            </button>
+                        </div>
+                        
+                        <!-- Reglas del Programa -->
+                        <div class="bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl p-6 text-white">
+                            <h3 class="text-lg font-bold mb-4">¿Cómo funciona?</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li><i class="fas fa-check mr-2"></i>$25 por cada referido activo</li>
+                                <li><i class="fas fa-check mr-2"></i>Depósito mínimo $100</li>
+                                <li><i class="fas fa-check mr-2"></i>Bono acreditado en 24h</li>
+                                <li><i class="fas fa-check mr-2"></i>Sin límite de referidos</li>
+                                <li><i class="fas fa-check mr-2"></i>Pagos instantáneos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBI4O0d_Mec38FDiuhirujCnX99PFKiXW4",
+            authDomain: "projekt-pc.firebaseapp.com",
+            databaseURL: "https://projekt-pc-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "projekt-pc",
+            storageBucket: "projekt-pc.appspot.com",
+            messagingSenderId: "90098431634",
+            appId: "1:90098431634:web:7cb61800d03533c2a6984b",
+            measurementId: "G-59YH8W8W1L"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', initReferrals);
+        
+        function initReferrals() {
+            // Check authentication
+            auth.onAuthStateChanged(user => {
+                if (!user) {
+                    window.location.href = 'index.html';
+                } else {
+                    loadUserData(user.uid);
+                    setupEventListeners();
+                    loadReferralsList(user.uid);
+                }
+            });
+        }
+        
+        function loadUserData(userId) {
+            const userRef = db.ref('users/' + userId);
+            
+            userRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    updateUserInfo(data);
+                    updateReferralStats(data);
+                }
+            });
+        }
+        
+        function updateUserInfo(userData) {
+            document.getElementById('user-name').textContent = userData.name || 'Usuario';
+            document.getElementById('dropdown-user-name').textContent = userData.name || 'Usuario';
+            document.getElementById('dropdown-user-email').textContent = userData.email || 'usuario@email.com';
+            
+            // Update referral code
+            const referralCode = userData.referralCode || 'NOCODE';
+            document.getElementById('referral-code').textContent = referralCode;
+            
+            // Update referral link
+            const referralLink = `${window.location.origin}/index.html?ref=${referralCode}`;
+            document.getElementById('referral-link').value = referralLink;
+            
+            // Update total bonus
+            const totalBonus = userData.referralBonus || 0;
+            document.getElementById('total-bonus').textContent = `$${totalBonus.toFixed(2)}`;
+        }
+        
+        function updateReferralStats(userData) {
+            const totalReferrals = userData.totalReferrals || 0;
+            const referralBonus = userData.referralBonus || 0;
+            
+            document.getElementById('total-referrals').textContent = totalReferrals;
+            document.getElementById('active-referrals').textContent = totalReferrals; // Assuming all are active
+            
+            // Calculate conversion rate (simplified)
+            const conversionRate = totalReferrals > 0 ? '100%' : '0%';
+            document.getElementById('conversion-rate').textContent = conversionRate;
+            
+            // Calculate next bonus
+            const nextBonus = 25; // Fixed bonus per referral
+            document.getElementById('next-bonus').textContent = `$${nextBonus}`;
+        }
+        
+        function loadReferralsList(userId) {
+            const referralsRef = db.ref('referrals/' + userId);
+            
+            referralsRef.on('value', (snapshot) => {
+                const referrals = [];
+                snapshot.forEach((childSnapshot) => {
+                    referrals.push({ id: childSnapshot.key, ...childSnapshot.val() });
+                });
+                
+                updateReferralsList(referrals);
+            });
+        }
+        
+        function updateReferralsList(referrals) {
+            const container = document.getElementById('referrals-list');
+            
+            if (!referrals.length) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-users text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500 mb-4">Aún no tienes referidos</p>
+                        <p class="text-sm text-gray-500">Comparte tu código para comenzar a ganar</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            referrals.forEach(referral => {
+                const date = new Date(referral.createdAt);
+                const statusBadge = referral.bonusPaid ? 
+                    '<span class="badge badge-success">Bono Pagado</span>' : 
+                    '<span class="badge badge-warning">Pendiente</span>';
+                
+                html += `
+                    <div class="referral-item">
+                        <div class="flex items-center mr-4">
+                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-purple-600"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-medium">${referral.referredUserName || 'Usuario'}</p>
+                                    <p class="text-sm text-gray-500">${referral.referredUserEmail || 'correo@ejemplo.com'}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-green-600">+$25</p>
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">Registrado: ${date.toLocaleDateString('es-ES')}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function setupEventListeners() {
+            // User dropdown
+            const userProfileButton = document.getElementById('user-profile-button');
+            const userProfileDropdown = document.getElementById('user-profile-dropdown');
+            
+            userProfileButton.addEventListener('click', () => {
+                userProfileDropdown.classList.toggle('active');
+            });
+            
+            // Logout
+            document.getElementById('logout-button').addEventListener('click', handleLogout);
+            
+            // Copy referral code
+            const copyReferralCodeBtn = document.getElementById('copy-referral-code');
+            const copyReferralLinkBtn = document.getElementById('copy-referral-link');
+            const referralLinkInput = document.getElementById('referral-link');
+            
+            if (copyReferralCodeBtn) {
+                copyReferralCodeBtn.addEventListener('click', () => {
+                    const referralCode = document.getElementById('referral-code').textContent;
+                    copyToClipboard(referralCode, 'Código de referido copiado');
+                });
+            }
+            
+            if (copyReferralLinkBtn) {
+                copyReferralLinkBtn.addEventListener('click', () => {
+                    copyToClipboard(referralLinkInput.value, 'Enlace de referido copiado');
+                });
+            }
+            
+            // Share buttons
+            const shareWhatsappBtn = document.getElementById('share-whatsapp');
+            const shareEmailBtn = document.getElementById('share-email');
+            const shareGeneralBtn = document.getElementById('share-general');
+            const downloadQrBtn = document.getElementById('download-qr');
+            const activateReferralBtn = document.getElementById('activate-referral-btn');
+            
+            // WhatsApp share
+            if (shareWhatsappBtn) {
+                shareWhatsappBtn.addEventListener('click', () => {
+                    const message = `¡Únete a Canada Coin usando mi código de referido! ${referralLinkInput.value}`;
+                    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+                    window.open(whatsappUrl, '_blank');
+                });
+            }
+            
+            // Email share
+            if (shareEmailBtn) {
+                shareEmailBtn.addEventListener('click', () => {
+                    const subject = 'Únete a Canada Coin con mi código de referido';
+                    const body = `Hola,\n\nTe invito a unirte a Canada Coin, la plataforma de inversiones más avanzada.\n\nUsa mi código de referido: ${document.getElementById('referral-code').textContent}\n\nRegístrate aquí: ${referralLinkInput.value}\n\n¡Nos vemos dentro!`;
+                    const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    window.location.href = mailtoUrl;
+                });
+            }
+            
+            // General share
+            if (shareGeneralBtn) {
+                shareGeneralBtn.addEventListener('click', () => {
+                    if (navigator.share) {
+                        navigator.share({
+                            title: 'Canada Coin - Programa de Referidos',
+                            text: `Únete a Canada Coin usando mi código: ${document.getElementById('referral-code').textContent}`,
+                            url: referralLinkInput.value
+                        });
+                    } else {
+                        copyToClipboard(referralLinkInput.value, 'Enlace copiado para compartir');
+                    }
+                });
+            }
+            
+            // Download QR
+            if (downloadQrBtn) {
+                downloadQrBtn.addEventListener('click', () => {
+                    showNotification('Función de descarga QR próximamente', 'info');
+                });
+            }
+            
+            // Activate referral code
+            if (activateReferralBtn) {
+                activateReferralBtn.addEventListener('click', activateReferralCode);
+            }
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!userProfileButton.contains(e.target) && !userProfileDropdown.contains(e.target)) {
+                    userProfileDropdown.classList.remove('active');
+                }
+            });
+        }
+        
+        function copyToClipboard(text, successMessage) {
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    showNotification(successMessage, 'success');
+                })
+                .catch(err => {
+                    console.error('Error copying text: ', err);
+                    showNotification('Error al copiar', 'error');
+                });
+        }
+        
+        async function activateReferralCode() {
+            const input = document.getElementById('activate-referral-input');
+            const code = input?.value.trim().toUpperCase();
+            
+            if (!code) {
+                showNotification('Por favor ingresa un código de referido', 'error');
+                return;
+            }
+            
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            // Check if user already has a referral code activated
+            const userRef = db.ref('users/' + user.uid);
+            const snapshot = await userRef.once('value');
+            const userData = snapshot.val();
+            
+            if (userData.referredBy) {
+                showNotification('Ya has activado un código de referido anteriormente', 'warning');
+                return;
+            }
+            
+            // Look for the referrer by referral code
+            const usersRef = db.ref('users');
+            const referrerSnapshot = await usersRef.orderByChild('referralCode').equalTo(code).once('value');
+            
+            if (!referrerSnapshot.exists()) {
+                showNotification('Código de referido inválido', 'error');
+                return;
+            }
+            
+            let referrerId = null;
+            let referrerName = null;
+            
+            referrerSnapshot.forEach((childSnapshot) => {
+                referrerId = childSnapshot.key;
+                referrerName = childSnapshot.val().name;
+            });
+            
+            if (referrerId === user.uid) {
+                showNotification('No puedes usar tu propio código de referido', 'error');
+                return;
+            }
+            
+            showNotification('Activando código de referido...', 'info');
+            
+            try {
+                const now = Date.now();
+                const referralId = 'ref_' + now;
+                
+                // Update user with referrer info
+                await userRef.update({
+                    referredBy: code,
+                    updatedAt: now
+                });
+                
+                // Create referral record for the referrer
+                const referralData = {
+                    referredUserId: user.uid,
+                    referredUserName: userData.name,
+                    referredUserEmail: userData.email,
+                    referrerId: referrerId,
+                    referrerName: referrerName,
+                    referralCode: code,
+                    bonus: 25,
+                    activated: true,
+                    bonusPaid: false,
+                    createdAt: now
+                };
+                
+                await db.ref('referrals/' + referrerId + '/' + referralId).set(referralData);
+                
+                // Update referrer's stats
+                const referrerRef = db.ref('users/' + referrerId);
+                const referrerSnapshot = await referrerRef.once('value');
+                const referrerData = referrerSnapshot.val();
+                
+                const currentReferrals = referrerData.totalReferrals || 0;
+                await referrerRef.update({
+                    totalReferrals: currentReferrals + 1,
+                    updatedAt: now
+                });
+                
+                showNotification('¡Código de referido activado exitosamente!', 'success');
+                
+                // Clear input
+                if (input) input.value = '';
+                
+                // Refresh the page to show updated stats
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error activating referral code:', error);
+                showNotification('Error al activar el código de referido', 'error');
+            }
+        }
+        
+        function handleLogout(e) {
+            e.preventDefault();
+            
+            auth.signOut()
+                .then(() => {
+                    showNotification('Sesión cerrada correctamente', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    showNotification('Error al cerrar sesión', 'error');
+                });
+        }
+        
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notifications-container');
+            const notification = document.createElement('div');
+            notification.className = `notification-toast ${type}`;
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-yellow-500',
+                info: 'bg-blue-500'
+            };
+            
+            notification.innerHTML = `
+                <div class="notification-icon ${colors[type]} text-white rounded-lg">
+                    <i class="fas ${icons[type]}"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="font-medium">${message}</p>
+                </div>
+                <button class="ml-4 text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 10);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+            
+            notification.querySelector('button').addEventListener('click', () => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            });
+        }
+    </script>
+</body>
+</html>

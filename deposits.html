@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canada Coin - Depósitos</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #1e40af;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1f2937;
+            --light-color: #f9fafb;
+            --gold-color: #fbbf24;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .banking-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .banking-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            min-height: calc(100vh - 200px);
+            overflow: hidden;
+        }
+        
+        .banking-tab {
+            position: relative;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: #4b5563;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .banking-tab:hover {
+            color: var(--primary-color);
+            background: rgba(30, 64, 175, 0.05);
+        }
+        
+        .banking-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: linear-gradient(to bottom, rgba(30, 64, 175, 0.1), transparent);
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification-toast.show {
+            transform: translateX(0);
+        }
+        
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 1rem;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #4b5563;
+            transition: background 0.3s ease;
+        }
+        
+        .dropdown-item:hover {
+            background: #f9fafb;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        .modal-banking {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-banking.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content-banking {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .modal-banking.active .modal-content-banking {
+            transform: scale(1);
+        }
+        
+        .file-dropzone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-dropzone:hover {
+            border-color: var(--primary-color);
+            background: #f8fafc;
+        }
+        
+        .file-dropzone.dragover {
+            border-color: var(--primary-color);
+            background: #eff6ff;
+        }
+        
+        .deposit-item {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        
+        .deposit-item:hover {
+            background: #f8fafc;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Notificaciones -->
+    <div id="notifications-container"></div>
+    
+    <!-- Header Superior -->
+    <header class="banking-header sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Primera fila: Logo y usuario -->
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-coins text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">Canada Coin</h1>
+                            <p class="text-xs text-gray-500">Banca Digital</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Perfil de usuario -->
+                    <div class="relative">
+                        <button id="user-profile-button" 
+                                class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition">
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div class="hidden md:block text-left">
+                                <p id="user-name" class="font-semibold text-gray-900">Usuario</p>
+                                <p class="text-xs text-gray-500">Ver perfil</p>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-500 text-sm"></i>
+                        </button>
+                        
+                        <!-- Dropdown usuario -->
+                        <div id="user-profile-dropdown" class="dropdown-menu">
+                            <div class="p-4 border-b border-gray-200">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p id="dropdown-user-name" class="font-bold text-gray-900">Usuario</p>
+                                        <p id="dropdown-user-email" class="text-sm text-gray-500">usuario@email.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="py-2">
+                                <a href="index.html" class="dropdown-item">
+                                    <i class="fas fa-user text-gray-400 w-6"></i>
+                                    Mi Perfil
+                                </a>
+                                <a href="index.html?section=settings" class="dropdown-item">
+                                    <i class="fas fa-shield-alt text-gray-400 w-6"></i>
+                                    Seguridad
+                                </a>
+                                <a href="index.html?section=settings" class="dropdown-item">
+                                    <i class="fas fa-cog text-gray-400 w-6"></i>
+                                    Configuración
+                                </a>
+                                <hr class="my-2">
+                                <a href="#" id="logout-button" class="dropdown-item text-red-600">
+                                    <i class="fas fa-sign-out-alt text-red-400 w-6"></i>
+                                    Cerrar Sesión
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Segunda fila: Navegación por pestañas -->
+            <div class="border-t border-gray-200">
+                <nav class="flex overflow-x-auto">
+                    <a href="index.html" class="banking-tab">
+                        <i class="fas fa-home mr-2"></i>Resumen
+                    </a>
+                    <a href="index.html?section=performance" class="banking-tab">
+                        <i class="fas fa-chart-line mr-2"></i>Inversiones
+                    </a>
+                    <a href="deposits.html" class="banking-tab active">
+                        <i class="fas fa-arrow-up mr-2"></i>Depósitos
+                    </a>
+                    <a href="withdrawals.html?section=withdrawals.html" class="banking-tab">
+                        <i class="fas fa-arrow-down mr-2"></i>Retiros
+                    </a>
+                    <a href="index.html?section=referrals" class="banking-tab">
+                        <i class="fas fa-exchange-alt mr-2"></i>Referidos
+                    </a>
+                    <a href="index.html?section=referrals" class="banking-tab">
+                        <i class="fas fa-credit-card mr-2"></i>Tarjetas
+                    </a>
+                    <a href="index.html?section=referrals" class="banking-tab">
+                        <i class="fas fa-users mr-2"></i>Referidos
+                    </a>
+                    <a href="index.html?section=help" class="banking-tab">
+                        <i class="fas fa-headset mr-2"></i>Soporte
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Contenido Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="banking-content">
+            <!-- Pestaña: Depósitos -->
+            <div class="p-6">
+                <div class="mb-8">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">Depósitos</h2>
+                            <p class="text-gray-600">Administra tus ingresos de fondos</p>
+                        </div>
+                        <button id="new-deposit-btn" 
+                                class="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-6 py-3 rounded-lg hover:opacity-90 transition-all">
+                            <i class="fas fa-plus mr-2"></i>Nuevo Depósito
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2">
+                        <!-- Historial de Depósitos -->
+                        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                            <div class="p-6 border-b border-gray-200">
+                                <h3 class="text-lg font-bold text-gray-900">Historial</h3>
+                            </div>
+                            <div id="deposits-history" class="divide-y divide-gray-100">
+                                <div class="text-center py-12">
+                                    <i class="fas fa-history text-4xl text-gray-300 mb-4"></i>
+                                    <p class="text-gray-500">No hay depósitos registrados</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <!-- Métodos de Pago -->
+                        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-6">Métodos de Pago</h3>
+                            <div class="space-y-4">
+                                <div class="payment-method-banking flex items-center justify-between p-3 bg-blue-50 rounded-lg cursor-pointer" data-method="bank">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                            <i class="fas fa-university text-blue-600"></i>
+                                        </div>
+                                        <span class="font-medium">Transferencia</span>
+                                    </div>
+                                    <span class="badge badge-success">Activo</span>
+                                </div>
+                                
+                                <div class="payment-method-banking flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer" data-method="paypal">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                                            <i class="fab fa-paypal text-blue-400"></i>
+                                        </div>
+                                        <span class="font-medium">PayPal</span>
+                                    </div>
+                                    <span class="badge badge-warning">Pendiente</span>
+                                </div>
+                                
+                                <div class="payment-method-banking flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer" data-method="crypto">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
+                                            <i class="fas fa-coins text-yellow-600"></i>
+                                        </div>
+                                        <span class="font-medium">Cripto</span>
+                                    </div>
+                                    <button class="text-blue-600 text-sm">Agregar</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Estadísticas -->
+                        <div class="bg-white rounded-xl border border-gray-200 p-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-6">Estadísticas</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-sm text-gray-600">Total Depositado</p>
+                                    <p id="total-deposited" class="text-2xl font-bold text-green-600">$0.00</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Depósitos este mes</p>
+                                    <p id="monthly-deposits" class="text-2xl font-bold text-blue-600">0</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Promedio por depósito</p>
+                                    <p id="avg-deposit" class="text-2xl font-bold text-purple-600">$0.00</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Información Bancaria -->
+                        <div class="bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl p-6 text-white mt-6">
+                            <h3 class="text-lg font-bold mb-4">Información Bancaria</h3>
+                            <div class="space-y-2 text-sm">
+                                <p><strong>Banco:</strong> Banco Pichincha</p>
+                                <p><strong>Titular:</strong> Canada Coin Investments LLC</p>
+                                <p><strong>Cuenta:</strong> 1234567890</p>
+                                <p><strong>SWIFT/BIC:</strong> CCFIUS33</p>
+                                <p class="text-xs mt-4">*Incluye tu correo electrónico en la referencia</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Modal de Nuevo Depósito -->
+    <div id="deposit-modal" class="modal-banking">
+        <div class="modal-content-banking">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-900">Nuevo Depósito</h2>
+                    <button id="close-deposit-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <form id="deposit-form">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Monto (USD)</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500">$</span>
+                                </div>
+                                <input type="number" id="deposit-amount" 
+                                       class="pl-8 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                       placeholder="100.00" min="100" step="0.01" required>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Mínimo: $100 USD</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Método de Pago</label>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div class="payment-method-modal border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500" data-method="bank">
+                                    <input type="radio" id="method-bank" name="payment-method" value="bank" class="hidden" checked>
+                                    <label for="method-bank" class="cursor-pointer">
+                                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                            <i class="fas fa-university text-blue-600 text-xl"></i>
+                                        </div>
+                                        <p class="font-medium">Transferencia</p>
+                                    </label>
+                                </div>
+                                <div class="payment-method-modal border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500" data-method="paypal">
+                                    <input type="radio" id="method-paypal" name="payment-method" value="paypal" class="hidden">
+                                    <label for="method-paypal" class="cursor-pointer">
+                                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                            <i class="fab fa-paypal text-blue-600 text-xl"></i>
+                                        </div>
+                                        <p class="font-medium">PayPal</p>
+                                    </label>
+                                </div>
+                                <div class="payment-method-modal border border-gray-300 rounded-lg p-4 text-center cursor-pointer transition-all hover:border-blue-500" data-method="crypto">
+                                    <input type="radio" id="method-crypto" name="payment-method" value="crypto" class="hidden">
+                                    <label for="method-crypto" class="cursor-pointer">
+                                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                            <i class="fas fa-coins text-blue-600 text-xl"></i>
+                                        </div>
+                                        <p class="font-medium">Cripto</p>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="payment-details" class="p-4 bg-gray-50 rounded-lg mb-4">
+                            <h3 class="font-bold mb-2">Instrucciones para Transferencia Bancaria</h3>
+                            <p class="text-gray-600 mb-2">Realiza una transferencia a la siguiente cuenta:</p>
+                            <div class="bg-white p-4 rounded border border-gray-200">
+                                <p><strong>Banco:</strong> Banco Pichincha</p>
+                                <p><strong>Cuenta:</strong> 1234567890</p>
+                                <p><strong>SWIFT/BIC:</strong> CCFIUS33</p>
+                                <p><strong>Beneficiario:</strong> Canada Coin Investments LLC</p>
+                                <p><strong>Referencia:</strong> <span id="user-email-reference">cargando...</span></p>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Sube el comprobante después de realizar la transferencia.</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Comprobante de Pago</label>
+                            <div id="file-dropzone" class="file-dropzone">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                                <p class="font-medium text-gray-700">Arrastra y suelta tu comprobante aquí</p>
+                                <p class="text-sm text-gray-500 mt-2">o haz clic para seleccionar archivo</p>
+                                <p class="text-xs text-gray-400 mt-4">Formatos: JPG, PNG, PDF (Máx. 5MB)</p>
+                                <input type="file" id="deposit-file" class="hidden" accept=".jpg,.jpeg,.png,.pdf">
+                            </div>
+                            <div id="file-preview" class="mt-4 hidden">
+                                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-file-alt text-green-600 mr-3"></i>
+                                        <div>
+                                            <p id="file-name" class="font-medium"></p>
+                                            <p id="file-size" class="text-sm text-gray-500"></p>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="remove-file" class="text-red-600 hover:text-red-800 transition-colors">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nota (opcional)</label>
+                            <input type="text" id="deposit-note" 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Ej: Transferencia #12345">
+                        </div>
+                        
+                        <div class="flex justify-end space-x-4">
+                            <button type="button" id="cancel-deposit" 
+                                    class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                                Cancelar
+                            </button>
+                            <button type="submit" id="submit-deposit"
+                                    class="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-8 py-3 rounded-lg hover:opacity-90 transition-all">
+                                Enviar Depósito
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBI4O0d_Mec38FDiuhirujCnX99PFKiXW4",
+            authDomain: "projekt-pc.firebaseapp.com",
+            databaseURL: "https://projekt-pc-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "projekt-pc",
+            storageBucket: "projekt-pc.appspot.com",
+            messagingSenderId: "90098431634",
+            appId: "1:90098431634:web:7cb61800d03533c2a6984b",
+            measurementId: "G-59YH8W8W1L"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        const auth = firebase.auth();
+        const db = firebase.database();
+        const storage = firebase.storage();
+
+        // Estado de la aplicación
+        const appState = {
+            currentUser: null,
+            userData: null,
+            deposits: [],
+            selectedFile: null
+        };
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de depósitos cargada');
+            
+            // Configurar event listeners PRIMERO
+            setupEventListeners();
+            
+            // Verificar autenticación DESPUÉS
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    console.log('Usuario autenticado:', user.email);
+                    appState.currentUser = user;
+                    
+                    // Actualizar referencia de email en el modal
+                    const emailRef = document.getElementById('user-email-reference');
+                    if (emailRef) {
+                        emailRef.textContent = user.email || 'Tu correo electrónico';
+                    }
+                    
+                    loadUserData(user.uid);
+                    loadDepositsHistory(user.uid);
+                } else {
+                    console.log('Usuario no autenticado, redirigiendo...');
+                    showNotification('Debes iniciar sesión para acceder a esta página', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                }
+            });
+        });
+        
+        function loadUserData(userId) {
+            const userRef = db.ref('users/' + userId);
+            
+            userRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    appState.userData = data;
+                    updateUserInfo(data);
+                    // NO actualizamos las estadísticas aquí, las calcularemos de los depósitos reales
+                }
+            });
+        }
+        
+        function updateUserInfo(userData) {
+            document.getElementById('user-name').textContent = userData.name || 'Usuario';
+            document.getElementById('dropdown-user-name').textContent = userData.name || 'Usuario';
+            document.getElementById('dropdown-user-email').textContent = userData.email || 'usuario@email.com';
+        }
+        
+        // CORREGIDO: Calcular estadísticas SOLO basadas en depósitos reales aprobados
+        function updateDepositStats() {
+            // Calcular total de depósitos aprobados REALES
+            let totalApprovedDeposits = 0;
+            let monthlyTotal = 0;
+            let depositCount = 0;
+            
+            const now = new Date();
+            const oneMonthAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+            
+            appState.deposits.forEach(deposit => {
+                const depositDate = new Date(deposit.createdAt);
+                
+                // Solo sumar depósitos aprobados
+                if (deposit.status === 'approved') {
+                    totalApprovedDeposits += parseFloat(deposit.amount) || 0;
+                    
+                    // Calcular depósitos del mes
+                    if (depositDate >= oneMonthAgo) {
+                        monthlyTotal += parseFloat(deposit.amount) || 0;
+                        depositCount++;
+                    }
+                }
+            });
+            
+            // Actualizar la UI con los datos REALES
+            document.getElementById('total-deposited').textContent = `$${totalApprovedDeposits.toFixed(2)}`;
+            document.getElementById('monthly-deposits').textContent = depositCount;
+            
+            const avgDeposit = depositCount > 0 ? monthlyTotal / depositCount : 0;
+            document.getElementById('avg-deposit').textContent = `$${avgDeposit.toFixed(2)}`;
+            
+            console.log('Estadísticas actualizadas:', {
+                totalDeposits: totalApprovedDeposits,
+                depositCount: depositCount,
+                avgDeposit: avgDeposit
+            });
+        }
+        
+        function loadDepositsHistory(userId) {
+            const depositsRef = db.ref('deposits/' + userId);
+            
+            depositsRef.orderByChild('createdAt').on('value', (snapshot) => {
+                appState.deposits = [];
+                snapshot.forEach((childSnapshot) => {
+                    const deposit = childSnapshot.val();
+                    appState.deposits.unshift({ 
+                        id: childSnapshot.key, 
+                        ...deposit,
+                        amount: parseFloat(deposit.amount) || 0
+                    });
+                });
+                
+                updateDepositsHistory();
+                updateDepositStats(); // Usar datos REALES, no los de userData
+            });
+        }
+        
+        function updateDepositsHistory() {
+            const container = document.getElementById('deposits-history');
+            
+            if (!appState.deposits.length) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <i class="fas fa-history text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">No hay depósitos registrados</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            appState.deposits.forEach(deposit => {
+                const date = new Date(deposit.createdAt);
+                let statusBadge = '';
+                
+                switch(deposit.status) {
+                    case 'approved':
+                        statusBadge = '<span class="badge badge-success">Aprobado</span>';
+                        break;
+                    case 'pending':
+                        statusBadge = '<span class="badge badge-warning">Pendiente</span>';
+                        break;
+                    case 'rejected':
+                        statusBadge = '<span class="badge badge-danger">Rechazado</span>';
+                        break;
+                }
+                
+                let methodIcon = 'fa-university';
+                if (deposit.method === 'paypal') methodIcon = 'fab fa-paypal';
+                else if (deposit.method === 'crypto') methodIcon = 'fas fa-coins';
+                
+                html += `
+                    <div class="deposit-item">
+                        <div class="flex items-center mr-4">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="${methodIcon} text-blue-600"></i>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-medium">Depósito ${getMethodName(deposit.method)}</p>
+                                    <p class="text-sm text-gray-500">${date.toLocaleDateString('es-ES', { 
+                                        day: '2-digit', 
+                                        month: 'short', 
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}</p>
+                                    ${deposit.note ? `<p class="text-xs text-gray-400 mt-1">${deposit.note}</p>` : ''}
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-green-600">+$${(deposit.amount || 0).toFixed(2)}</p>
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function getMethodName(method) {
+            switch(method) {
+                case 'bank': return 'por Transferencia';
+                case 'paypal': return 'vía PayPal';
+                case 'crypto': return 'en Cripto';
+                default: return '';
+            }
+        }
+        
+        function setupEventListeners() {
+            console.log('Configurando event listeners...');
+            
+            // User dropdown
+            const userProfileButton = document.getElementById('user-profile-button');
+            const userProfileDropdown = document.getElementById('user-profile-dropdown');
+            
+            if (userProfileButton) {
+                userProfileButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    userProfileDropdown.classList.toggle('active');
+                });
+            }
+            
+            // Logout
+            const logoutButton = document.getElementById('logout-button');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', handleLogout);
+            }
+            
+            // Deposit modal - BOTÓN PRINCIPAL "NUEVO DEPÓSITO"
+            const newDepositBtn = document.getElementById('new-deposit-btn');
+            const closeDepositModal = document.getElementById('close-deposit-modal');
+            const cancelDeposit = document.getElementById('cancel-deposit');
+            const depositModal = document.getElementById('deposit-modal');
+            const depositForm = document.getElementById('deposit-form');
+            
+            console.log('Elementos del modal:', {
+                newDepositBtn: !!newDepositBtn,
+                depositModal: !!depositModal,
+                depositForm: !!depositForm
+            });
+            
+            // 1. BOTÓN PRINCIPAL - NUEVO DEPÓSITO
+            if (newDepositBtn && depositModal) {
+                newDepositBtn.addEventListener('click', (e) => {
+                    console.log('BOTÓN NUEVO DEPÓSITO CLICADO');
+                    e.preventDefault();
+                    
+                    // Verificar autenticación
+                    if (!appState.currentUser) {
+                        showNotification('Debes iniciar sesión para realizar un depósito', 'error');
+                        return;
+                    }
+                    
+                    // Abrir modal
+                    depositModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    
+                    // Actualizar email de referencia
+                    const emailRef = document.getElementById('user-email-reference');
+                    if (emailRef && appState.currentUser) {
+                        emailRef.textContent = appState.currentUser.email;
+                    }
+                });
+            }
+            
+            // 2. BOTÓN CERRAR MODAL
+            if (closeDepositModal) {
+                closeDepositModal.addEventListener('click', () => {
+                    closeModal(depositModal);
+                });
+            }
+            
+            // 3. BOTÓN CANCELAR
+            if (cancelDeposit) {
+                cancelDeposit.addEventListener('click', () => {
+                    closeModal(depositModal);
+                });
+            }
+            
+            // 4. MÉTODOS DE PAGO EN EL MODAL
+            document.querySelectorAll('.payment-method-modal').forEach(method => {
+                method.addEventListener('click', function() {
+                    const methodType = this.getAttribute('data-method');
+                    const radio = this.querySelector('input[type="radio"]');
+                    if (radio) {
+                        radio.checked = true;
+                        updatePaymentDetails();
+                    }
+                });
+            });
+            
+            // 5. MÉTODOS DE PAGO EN EL PANEL LATERAL
+            document.querySelectorAll('.payment-method-banking').forEach(method => {
+                method.addEventListener('click', function() {
+                    const methodType = this.getAttribute('data-method');
+                    
+                    // Verificar autenticación
+                    if (!appState.currentUser) {
+                        showNotification('Debes iniciar sesión para realizar un depósito', 'error');
+                        return;
+                    }
+                    
+                    // Abrir modal
+                    depositModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    
+                    // Seleccionar método en el modal
+                    const radio = document.querySelector(`input[name="payment-method"][value="${methodType}"]`);
+                    if (radio) {
+                        radio.checked = true;
+                        updatePaymentDetails();
+                    }
+                });
+            });
+            
+            // 6. CAMBIO DE MÉTODO DE PAGO (RADIO BUTTONS)
+            const depositMethodRadios = document.querySelectorAll('input[name="payment-method"]');
+            depositMethodRadios.forEach(radio => {
+                radio.addEventListener('change', updatePaymentDetails);
+            });
+            
+            // 7. MANEJO DE ARCHIVOS
+            const fileDropzone = document.getElementById('file-dropzone');
+            const fileInput = document.getElementById('deposit-file');
+            const filePreview = document.getElementById('file-preview');
+            const removeFile = document.getElementById('remove-file');
+            
+            if (fileDropzone) {
+                fileDropzone.addEventListener('click', () => {
+                    console.log('Dropzone clickeada');
+                    fileInput.click();
+                });
+                
+                fileDropzone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    fileDropzone.classList.add('dragover');
+                });
+                
+                fileDropzone.addEventListener('dragleave', () => {
+                    fileDropzone.classList.remove('dragover');
+                });
+                
+                fileDropzone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    fileDropzone.classList.remove('dragover');
+                    
+                    if (e.dataTransfer.files.length) {
+                        handleFileSelect(e.dataTransfer.files[0]);
+                    }
+                });
+            }
+            
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length) {
+                        handleFileSelect(e.target.files[0]);
+                    }
+                });
+            }
+            
+            if (removeFile) {
+                removeFile.addEventListener('click', () => {
+                    filePreview.classList.add('hidden');
+                    fileInput.value = '';
+                    appState.selectedFile = null;
+                    showNotification('Archivo eliminado', 'info');
+                });
+            }
+            
+            // 8. ENVÍO DEL FORMULARIO
+            if (depositForm) {
+                depositForm.addEventListener('submit', handleDepositSubmit);
+            }
+            
+            // 9. CERRAR DROPDOWN AL HACER CLIC FUERA
+            document.addEventListener('click', (e) => {
+                if (userProfileButton && !userProfileButton.contains(e.target) && 
+                    userProfileDropdown && !userProfileDropdown.contains(e.target)) {
+                    userProfileDropdown.classList.remove('active');
+                }
+                
+                // Cerrar modal al hacer clic fuera
+                if (depositModal && depositModal.classList.contains('active') && 
+                    !e.target.closest('.modal-content-banking') && 
+                    !e.target.closest('#new-deposit-btn')) {
+                    closeModal(depositModal);
+                }
+            });
+            
+            console.log('Event listeners configurados correctamente');
+        }
+        
+        function updatePaymentDetails() {
+            const selectedMethod = document.querySelector('input[name="payment-method"]:checked');
+            
+            if (!selectedMethod) return;
+            
+            let detailsHTML = '';
+            
+            switch (selectedMethod.value) {
+                case 'bank':
+                    detailsHTML = `
+                        <h3 class="font-bold mb-2">Instrucciones para Transferencia Bancaria</h3>
+                        <p class="text-gray-600 mb-2">Realiza una transferencia a la siguiente cuenta:</p>
+                        <div class="bg-white p-4 rounded border border-gray-200">
+                            <p><strong>Banco:</strong> Banco Pichincha</p>
+                            <p><strong>Cuenta:</strong> 1234567890</p>
+                            <p><strong>SWIFT/BIC:</strong> CCFIUS33</p>
+                            <p><strong>Beneficiario:</strong> Canada Coin Investments LLC</p>
+                            <p><strong>Referencia:</strong> ${appState.currentUser?.email || 'Tu correo electrónico'}</p>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">Sube el comprobante después de realizar la transferencia.</p>
+                    `;
+                    break;
+                case 'paypal':
+                    detailsHTML = `
+                        <h3 class="font-bold mb-2">Instrucciones para PayPal</h3>
+                        <p class="text-gray-600 mb-2">Realiza el pago a la siguiente dirección de PayPal:</p>
+                        <div class="bg-white p-4 rounded border border-gray-200">
+                            <p><strong>Email de PayPal:</strong> payments@canadacoin.com</p>
+                            <p><strong>Referencia:</strong> ${appState.currentUser?.email || 'Tu correo electrónico'}</p>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">Sube el comprobante después de realizar el pago.</p>
+                    `;
+                    break;
+                case 'crypto':
+                    detailsHTML = `
+                        <h3 class="font-bold mb-2">Instrucciones para Criptomonedas</h3>
+                        <p class="text-gray-600 mb-2">Envía la criptomoneda a la siguiente dirección:</p>
+                        <div class="bg-white p-4 rounded border border-gray-200">
+                            <p><strong>Bitcoin (BTC):</strong> 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa</p>
+                            <p><strong>Ethereum (ETH):</strong> 0x742d35Cc6634C0532925a3b8D4C9db7c1b7c8e8e</p>
+                            <p><strong>USDT (ERC-20):</strong> 0x742d35Cc6634C0532925a3b8D4C9db7c1b7c8e8e</p>
+                            <p><strong>Referencia:</strong> ${appState.currentUser?.email || 'Tu correo electrónico'}</p>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">Sube el comprobante de la transacción.</p>
+                    `;
+                    break;
+            }
+            
+            const paymentDetails = document.getElementById('payment-details');
+            if (paymentDetails) {
+                paymentDetails.innerHTML = detailsHTML;
+            }
+        }
+        
+        function handleFileSelect(file) {
+            // Validar tamaño (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showNotification('El archivo es demasiado grande (máximo 5MB)', 'error');
+                return;
+            }
+            
+            // Validar tipo de archivo
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+            if (!validTypes.includes(file.type)) {
+                showNotification('Formato de archivo no válido. Use JPG, PNG o PDF', 'error');
+                return;
+            }
+            
+            appState.selectedFile = file;
+            
+            // Mostrar vista previa
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-size').textContent = formatFileSize(file.size);
+            document.getElementById('file-preview').classList.remove('hidden');
+            
+            showNotification('Archivo seleccionado correctamente', 'success');
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' bytes';
+            else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            else return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+        
+        async function handleDepositSubmit(e) {
+            e.preventDefault();
+            console.log('Enviando formulario de depósito...');
+            
+            if (!appState.currentUser) {
+                showNotification('Debes iniciar sesión para realizar un depósito', 'error');
+                return;
+            }
+            
+            const amountInput = document.getElementById('deposit-amount');
+            const amount = parseFloat(amountInput.value);
+            const methodElement = document.querySelector('input[name="payment-method"]:checked');
+            
+            if (!methodElement) {
+                showNotification('Por favor selecciona un método de pago', 'error');
+                return;
+            }
+            
+            const method = methodElement.value;
+            
+            if (!amount || isNaN(amount) || amount < 100) {
+                showNotification('El monto mínimo de depósito es $100 USD', 'error');
+                amountInput.focus();
+                return;
+            }
+            
+            if (!appState.selectedFile) {
+                showNotification('Debes subir un comprobante de pago', 'error');
+                return;
+            }
+            
+            showNotification('Procesando depósito...', 'warning');
+            
+            const submitButton = document.getElementById('submit-deposit');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<span>Procesando...</span><i class="fas fa-spinner fa-spin ml-2"></i>';
+            }
+            
+            try {
+                // Subir archivo a Firebase Storage
+                const fileExtension = appState.selectedFile.name.split('.').pop();
+                const fileName = `deposit_${Date.now()}.${fileExtension}`;
+                const fileRef = storage.ref().child(`deposits/${appState.currentUser.uid}/${fileName}`);
+                const uploadTask = await fileRef.put(appState.selectedFile);
+                const fileUrl = await uploadTask.ref.getDownloadURL();
+                
+                // Crear ID único para el depósito
+                const depositId = 'dep_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                
+                // Datos del depósito
+                const depositData = {
+                    amount: amount,
+                    method: method,
+                    status: 'pending',
+                    userId: appState.currentUser.uid,
+                    userEmail: appState.currentUser.email,
+                    fileUrl: fileUrl,
+                    fileName: appState.selectedFile.name,
+                    note: document.getElementById('deposit-note').value || '',
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                };
+                
+                // Guardar en Firebase - NO ACTUALIZAR EL BALANCE AQUÍ
+                await db.ref('deposits/' + appState.currentUser.uid + '/' + depositId).set(depositData);
+                
+                // Crear registro de transacción (solo registro, no afecta balance)
+                const transactionId = 'tx_' + Date.now();
+                const transactionData = {
+                    type: 'deposit',
+                    amount: amount,
+                    method: method,
+                    description: `Depósito #${depositId.substring(0, 8)}`,
+                    status: 'pending',
+                    createdAt: Date.now()
+                };
+                
+                await db.ref('transactions/' + appState.currentUser.uid + '/' + transactionId).set(transactionData);
+                
+                showNotification('¡Depósito enviado correctamente! Será revisado por nuestro equipo.', 'success');
+                
+                // Cerrar modal y limpiar formulario
+                const depositModal = document.getElementById('deposit-modal');
+                if (depositModal) {
+                    closeModal(depositModal);
+                }
+                
+                // Resetear formulario
+                document.getElementById('deposit-form').reset();
+                document.getElementById('file-preview').classList.add('hidden');
+                const depositFileInput = document.getElementById('deposit-file');
+                if (depositFileInput) {
+                    depositFileInput.value = '';
+                }
+                appState.selectedFile = null;
+                
+                // Recargar datos
+                loadDepositsHistory(appState.currentUser.uid);
+                
+            } catch (error) {
+                console.error('Error al procesar el depósito:', error);
+                showNotification('Error al guardar el depósito: ' + error.message, 'error');
+            } finally {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = 'Enviar Depósito';
+                }
+            }
+        }
+        
+        function closeModal(modal) {
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                
+                // Resetear formulario si es el modal de depósito
+                if (modal.id === 'deposit-modal') {
+                    const depositForm = document.getElementById('deposit-form');
+                    if (depositForm) {
+                        depositForm.reset();
+                    }
+                    
+                    const filePreview = document.getElementById('file-preview');
+                    if (filePreview) {
+                        filePreview.classList.add('hidden');
+                    }
+                    
+                    const depositFileInput = document.getElementById('deposit-file');
+                    if (depositFileInput) {
+                        depositFileInput.value = '';
+                    }
+                    
+                    appState.selectedFile = null;
+                    
+                    // Restaurar método de pago por defecto
+                    const defaultMethod = document.getElementById('method-bank');
+                    if (defaultMethod) {
+                        defaultMethod.checked = true;
+                        updatePaymentDetails();
+                    }
+                }
+            }
+        }
+        
+        function handleLogout(e) {
+            e.preventDefault();
+            
+            auth.signOut()
+                .then(() => {
+                    showNotification('Sesión cerrada correctamente', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    showNotification('Error al cerrar sesión', 'error');
+                });
+        }
+        
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notifications-container');
+            const notification = document.createElement('div');
+            notification.className = `notification-toast`;
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-yellow-500',
+                info: 'bg-blue-500'
+            };
+            
+            notification.innerHTML = `
+                <div class="notification-icon ${colors[type]} text-white rounded-lg">
+                    <i class="fas ${icons[type]}"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="font-medium">${message}</p>
+                </div>
+                <button class="ml-4 text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 10);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

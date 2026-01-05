@@ -20,6 +20,7 @@
             --warning-orange: #f59e0b;
             --danger-red: #ef4444;
             --profit-gold: #fbbf24;
+            --admin-purple: #8b5cf6;
             --dark-bg: #0f172a;
             --card-bg: #1e293b;
             --light-blue: #dbeafe;
@@ -245,9 +246,13 @@
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
         
-        /* Chat Modal Styles */
+        /* Chat Modal Styles - Actualizado */
         .chat-modal {
             max-width: 500px;
+            width: 95%;
+            background: var(--card-bg);
+            border-radius: 20px;
+            animation: modalSlideIn 0.3s ease;
         }
         
         .chat-container {
@@ -275,18 +280,33 @@
             padding: 0.75rem 1rem;
             border-radius: 1rem;
             word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
         }
         
-        .agent-message {
-            background: rgba(59, 130, 246, 0.2);
-            align-self: flex-start;
-            border-bottom-left-radius: 0.25rem;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .user-message {
             background: rgba(16, 185, 129, 0.2);
             align-self: flex-end;
             border-bottom-right-radius: 0.25rem;
+            border-right: 3px solid var(--success-green);
+        }
+        
+        .bot-message {
+            background: rgba(245, 158, 11, 0.2);
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+            border-left: 3px solid var(--warning-orange);
+        }
+        
+        .admin-message {
+            background: rgba(139, 92, 246, 0.2);
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+            border-left: 3px solid var(--admin-purple);
         }
         
         .chat-input-container {
@@ -350,6 +370,18 @@
             animation: pulse 1.5s infinite;
         }
         
+        .status-indicator.waiting {
+            background: #f59e0b;
+        }
+        
+        .status-indicator.connected {
+            background: #10b981;
+        }
+        
+        .status-indicator.admin {
+            background: var(--admin-purple);
+        }
+        
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
@@ -376,6 +408,60 @@
         .quick-action-btn:hover {
             background: rgba(59, 130, 246, 0.2);
             border-color: var(--secondary-blue);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-5px);
+                opacity: 1;
+            }
+        }
+        
+        .message-sender {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-align: right;
+            margin-top: 0.25rem;
         }
         
         .faq-modal-content {
@@ -476,16 +562,16 @@
         </div>
     </div>
     
-    <!-- Modal para Chat en Vivo -->
+    <!-- Modal para Chat en Vivo (ACTUALIZADO) -->
     <div id="chatModal" class="modal-overlay">
-        <div class="modal-content p-0 chat-modal">
+        <div class="chat-modal">
             <div class="chat-header">
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-xl font-bold text-white">Chat en Vivo</h2>
                         <div class="agent-status">
-                            <div id="agentStatusIndicator" class="status-indicator"></div>
-                            <span id="agentStatusText" class="text-sm text-gray-300">Conectando con agente...</span>
+                            <div id="agentStatusIndicator" class="status-indicator connecting"></div>
+                            <span id="agentStatusText" class="text-sm text-gray-300">Conectando...</span>
                         </div>
                     </div>
                     <button id="closeChatModal" class="text-gray-400 hover:text-white text-xl">
@@ -496,10 +582,7 @@
             
             <div class="chat-container">
                 <div class="chat-messages" id="chatMessages">
-                    <div class="message agent-message">
-                        <p class="font-medium text-blue-300">Agente Carlos</p>
-                        <p class="text-white">¡Hola! Soy Carlos, agente de soporte de Canada Coin. ¿En qué puedo ayudarte hoy?</p>
-                    </div>
+                    <!-- Mensajes se cargarán dinámicamente -->
                 </div>
                 
                 <div class="chat-input-container">
@@ -518,6 +601,14 @@
                         <button id="sendMessage" class="send-button">
                             <i class="fas fa-paper-plane"></i>
                         </button>
+                    </div>
+                    <div id="typingIndicator" class="typing-indicator hidden">
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                        <span id="typingText">El asistente virtual está escribiendo...</span>
                     </div>
                 </div>
             </div>
@@ -753,6 +844,7 @@
                         <div class="glass-card p-6 mb-6">
                             <h3 class="text-lg font-bold text-white mb-6">Contacto Directo</h3>
                             <div class="space-y-4">
+                                <!-- Botón de Chat en Vivo -->
                                 <div class="contact-item p-4 rounded-lg cursor-pointer" id="live-chat-btn">
                                     <div class="flex items-center">
                                         <div class="w-12 h-12 bg-blue-900/30 rounded-lg flex items-center justify-center mr-4">
@@ -938,8 +1030,12 @@
 
         let currentUser = null;
         let appInitialized = false;
-        let chatConnection = null;
-        let agentAvailable = false;
+        let currentChatRoom = null;
+        let messagesRef = null;
+        let chatRoomRef = null;
+        const MAX_BOT_RESPONSES = 3;
+        const ADMIN_EMAIL = 'vinicio@geomira.se';
+        let botResponseDisabled = false;
 
         document.addEventListener('DOMContentLoaded', initSupport);
 
@@ -959,6 +1055,9 @@
                     await loadUserData();
                     setupEventListeners();
                     loadFAQ();
+                    
+                    // NOTA: He quitado la redirección automática a admin.html
+                    // Los administradores ahora pueden usar la página de soporte normalmente
                 });
             } catch (error) {
                 console.error('Error en initSupport:', error);
@@ -1007,7 +1106,7 @@
                 },
                 {
                     question: "¿Qué hacer si olvidé mi contraseña?",
-                    answer: "Sigue estos pasos:<br><br>1. En la página de login, haz clic en '¿Olvidaste tu contraseña?'<br>2. Ingresa el correo electrónico asociado a tu cuenta<br>3. Revisa tu bandeja de entrada (y spam)<br>4. Haz clic en el enlace del correo<br>5. Crea una nueva contraseña segura<br><br><strong>Recomendaciones:</strong><br>• Usa al menos 8 caracteres<br>• Combina mayúsculas, minúsculas, números y símbolos<br>• No uses contraseñas anteriores<br><br>Si no recibes el correo, contacta a soporte.",
+                    answer: "Sigue estos pasos:<br><br>1. En la página de login, haz clic en '¿Olvidaste tu contraseña?'<br>2. Ingresa el correo electrónico asociado a tu cuenta<br>3. Revisa tu bandeja de entrada (y spam)<br>4. Haz clic en el enlace del correo<br>5. Crea una nueva contraseña segura<br><br><strong>Recomendaciones:</strong><br>• Usa al menos 8 caracteres<br>• Combina mayúsculas, minúsculas, números y símbolos<br>• No usa contraseñas anteriores<br><br>Si no recibes el correo, contacta a soporte.",
                     category: "security"
                 },
                 {
@@ -1265,9 +1364,8 @@
                 });
             }
             
-            // Modal de chat
+            // Modal de chat (ACTUALIZADO)
             const closeChatModal = document.getElementById('closeChatModal');
-            const chatModal = document.getElementById('chatModal');
             const sendMessageBtn = document.getElementById('sendMessage');
             const chatInput = document.getElementById('chatInput');
             
@@ -1303,6 +1401,437 @@
                     sendChatMessage();
                 });
             });
+        }
+
+        function openChatModal() {
+            const modal = document.getElementById('chatModal');
+            if (!modal) return;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Inicializar el chat para el usuario actual
+            initUserChat();
+            
+            // Enfocar en el input del chat
+            setTimeout(() => {
+                document.getElementById('chatInput').focus();
+            }, 300);
+        }
+
+        function initUserChat() {
+            if (!currentUser) {
+                showNotification('Debes iniciar sesión para usar el chat', 'error');
+                return;
+            }
+            
+            const chatRoomId = `chat_${currentUser.uid}`;
+            chatRoomRef = db.ref(`chatRooms/${chatRoomId}`);
+            
+            updateChatStatus('connecting', 'Conectando...');
+            
+            // Verificar si existe el chat o crear uno nuevo
+            chatRoomRef.once('value').then((snapshot) => {
+                if (!snapshot.exists()) {
+                    // Crear nueva sala de chat
+                    const chatData = {
+                        userId: currentUser.uid,
+                        userEmail: currentUser.email,
+                        userName: currentUser.displayName || currentUser.email.split('@')[0],
+                        createdAt: Date.now(),
+                        status: 'waiting',
+                        assignedTo: 'bot',
+                        lastMessage: null,
+                        lastMessageTime: Date.now(),
+                        unreadCount: 0,
+                        botResponseCount: 0,
+                        needsHuman: false
+                    };
+                    
+                    chatRoomRef.set(chatData).then(() => {
+                        updateChatStatus('connected', 'Conectado con asistente virtual');
+                        
+                        // Enviar mensaje de bienvenida del bot después de 1 segundo
+                        setTimeout(() => {
+                            sendBotMessage(chatRoomId, "¡Hola! Soy el asistente virtual de Canada Coin. ¿En qué puedo ayudarte hoy?");
+                        }, 1000);
+                    });
+                } else {
+                    const chatData = snapshot.val();
+                    
+                    // Verificar si el chat ya necesita humano
+                    if (chatData.needsHuman || chatData.status === 'needs_human' || chatData.assignedTo === 'admin') {
+                        botResponseDisabled = true;
+                        if (chatData.assignedTo === 'admin') {
+                            updateChatStatus('connected', 'Conectado con especialista');
+                            document.getElementById('agentStatusIndicator').classList.add('admin');
+                        } else {
+                            updateChatStatus('waiting', 'Esperando especialista...');
+                        }
+                    } else {
+                        updateChatStatus('connected', 'Conectado con asistente virtual');
+                    }
+                    
+                    // Actualizar estado
+                    chatRoomRef.update({
+                        status: 'active',
+                        lastActivity: Date.now()
+                    });
+                    
+                    // Cargar mensajes existentes
+                    loadChatMessages(chatRoomId);
+                }
+                
+                // Escuchar cambios en el estado del chat
+                chatRoomRef.on('value', (snapshot) => {
+                    const chatData = snapshot.val();
+                    if (!chatData) return;
+                    
+                    // Actualizar estado del chat en tiempo real
+                    if (chatData.assignedTo === 'admin') {
+                        botResponseDisabled = true;
+                        updateChatStatus('connected', 'Conectado con especialista');
+                        document.getElementById('agentStatusIndicator').classList.add('admin');
+                    } else if (chatData.status === 'needs_human' || chatData.needsHuman) {
+                        botResponseDisabled = true;
+                        updateChatStatus('waiting', 'Esperando especialista...');
+                    }
+                });
+                
+                // Escuchar nuevos mensajes
+                messagesRef = db.ref(`chatRooms/${chatRoomId}/messages`);
+                messagesRef.on('child_added', (snapshot) => {
+                    const message = snapshot.val();
+                    addMessageToChat(message);
+                });
+                
+                currentChatRoom = chatRoomId;
+                
+            }).catch(error => {
+                console.error('Error al inicializar chat:', error);
+                updateChatStatus('error', 'Error de conexión');
+                showNotification('Error al conectar con el chat', 'error');
+            });
+        }
+
+        function updateChatStatus(status, text) {
+            const indicator = document.getElementById('agentStatusIndicator');
+            const statusText = document.getElementById('agentStatusText');
+            
+            indicator.className = 'status-indicator';
+            
+            if (status === 'connecting') {
+                indicator.classList.add('connecting');
+                statusText.textContent = text || 'Conectando...';
+            } else if (status === 'connected') {
+                indicator.classList.add('connected');
+                statusText.textContent = text || 'Conectado con asistente virtual';
+            } else if (status === 'waiting') {
+                indicator.classList.add('waiting');
+                statusText.textContent = text || 'Esperando asistente humano...';
+            } else if (status === 'admin') {
+                indicator.classList.add('admin');
+                statusText.textContent = text || 'Conectado con especialista';
+            } else {
+                indicator.style.background = '#ef4444';
+                statusText.textContent = text || 'Error de conexión';
+            }
+        }
+
+        function addMessageToChat(message) {
+            const chatMessages = document.getElementById('chatMessages');
+            
+            // Si no hay mensajes, mostrar placeholder
+            if (chatMessages.children.length === 0) {
+                chatMessages.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-comments text-4xl text-gray-600 mb-4"></i>
+                        <p class="text-gray-400">Inicia una conversación con nuestro equipo de soporte</p>
+                    </div>
+                `;
+            }
+            
+            // Si todavía hay placeholder, limpiarlo
+            if (chatMessages.children.length === 1 && 
+                chatMessages.children[0].classList.contains('text-center')) {
+                chatMessages.innerHTML = '';
+            }
+            
+            const messageElement = createChatMessageElement(message);
+            chatMessages.appendChild(messageElement);
+            
+            // Scroll al final
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function createChatMessageElement(message) {
+            const div = document.createElement('div');
+            div.className = 'message';
+            
+            const isUserMessage = message.senderId === currentUser.uid && message.senderRole !== 'admin';
+            const isBotMessage = message.senderRole === 'bot';
+            const isAdminMessage = message.senderRole === 'admin';
+            
+            let messageClass = 'user-message';
+            let senderName = 'Tú';
+            let senderInfo = '';
+            
+            if (isBotMessage) {
+                messageClass = 'bot-message';
+                senderName = 'Asistente Virtual';
+                senderInfo = '<div class="message-sender text-orange-300">' + senderName + '</div>';
+            } else if (isAdminMessage) {
+                messageClass = 'admin-message';
+                senderName = 'Soporte';
+                senderInfo = '<div class="message-sender text-purple-300">' + senderName + '</div>';
+            } else if (isUserMessage) {
+                senderInfo = '<div class="message-sender text-green-300">' + senderName + '</div>';
+            }
+            
+            const time = new Date(message.timestamp).toLocaleTimeString([], { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            div.innerHTML = `
+                ${senderInfo}
+                <p class="text-white">${message.text}</p>
+                <div class="message-time">${time}</div>
+            `;
+            div.className += ' ' + messageClass;
+            
+            return div;
+        }
+
+        function loadChatMessages(chatRoomId) {
+            const messagesRef = db.ref(`chatRooms/${chatRoomId}/messages`);
+            const chatMessages = document.getElementById('chatMessages');
+            
+            messagesRef.once('value').then((snapshot) => {
+                const messages = snapshot.val();
+                
+                if (!messages) {
+                    chatMessages.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-comments text-4xl text-gray-600 mb-4"></i>
+                            <p class="text-gray-400">Inicia una conversación con nuestro equipo de soporte</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Ordenar mensajes por timestamp
+                const sortedMessages = Object.values(messages)
+                    .sort((a, b) => a.timestamp - b.timestamp);
+                
+                chatMessages.innerHTML = '';
+                
+                sortedMessages.forEach(message => {
+                    const messageElement = createChatMessageElement(message);
+                    chatMessages.appendChild(messageElement);
+                });
+                
+                // Scroll al final
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+        }
+
+        function sendChatMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            
+            if (!message || !currentChatRoom) return;
+            
+            // Ocultar indicador de escritura si estaba visible
+            document.getElementById('typingIndicator').classList.add('hidden');
+            
+            const messageData = {
+                text: message,
+                senderId: currentUser.uid,
+                senderName: currentUser.displayName || currentUser.email.split('@')[0],
+                senderEmail: currentUser.email,
+                senderRole: 'user',
+                timestamp: Date.now(),
+                type: 'text'
+            };
+            
+            // Enviar mensaje del usuario
+            db.ref(`chatRooms/${currentChatRoom}/messages`).push(messageData);
+            
+            // Actualizar estado del chat
+            db.ref(`chatRooms/${currentChatRoom}`).update({
+                lastMessage: message,
+                lastMessageTime: Date.now(),
+                unreadCount: firebase.database.ServerValue.increment(1),
+                status: 'active',
+                lastActivity: Date.now()
+            });
+            
+            // Verificar si el bot puede responder
+            if (!botResponseDisabled) {
+                // Mostrar indicador de escritura
+                showTypingIndicator('El asistente virtual está escribiendo...');
+                
+                // Obtener contador actual de respuestas del bot
+                db.ref(`chatRooms/${currentChatRoom}/botResponseCount`).once('value').then((snapshot) => {
+                    let currentBotCount = snapshot.val() || 0;
+                    
+                    // Incrementar contador
+                    currentBotCount++;
+                    db.ref(`chatRooms/${currentChatRoom}`).update({
+                        botResponseCount: currentBotCount
+                    });
+                    
+                    // Ocultar indicador de escritura
+                    setTimeout(() => {
+                        document.getElementById('typingIndicator').classList.add('hidden');
+                    }, 1000);
+                    
+                    // Verificar si se debe conectar con un humano
+                    if (currentBotCount >= MAX_BOT_RESPONSES) {
+                        // Conectar con administrador
+                        setTimeout(() => {
+                            connectToAdmin(currentChatRoom);
+                        }, 1500);
+                    } else {
+                        // Responder con el bot
+                        setTimeout(() => {
+                            const botResponse = getBotResponse(message);
+                            sendBotMessage(currentChatRoom, botResponse);
+                        }, 1000);
+                    }
+                });
+            } else {
+                // Si el bot está deshabilitado, solo actualizar el chat
+                showNotification('Mensaje enviado al especialista', 'info');
+            }
+            
+            // Limpiar input
+            chatInput.value = '';
+            chatInput.focus();
+        }
+
+        function showTypingIndicator(text) {
+            const typingIndicator = document.getElementById('typingIndicator');
+            const typingText = document.getElementById('typingText');
+            
+            typingText.textContent = text || 'El asistente virtual está escribiendo...';
+            typingIndicator.classList.remove('hidden');
+        }
+
+        function getBotResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Respuestas inteligentes del bot
+            if (lowerMessage.includes('hola') || lowerMessage.includes('buenas') || lowerMessage.includes('saludos')) {
+                return "¡Hola! Soy el asistente virtual de Canada Coin. Puedo ayudarte con depósitos, retiros, inversiones, verificación de cuenta y más. ¿En qué puedo asistirte?";
+            }
+            else if (lowerMessage.includes('depósito') || lowerMessage.includes('deposito')) {
+                return "Para realizar un depósito: 1. Ve a 'Depósitos' en tu dashboard 2. Selecciona el método de pago 3. Ingresa el monto 4. Sigue las instrucciones. ¿Necesitas ayuda con algún método específico?";
+            }
+            else if (lowerMessage.includes('retiro') || lowerMessage.includes('retirar')) {
+                return "Los retiros se procesan en 1-5 días hábiles. Métodos disponibles: transferencia bancaria ($25), PayPal (3.5%), criptomonedas. ¿Qué método prefieres usar?";
+            }
+            else if (lowerMessage.includes('inversión') || lowerMessage.includes('inversion')) {
+                return "Ofrecemos: Básico (4% anual, $100 mínimo), Premium (5% anual, $1,000 mínimo), VIP (6% anual, $5,000 mínimo). ¿Te interesa algún plan?";
+            }
+            else if (lowerMessage.includes('verificación') || lowerMessage.includes('verificacion') || lowerMessage.includes('kyc')) {
+                return "La verificación KYC requiere: documento de identidad, selfie con documento y comprobante de domicilio. Proceso: 24-48 horas. ¿Tienes algún documento específico?";
+            }
+            else if (lowerMessage.includes('problema') || lowerMessage.includes('error') || lowerMessage.includes('no funciona')) {
+                return "Lamento escuchar que tienes problemas. Para ayudarte mejor, ¿podrías describir el problema con más detalle?";
+            }
+            else if (lowerMessage.includes('gracias') || lowerMessage.includes('thank you')) {
+                return "¡De nada! Estoy aquí para ayudar. ¿Hay algo más en lo que pueda asistirte?";
+            }
+            else if (lowerMessage.includes('tarjeta') || lowerMessage.includes('card')) {
+                return "Ofrecemos tarjetas virtuales (gratis) y físicas ($15). Aceptadas mundialmente, sin cargos de mantenimiento. ¿Te interesa solicitar una?";
+            }
+            else if (lowerMessage.includes('seguridad') || lowerMessage.includes('hack')) {
+                return "Tu seguridad es nuestra prioridad. Contamos con autenticación 2FA, encriptación SSL y seguro de $250,000. Si notas actividad sospechosa, contacta a security@canadacoin.com";
+            }
+            else {
+                return "Entiendo tu consulta. Para brindarte la mejor asistencia, estoy conectándote con un especialista humano que podrá ayudarte con mayor precisión. Un momento por favor...";
+            }
+        }
+
+        function sendBotMessage(chatRoomId, message) {
+            // Verificar nuevamente que el bot pueda responder
+            if (botResponseDisabled) {
+                console.log('Bot response disabled, skipping...');
+                return;
+            }
+            
+            const messageData = {
+                text: message,
+                senderId: 'bot',
+                senderName: 'Asistente Virtual',
+                senderRole: 'bot',
+                timestamp: Date.now(),
+                type: 'text'
+            };
+            
+            db.ref(`chatRooms/${chatRoomId}/messages`).push(messageData);
+            db.ref(`chatRooms/${chatRoomId}`).update({
+                lastMessage: message,
+                lastMessageTime: Date.now()
+            });
+        }
+
+        function connectToAdmin(chatRoomId) {
+            // Deshabilitar respuestas del bot
+            botResponseDisabled = true;
+            
+            // Actualizar estado del chat para indicar que necesita atención humana
+            db.ref(`chatRooms/${chatRoomId}`).update({
+                status: 'needs_human',
+                assignedTo: 'pending',
+                needsHuman: true,
+                lastActivity: Date.now()
+            });
+            
+            // Enviar mensaje del bot indicando la conexión con humano
+            const messageData = {
+                text: "He detectado que necesitas atención más especializada. Estoy conectándote con uno de nuestros especialistas humanos. Por favor, espera un momento...",
+                senderId: 'bot',
+                senderName: 'Asistente Virtual',
+                senderRole: 'bot',
+                timestamp: Date.now(),
+                type: 'text'
+            };
+            
+            db.ref(`chatRooms/${chatRoomId}/messages`).push(messageData);
+            
+            // Actualizar estado en la interfaz del usuario
+            updateChatStatus('waiting', 'Esperando conexión con especialista...');
+            
+            showNotification('Conectando con especialista humano...', 'info');
+        }
+
+        function closeChatModalFunc() {
+            if (confirm('¿Estás seguro de que deseas cerrar el chat?')) {
+                const modal = document.getElementById('chatModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                }
+                document.body.style.overflow = 'auto';
+                
+                // Limpiar listeners
+                if (messagesRef) {
+                    messagesRef.off();
+                }
+                if (chatRoomRef) {
+                    chatRoomRef.off();
+                }
+                
+                // Limpiar mensajes para la próxima sesión
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.innerHTML = '';
+                
+                // Resetear algunas variables pero mantener al usuario logueado
+                currentChatRoom = null;
+                botResponseDisabled = false;
+            }
         }
 
         function filterFAQ(query) {
@@ -1827,138 +2356,6 @@
             if (modal) {
                 modal.classList.remove('active');
                 document.body.style.overflow = 'auto';
-            }
-        }
-
-        function openChatModal() {
-            const modal = document.getElementById('chatModal');
-            if (!modal) return;
-            
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            
-            // Simular conexión con agente
-            const statusIndicator = document.getElementById('agentStatusIndicator');
-            const statusText = document.getElementById('agentStatusText');
-            
-            statusIndicator.className = 'status-indicator connecting';
-            statusText.textContent = 'Conectando con agente...';
-            
-            setTimeout(() => {
-                agentAvailable = true;
-                statusIndicator.className = 'status-indicator';
-                statusText.textContent = 'Agente Carlos - Conectado';
-                
-                // Enviar mensaje de bienvenida automático
-                setTimeout(() => {
-                    addAgentMessage("¿En qué puedo ayudarte hoy? Puedes preguntarme sobre depósitos, retiros, inversiones, o cualquier otro tema.");
-                }, 500);
-            }, 2000);
-            
-            // Enfocar en el input del chat
-            setTimeout(() => {
-                document.getElementById('chatInput').focus();
-            }, 300);
-        }
-
-        function closeChatModalFunc() {
-            const modal = document.getElementById('chatModal');
-            if (modal) {
-                modal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-                agentAvailable = false;
-                
-                // Limpiar mensajes excepto el primero
-                const chatMessages = document.getElementById('chatMessages');
-                if (chatMessages.children.length > 1) {
-                    while (chatMessages.children.length > 1) {
-                        chatMessages.removeChild(chatMessages.lastChild);
-                    }
-                }
-            }
-        }
-
-        function sendChatMessage() {
-            const chatInput = document.getElementById('chatInput');
-            const message = chatInput.value.trim();
-            
-            if (!message) return;
-            
-            if (!agentAvailable) {
-                showNotification('Esperando conexión con agente...', 'warning');
-                return;
-            }
-            
-            // Agregar mensaje del usuario
-            addUserMessage(message);
-            chatInput.value = '';
-            
-            // Simular respuesta del agente después de un delay
-            setTimeout(() => {
-                const response = getAgentResponse(message);
-                addAgentMessage(response);
-                
-                // Hacer scroll al final
-                const chatMessages = document.getElementById('chatMessages');
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 1000);
-        }
-
-        function addUserMessage(message) {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message user-message';
-            messageDiv.innerHTML = `<p class="text-white">${message}</p>`;
-            chatMessages.appendChild(messageDiv);
-            
-            // Hacer scroll al final
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function addAgentMessage(message) {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message agent-message';
-            messageDiv.innerHTML = `
-                <p class="font-medium text-blue-300">Agente Carlos</p>
-                <p class="text-white">${message}</p>
-            `;
-            chatMessages.appendChild(messageDiv);
-            
-            // Hacer scroll al final
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function getAgentResponse(message) {
-            const lowerMessage = message.toLowerCase();
-            
-            // Respuestas predefinidas basadas en palabras clave
-            if (lowerMessage.includes('depósito') || lowerMessage.includes('deposito')) {
-                return "Para realizar un depósito, ve a la sección 'Depósitos' en tu dashboard. Ofrecemos transferencias bancarias (sin comisión), PayPal (2.9% + $0.30), criptomonedas y tarjetas. ¿Necesitas ayuda con algún método específico?";
-            }
-            else if (lowerMessage.includes('retiro') || lowerMessage.includes('retirar')) {
-                return "Los retiros se procesan en 1-5 días hábiles dependiendo del método. Transferencia bancaria: $25 de comisión, PayPal: 3.5%, criptomonedas: comisión de red. ¿Qué método prefieres usar?";
-            }
-            else if (lowerMessage.includes('inversión') || lowerMessage.includes('inversion')) {
-                return "Tenemos tres planes: Básico (4% anual, mínimo $100), Premium (5% anual, mínimo $1,000) y VIP (6% anual, mínimo $5,000). Las ganancias se calculan diariamente. ¿Te interesa algún plan en particular?";
-            }
-            else if (lowerMessage.includes('verificación') || lowerMessage.includes('verificacion') || lowerMessage.includes('kyc')) {
-                return "La verificación KYC es obligatoria y toma 24-48 horas. Necesitas: documento de identidad, selfie con documento y comprobante de domicilio. ¿Tienes problemas con algún documento?";
-            }
-            else if (lowerMessage.includes('seguridad') || lowerMessage.includes('hack') || lowerMessage.includes('robo')) {
-                return "Tu cuenta está protegida con autenticación de dos factores, encriptación SSL 256-bit y seguro de $250,000. Si notas actividad sospechosa, contacta a security@canadacoin.com inmediatamente.";
-            }
-            else if (lowerMessage.includes('tarjeta') || lowerMessage.includes('card')) {
-                return "Ofrecemos tarjetas virtuales (gratis) y físicas ($15 de envío). Aceptadas mundialmente, sin cargos de mantenimiento y con cashback del 1%. ¿Te interesa solicitar una?";
-            }
-            else if (lowerMessage.includes('hola') || lowerMessage.includes('buenas')) {
-                return "¡Hola! Soy Carlos, agente de soporte de Canada Coin. Estoy aquí para ayudarte con cualquier consulta sobre depósitos, retiros, inversiones, verificación, seguridad o tarjetas. ¿En qué puedo asistirte?";
-            }
-            else if (lowerMessage.includes('gracias') || lowerMessage.includes('thanks')) {
-                return "¡De nada! Es un placer ayudarte. Si tienes más preguntas, no dudes en contactarnos. ¡Que tengas un excelente día!";
-            }
-            else {
-                return "Entiendo tu consulta. Para brindarte la mejor asistencia, ¿podrías ser más específico? Puedo ayudarte con temas de depósitos, retiros, inversiones, verificación, seguridad o tarjetas.";
             }
         }
 

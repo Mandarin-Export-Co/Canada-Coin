@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canada Coin - Security</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #0ea5e9;
+            --dark: #1f2937;
+            --light: #f9fafb;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .dashboard-container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+        
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        
+        .nav-tab:hover {
+            color: var(--primary);
+            background: rgba(30, 64, 175, 0.05);
+        }
+        
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: linear-gradient(to bottom, rgba(30, 64, 175, 0.08), transparent);
+        }
+        
+        .security-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .security-card:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .security-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .security-item:last-child {
+            border-bottom: none;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--success);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1;
+        }
+        
+        .badge-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        .badge-info {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+        
+        .session-item {
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .session-item:hover {
+            background-color: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-width: 400px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 0.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 50;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #374151;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 0.75rem;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f9fafb;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(30, 64, 175, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Notifications Container -->
+    <div id="notifications" class="fixed top-6 right-6 z-50"></div>
+    
+    <!-- Change Password Modal -->
+    <div id="change-password-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900">Change Password</h3>
+                <button onclick="closeModal('change-password-modal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="password-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                    <input type="password" id="current-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                    <input type="password" id="new-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required minlength="8">
+                    <p class="text-xs text-gray-500 mt-1">Must be at least 8 characters long</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                    <input type="password" id="confirm-password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                
+                <div class="pt-4">
+                    <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-300">
+                        Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Two-Factor Modal -->
+    <div id="two-factor-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900">Two-Factor Authentication</h3>
+                <button onclick="closeModal('two-factor-modal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="text-center mb-6">
+                <div class="w-32 h-32 bg-gray-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-mobile-alt text-4xl text-gray-400"></i>
+                </div>
+                <p class="text-gray-600">Scan the QR code with your authenticator app</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <p class="text-sm text-gray-700 mb-2">Manual setup code:</p>
+                    <p class="font-mono text-lg font-bold text-center">JBSWY3DPEHPK3PXP</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Enter verification code</label>
+                    <input type="text" id="verification-code" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center text-xl tracking-widest" maxlength="6" placeholder="000000">
+                </div>
+                
+                <div class="pt-4">
+                    <button onclick="enableTwoFactor()" class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all duration-300">
+                        Enable Two-Factor
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Container -->
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-lg border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-coins text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">Canada Coin</h1>
+                            <p class="text-xs text-gray-500">Digital Banking</p>
+                        </div>
+                    </div>
+                    
+                    <!-- User Menu -->
+                    <div class="dropdown">
+                        <button id="user-menu-button" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div class="hidden md:block text-left">
+                                <p id="user-name" class="font-semibold text-gray-900">Loading...</p>
+                                <p class="text-xs text-gray-500">Account</p>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-400 text-sm"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="user-menu" class="dropdown-menu">
+                            <div class="p-4 border-b border-gray-100">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p id="dropdown-name" class="font-bold text-gray-900">Loading...</p>
+                                        <p id="dropdown-email" class="text-sm text-gray-500 truncate">user@example.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="py-2">
+                                <a href="profile.html" class="dropdown-item">
+                                    <i class="fas fa-user text-gray-400"></i>
+                                    <span>My Profile</span>
+                                </a>
+                                <a href="settings.html" class="dropdown-item">
+                                    <i class="fas fa-cog text-gray-400"></i>
+                                    <span>Settings</span>
+                                </a>
+                                <a href="security.html" class="dropdown-item">
+                                    <i class="fas fa-shield-alt text-gray-400"></i>
+                                    <span>Security</span>
+                                </a>
+                                <div class="border-t border-gray-100 my-2"></div>
+                                <a href="#" id="logout-btn" class="dropdown-item text-red-600">
+                                    <i class="fas fa-sign-out-alt text-red-400"></i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation Tabs -->
+                <nav class="flex overflow-x-auto -mb-px">
+                    <a href="dashboard.html" class="nav-tab">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="investments.html" class="nav-tab">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Investments</span>
+                    </a>
+                    <a href="deposits.html" class="nav-tab">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Deposits</span>
+                    </a>
+                    <a href="withdrawals.html" class="nav-tab">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>Withdrawals</span>
+                    </a>
+                    <a href="transfers.html" class="nav-tab">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Transfers</span>
+                    </a>
+                    <a href="cards.html" class="nav-tab">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Cards</span>
+                    </a>
+                    <a href="referrals.html" class="nav-tab">
+                        <i class="fas fa-users"></i>
+                        <span>Referrals</span>
+                    </a>
+                    <a href="support.html" class="nav-tab">
+                        <i class="fas fa-headset"></i>
+                        <span>Support</span>
+                    </a>
+                    <a href="security.html" class="nav-tab active">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Security</span>
+                    </a>
+                </nav>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="dashboard-container p-6 sm:p-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">Security Center</h2>
+                    <p class="text-gray-600 mt-2">Manage your account security and privacy settings</p>
+                </div>
+                
+                <!-- Security Score -->
+                <div class="security-card mb-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Security Score</h3>
+                            <p class="text-gray-600">Based on your security settings</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold text-green-600" id="security-score">85%</div>
+                            <div class="text-sm text-gray-500">Excellent</div>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                        <div class="bg-green-600 h-3 rounded-full" style="width: 85%"></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-green-600">✓</div>
+                            <p class="text-sm text-gray-600">Strong Password</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-yellow-500">⚠</div>
+                            <p class="text-sm text-gray-600">2FA Pending</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-green-600">✓</div>
+                            <p class="text-sm text-gray-600">KYC Verified</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-green-600">✓</div>
+                            <p class="text-sm text-gray-600">Active Sessions</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Security Settings -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Account Security -->
+                    <div class="security-card fade-in">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">Account Security</h3>
+                                <p class="text-gray-600">Protect your account</p>
+                            </div>
+                            <i class="fas fa-lock text-blue-500 text-2xl"></i>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="security-item">
+                                <div>
+                                    <p class="font-medium text-gray-900">Password</p>
+                                    <p class="text-sm text-gray-500">Last changed 30 days ago</p>
+                                </div>
+                                <button onclick="showModal('change-password-modal')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all duration-300">
+                                    Change
+                                </button>
+                            </div>
+                            
+                            <div class="security-item">
+                                <div>
+                                    <p class="font-medium text-gray-900">Two-Factor Authentication</p>
+                                    <p class="text-sm text-gray-500">Add an extra layer of security</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="two-factor-toggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="security-item">
+                                <div>
+                                    <p class="font-medium text-gray-900">Login Alerts</p>
+                                    <p class="text-sm text-gray-500">Get notified of new logins</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="login-alerts" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="security-item">
+                                <div>
+                                    <p class="font-medium text-gray-900">Biometric Login</p>
+                                    <p class="text-sm text-gray-500">Use fingerprint or face ID</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="biometric-login">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Privacy Settings -->
+                    <div class="security-card fade-in">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">Privacy Settings</h3>
+                                <p class="text-gray-600">Control your data</p>
+                            </div>
+                            <i class="fas fa-user-shield text-purple-500 text-2xl"></i>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="security-item">
+                                <div>
+                                    <p class="font-medium text-gray-900">Data Sharing</p>
+                                    <p class="text-sm text-gray-500">Allow data for analytics</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="data-sharing">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="security-item">
+                                <div>
+                                    <p class="font-medium text-gray-900">Marketing Emails</p>
+                                    <p class="text-sm text-gray-500">Receive promotional content</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="marketing-emails" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="security-item">
+                                <div>
+                                    <p class="font-medium text-gray-900">Show Online Status</p>
+                                    <p class="text-sm text-gray-500">Visible to other users</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="online-status" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="security-item">
+                                <div>
+                                    <p class="font-medium text-gray-900">Activity History</p>
+                                    <p class="text-sm text-gray-500">Save your activity log</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="activity-history" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Active Sessions -->
+                <div class="security-card fade-in mb-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Active Sessions</h3>
+                            <p class="text-gray-600">Devices currently logged into your account</p>
+                        </div>
+                        <i class="fas fa-desktop text-green-500 text-2xl"></i>
+                    </div>
+                    
+                    <div id="sessions-list" class="mb-4">
+                        <!-- Loading -->
+                        <div class="text-center py-8">
+                            <div class="loading mx-auto mb-4"></div>
+                            <p class="text-gray-500">Loading active sessions...</p>
+                        </div>
+                    </div>
+                    
+                    <button id="terminate-all" class="w-full py-3 border border-red-600 text-red-600 hover:bg-red-50 font-semibold rounded-lg transition-all duration-300">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        Terminate All Other Sessions
+                    </button>
+                </div>
+                
+                <!-- Security Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button id="download-data" class="py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-all duration-300 flex flex-col items-center justify-center">
+                        <i class="fas fa-download text-2xl mb-2"></i>
+                        <span>Download Data</span>
+                    </button>
+                    
+                    <button id="export-logs" class="py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-all duration-300 flex flex-col items-center justify-center">
+                        <i class="fas fa-file-export text-2xl mb-2"></i>
+                        <span>Export Logs</span>
+                    </button>
+                    
+                    <button id="delete-account" class="py-4 bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded-lg transition-all duration-300 flex flex-col items-center justify-center">
+                        <i class="fas fa-trash-alt text-2xl mb-2"></i>
+                        <span>Delete Account</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBI4O0d_Mec38FDiuhirujCnX99PFKiXW4",
+            authDomain: "projekt-pc.firebaseapp.com",
+            databaseURL: "https://projekt-pc-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "projekt-pc",
+            storageBucket: "projekt-pc.appspot.com",
+            messagingSenderId: "90098431634",
+            appId: "1:90098431634:web:7cb61800d03533c2a6984b",
+            measurementId: "G-59YH8W8W1L"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            auth.onAuthStateChanged(user => {
+                if (!user) {
+                    redirectToLogin();
+                } else {
+                    initializeSecurity(user);
+                }
+            });
+        });
+
+        async function initializeSecurity(user) {
+            try {
+                // Load user data
+                await loadUserData(user);
+                loadActiveSessions(user);
+                setupEventListeners();
+                showNotification('Security settings loaded', 'success');
+            } catch (error) {
+                console.error('Security initialization error:', error);
+                showNotification('Error loading security settings', 'error');
+            }
+        }
+
+        async function loadUserData(user) {
+            const userRef = db.ref(`users/${user.uid}`);
+            
+            userRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                
+                if (data) {
+                    // Update user info
+                    const name = data.name || user.email.split('@')[0];
+                    const email = data.email || user.email;
+                    
+                    document.getElementById('user-name').textContent = name;
+                    document.getElementById('dropdown-name').textContent = name;
+                    document.getElementById('dropdown-email').textContent = email;
+                    
+                    // Load security settings
+                    if (data.securitySettings) {
+                        if (data.securitySettings.twoFactorEnabled !== undefined) {
+                            document.getElementById('two-factor-toggle').checked = data.securitySettings.twoFactorEnabled;
+                        }
+                        if (data.securitySettings.loginAlerts !== undefined) {
+                            document.getElementById('login-alerts').checked = data.securitySettings.loginAlerts;
+                        }
+                        if (data.securitySettings.biometricLogin !== undefined) {
+                            document.getElementById('biometric-login').checked = data.securitySettings.biometricLogin;
+                        }
+                    }
+                    
+                    // Calculate security score
+                    calculateSecurityScore(data);
+                }
+            });
+        }
+
+        function calculateSecurityScore(userData) {
+            let score = 0;
+            
+            // Check for strong password (assuming if user exists, they have password)
+            score += 25;
+            
+            // Check for KYC verification
+            if (userData.kycStatus === 'verified') {
+                score += 25;
+            } else if (userData.kycStatus === 'pending') {
+                score += 15;
+            }
+            
+            // Check for 2FA
+            if (userData.securitySettings && userData.securitySettings.twoFactorEnabled) {
+                score += 25;
+            } else {
+                score += 5;
+            }
+            
+            // Check for recent activity
+            if (userData.lastLogin && (Date.now() - userData.lastLogin) < 7 * 24 * 60 * 60 * 1000) {
+                score += 25;
+            } else {
+                score += 15;
+            }
+            
+            // Update UI
+            document.getElementById('security-score').textContent = `${score}%`;
+            document.getElementById('security-score').className = `text-3xl font-bold ${
+                score >= 80 ? 'text-green-600' : 
+                score >= 60 ? 'text-yellow-500' : 
+                'text-red-600'
+            }`;
+            
+            const progressBar = document.querySelector('.security-card .bg-green-600');
+            if (progressBar) {
+                progressBar.style.width = `${score}%`;
+                progressBar.className = `h-3 rounded-full ${
+                    score >= 80 ? 'bg-green-600' : 
+                    score >= 60 ? 'bg-yellow-500' : 
+                    'bg-red-600'
+                }`;
+            }
+        }
+
+        function loadActiveSessions(user) {
+            const sessionsList = document.getElementById('sessions-list');
+            
+            // For demo purposes, show some sample sessions
+            const sessions = [
+                {
+                    device: 'Chrome on Windows 10',
+                    location: 'New York, USA',
+                    ip: '192.168.1.1',
+                    time: 'Active now',
+                    current: true
+                },
+                {
+                    device: 'Safari on iPhone',
+                    location: 'London, UK',
+                    ip: '10.0.0.1',
+                    time: '2 hours ago',
+                    current: false
+                },
+                {
+                    device: 'Firefox on MacOS',
+                    location: 'Tokyo, Japan',
+                    ip: '172.16.0.1',
+                    time: '1 day ago',
+                    current: false
+                }
+            ];
+            
+            let html = '';
+            sessions.forEach(session => {
+                html += `
+                    <div class="session-item">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="flex items-center">
+                                    <p class="font-medium text-gray-900">${session.device}</p>
+                                    ${session.current ? '<span class="ml-2 badge badge-success">Current</span>' : ''}
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>
+                                    ${session.location} • ${session.ip} • ${session.time}
+                                </p>
+                            </div>
+                            ${!session.current ? `
+                                <button class="text-red-600 hover:text-red-800" onclick="terminateSession('${session.ip}')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            sessionsList.innerHTML = html;
+        }
+
+        function setupEventListeners() {
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userMenu = document.getElementById('user-menu');
+            
+            userMenuButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userMenu.classList.toggle('show');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!userMenu.contains(e.target) && !userMenuButton.contains(e.target)) {
+                    userMenu.classList.remove('show');
+                }
+            });
+            
+            document.getElementById('logout-btn').addEventListener('click', handleLogout);
+            
+            // Password form
+            document.getElementById('password-form').addEventListener('submit', changePassword);
+            
+            // Two-factor toggle
+            document.getElementById('two-factor-toggle').addEventListener('change', toggleTwoFactor);
+            
+            // Terminate all sessions
+            document.getElementById('terminate-all').addEventListener('click', terminateAllSessions);
+            
+            // Security actions
+            document.getElementById('download-data').addEventListener('click', downloadData);
+            document.getElementById('export-logs').addEventListener('click', exportLogs);
+            document.getElementById('delete-account').addEventListener('click', deleteAccount);
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function toggleTwoFactor(e) {
+            if (e.target.checked) {
+                showModal('two-factor-modal');
+            } else {
+                if (confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')) {
+                    disableTwoFactor();
+                } else {
+                    e.target.checked = true;
+                }
+            }
+        }
+
+        function enableTwoFactor() {
+            const code = document.getElementById('verification-code').value;
+            if (code && code.length === 6) {
+                // In a real app, verify the code with the backend
+                showNotification('Two-factor authentication enabled successfully!', 'success');
+                closeModal('two-factor-modal');
+                document.getElementById('two-factor-toggle').checked = true;
+                
+                // Save to Firebase
+                const user = auth.currentUser;
+                if (user) {
+                    db.ref(`users/${user.uid}/securitySettings/twoFactorEnabled`).set(true);
+                }
+            } else {
+                showNotification('Please enter a valid 6-digit code', 'error');
+            }
+        }
+
+        function disableTwoFactor() {
+            const user = auth.currentUser;
+            if (user) {
+                db.ref(`users/${user.uid}/securitySettings/twoFactorEnabled`).set(false);
+                showNotification('Two-factor authentication disabled', 'warning');
+            }
+        }
+
+        async function changePassword(e) {
+            e.preventDefault();
+            
+            const user = auth.currentUser;
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (newPassword !== confirmPassword) {
+                showNotification('New passwords do not match', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 8) {
+                showNotification('Password must be at least 8 characters long', 'error');
+                return;
+            }
+            
+            try {
+                // In a real app, you would reauthenticate the user first
+                // For demo purposes, we'll simulate success
+                
+                await user.updatePassword(newPassword);
+                
+                showNotification('Password changed successfully!', 'success');
+                closeModal('change-password-modal');
+                
+                // Clear form
+                document.getElementById('password-form').reset();
+                
+            } catch (error) {
+                console.error('Password change error:', error);
+                showNotification('Error changing password. Please try again.', 'error');
+            }
+        }
+
+        function terminateSession(ip) {
+            if (confirm('Are you sure you want to terminate this session?')) {
+                showNotification(`Session terminated for IP: ${ip}`, 'success');
+                // Reload sessions
+                const user = auth.currentUser;
+                loadActiveSessions(user);
+            }
+        }
+
+        function terminateAllSessions() {
+            if (confirm('Are you sure you want to terminate all other sessions? You will remain logged in on this device.')) {
+                showNotification('All other sessions have been terminated', 'success');
+                // Reload sessions
+                const user = auth.currentUser;
+                loadActiveSessions(user);
+            }
+        }
+
+        function downloadData() {
+            showNotification('Data download feature coming soon', 'info');
+        }
+
+        function exportLogs() {
+            showNotification('Log export feature coming soon', 'info');
+        }
+
+        function deleteAccount() {
+            if (confirm('WARNING: This will permanently delete your account and all associated data. This action cannot be undone. Are you absolutely sure?')) {
+                showNotification('Account deletion feature coming soon', 'info');
+            }
+        }
+
+        function handleLogout(e) {
+            e.preventDefault();
+            
+            showNotification('Logging out...', 'info');
+            
+            auth.signOut().then(() => {
+                showNotification('Successfully logged out', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            }).catch(error => {
+                console.error('Logout error:', error);
+                showNotification('Error logging out', 'error');
+            });
+        }
+
+        function redirectToLogin() {
+            window.location.href = 'index.html';
+        }
+
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notifications');
+            const notificationId = 'notification-' + Date.now();
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            const colors = {
+                success: 'bg-green-100 text-green-800 border-green-200',
+                error: 'bg-red-100 text-red-800 border-red-200',
+                warning: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                info: 'bg-blue-100 text-blue-800 border-blue-200'
+            };
+            
+            const iconColors = {
+                success: 'bg-green-500 text-white',
+                error: 'bg-red-500 text-white',
+                warning: 'bg-yellow-500 text-white',
+                info: 'bg-blue-500 text-white'
+            };
+            
+            const notification = document.createElement('div');
+            notification.id = notificationId;
+            notification.className = `notification ${colors[type]}`;
+            notification.innerHTML = `
+                <div class="notification-icon ${iconColors[type]}">
+                    <i class="fas ${icons[type]}"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="font-medium">${message}</p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600" onclick="closeNotification('${notificationId}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 10);
+            
+            setTimeout(() => closeNotification(notificationId), 5000);
+        }
+
+        function closeNotification(id) {
+            const notification = document.getElementById(id);
+            if (notification) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }
+        }
+
+        window.closeNotification = closeNotification;
+        window.showModal = showModal;
+        window.closeModal = closeModal;
+        window.terminateSession = terminateSession;
+        window.enableTwoFactor = enableTwoFactor;
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canada Coin - Soporte</title>
+    <title>Canada Coin - Soporte y Ayuda</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,70 +14,152 @@
     
     <style>
         :root {
-            --primary-color: #1e40af;
-            --secondary-color: #3b82f6;
-            --accent-color: #10b981;
-            --danger-color: #ef4444;
-            --warning-color: #f59e0b;
-            --dark-color: #1f2937;
-            --light-color: #f9fafb;
-            --gold-color: #fbbf24;
+            --primary-blue: #1e40af;
+            --secondary-blue: #3b82f6;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --danger-red: #ef4444;
+            --profit-gold: #fbbf24;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --light-blue: #dbeafe;
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
             min-height: 100vh;
         }
         
-        .banking-header {
-            background: rgba(255, 255, 255, 0.95);
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            border-bottom: 3px solid var(--primary-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
         }
         
-        .banking-content {
-            background: white;
+        .profit-badge {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #1e293b;
+            font-weight: bold;
+        }
+        
+        .support-card {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .support-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--secondary-blue);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            min-height: calc(100vh - 200px);
-            overflow: hidden;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: var(--success-green);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 1001;
+        }
+        
+        .notification.show {
+            display: flex;
+            animation: slideInRight 0.3s ease;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
         
         .banking-tab {
             position: relative;
             padding: 1rem 1.5rem;
             font-weight: 600;
-            color: #4b5563;
+            color: #f1f5f9;
             transition: all 0.3s ease;
             border-bottom: 3px solid transparent;
+            white-space: nowrap;
         }
         
         .banking-tab:hover {
-            color: var(--primary-color);
-            background: rgba(30, 64, 175, 0.05);
+            color: var(--secondary-blue);
+            background: rgba(59, 130, 246, 0.1);
         }
         
         .banking-tab.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
-            background: linear-gradient(to bottom, rgba(30, 64, 175, 0.1), transparent);
+            color: var(--secondary-blue);
+            border-bottom-color: var(--secondary-blue);
+            background: linear-gradient(to bottom, rgba(59, 130, 246, 0.1), transparent);
         }
         
         .dropdown-menu {
             position: absolute;
             right: 0;
             top: 100%;
-            background: white;
+            background: var(--card-bg);
             border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             min-width: 200px;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.3s ease;
             z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .dropdown-menu.active {
@@ -86,66 +168,43 @@
             transform: translateY(0);
         }
         
-        .notification-toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            background: white;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            transform: translateX(150%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
-        
-        .notification-toast.show {
-            transform: translateX(0);
-        }
-        
-        .notification-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            margin-right: 1rem;
-        }
-        
         .dropdown-item {
             display: flex;
             align-items: center;
             padding: 0.75rem 1rem;
-            color: #4b5563;
+            color: #f1f5f9;
             transition: background 0.3s ease;
         }
         
         .dropdown-item:hover {
-            background: #f9fafb;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .banking-header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border-bottom: 3px solid var(--primary-blue);
         }
         
         .faq-question {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            text-align: left;
-            background: none;
-            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
         }
         
         .faq-question:hover {
-            background: #f9fafb;
+            background: rgba(59, 130, 246, 0.1);
         }
         
         .faq-answer {
-            background: #f8fafc;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 0 0 12px 12px;
+            padding: 1.5rem;
+            margin-top: -10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             animation: fadeIn 0.3s ease;
         }
         
@@ -153,16 +212,343 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        
+        .resource-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        
+        .resource-content.expanded {
+            max-height: 2000px;
+        }
+        
+        .contact-item {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .contact-item:hover {
+            transform: translateY(-3px);
+            border-color: var(--secondary-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .search-input {
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: var(--secondary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Chat Modal Styles */
+        .chat-modal {
+            max-width: 500px;
+        }
+        
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+        
+        .chat-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            word-wrap: break-word;
+        }
+        
+        .agent-message {
+            background: rgba(59, 130, 246, 0.2);
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+        }
+        
+        .user-message {
+            background: rgba(16, 185, 129, 0.2);
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+        }
+        
+        .chat-input-container {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-input {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            color: white;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .chat-input:focus {
+            border-color: var(--secondary-blue);
+        }
+        
+        .send-button {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--secondary-blue);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .send-button:hover {
+            background: #2563eb;
+        }
+        
+        .chat-input-wrapper {
+            position: relative;
+        }
+        
+        .agent-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+        
+        .status-indicator.connecting {
+            background: #f59e0b;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .quick-action-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+            color: #93c5fd;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-action-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: var(--secondary-blue);
+        }
+        
+        .faq-modal-content {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .category-section {
+            margin-bottom: 2rem;
+        }
+        
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary-blue);
+        }
+        
+        .category-description {
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--secondary-blue);
+        }
+        
+        .feature-title {
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-description {
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+        
+        .important-note {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .note-title {
+            color: #fbbf24;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .note-content {
+            color: #fde68a;
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 <body class="min-h-screen">
-    <!-- Notificaciones -->
-    <div id="notifications-container"></div>
+    <!-- Notificación -->
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-message">Mensaje enviado correctamente</span>
+    </div>
+    
+    <!-- Modal para FAQ Detallada -->
+    <div id="faqModal" class="modal-overlay">
+        <div class="modal-content p-6 faq-modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="faqModalTitle" class="text-2xl font-bold">FAQ Detallada</h2>
+                <button id="closeFaqModal" class="text-gray-400 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="faqModalContent" class="space-y-8">
+                <!-- Contenido dinámico se cargará aquí -->
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-gray-700">
+                <button id="closeFaqModalBtn" class="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg font-bold hover:opacity-90 transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para Chat en Vivo -->
+    <div id="chatModal" class="modal-overlay">
+        <div class="modal-content p-0 chat-modal">
+            <div class="chat-header">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Chat en Vivo</h2>
+                        <div class="agent-status">
+                            <div id="agentStatusIndicator" class="status-indicator"></div>
+                            <span id="agentStatusText" class="text-sm text-gray-300">Conectando con agente...</span>
+                        </div>
+                    </div>
+                    <button id="closeChatModal" class="text-gray-400 hover:text-white text-xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message agent-message">
+                        <p class="font-medium text-blue-300">Agente Carlos</p>
+                        <p class="text-white">¡Hola! Soy Carlos, agente de soporte de Canada Coin. ¿En qué puedo ayudarte hoy?</p>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" data-message="Problema con depósito">Depósito</button>
+                        <button class="quick-action-btn" data-message="Consulta sobre retiro">Retiro</button>
+                        <button class="quick-action-btn" data-message="Pregunta sobre inversión">Inversión</button>
+                        <button class="quick-action-btn" data-message="Problema de verificación">Verificación</button>
+                    </div>
+                    <div class="chat-input-wrapper mt-3">
+                        <input type="text" 
+                               id="chatInput" 
+                               class="chat-input pr-24" 
+                               placeholder="Escribe tu mensaje..."
+                               autocomplete="off">
+                        <button id="sendMessage" class="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para Recursos -->
+    <div id="resourceModal" class="modal-overlay">
+        <div class="modal-content p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="resourceTitle" class="text-2xl font-bold">Título del Recurso</h2>
+                <button id="closeResourceModal" class="text-gray-400 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div id="resourceContent" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                <!-- Contenido dinámico se cargará aquí -->
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-gray-700">
+                <button id="closeResourceBtn" class="w-full py-3 px-6 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg font-bold hover:opacity-90 transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
     
     <!-- Header Superior -->
     <header class="banking-header sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Primera fila: Logo y usuario -->
             <div class="flex justify-between items-center py-4">
                 <div class="flex items-center space-x-4">
                     <div class="flex items-center space-x-3">
@@ -170,37 +556,42 @@
                             <i class="fas fa-coins text-white text-lg"></i>
                         </div>
                         <div>
-                            <h1 class="text-xl font-bold text-gray-900">Canada Coin</h1>
-                            <p class="text-xs text-gray-500">Banca Digital</p>
+                            <h1 class="text-xl font-bold text-white">Canada Coin</h1>
+                            <p class="text-xs text-gray-300">Banca Digital</p>
                         </div>
                     </div>
                 </div>
                 
                 <div class="flex items-center space-x-4">
-                    <!-- Perfil de usuario -->
+                    <div class="hidden md:block">
+                        <div class="text-right">
+                            <p class="text-xs text-gray-300">Soporte 24/7</p>
+                            <p class="font-bold text-green-400">Disponible</p>
+                        </div>
+                    </div>
+                    
                     <div class="relative">
                         <button id="user-profile-button" 
-                                class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition">
+                                class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-800 transition">
                             <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
                                 <i class="fas fa-user text-white"></i>
                             </div>
                             <div class="hidden md:block text-left">
-                                <p id="user-name" class="font-semibold text-gray-900">Usuario</p>
-                                <p class="text-xs text-gray-500">Ver perfil</p>
+                                <p id="user-name" class="font-semibold text-white">Usuario</p>
+                                <p class="text-xs text-gray-300">Soporte</p>
                             </div>
-                            <i class="fas fa-chevron-down text-gray-500 text-sm"></i>
+                            <i class="fas fa-chevron-down text-gray-300 text-sm"></i>
                         </button>
                         
-                        <!-- Dropdown usuario -->
                         <div id="user-profile-dropdown" class="dropdown-menu">
-                            <div class="p-4 border-b border-gray-200">
+                            <div class="p-4 border-b border-gray-700">
                                 <div class="flex items-center space-x-3">
                                     <div class="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
                                         <i class="fas fa-user text-white text-lg"></i>
                                     </div>
                                     <div>
-                                        <p id="dropdown-user-name" class="font-bold text-gray-900">Usuario</p>
-                                        <p id="dropdown-user-email" class="text-sm text-gray-500">usuario@email.com</p>
+                                        <p id="dropdown-user-name" class="font-bold text-white">Usuario</p>
+                                        <p id="dropdown-user-email" class="text-sm text-gray-300">usuario@email.com</p>
                                     </div>
                                 </div>
                             </div>
@@ -217,8 +608,8 @@
                                     <i class="fas fa-cog text-gray-400 w-6"></i>
                                     Configuración
                                 </a>
-                                <hr class="my-2">
-                                <a href="#" id="logout-button" class="dropdown-item text-red-600">
+                                <hr class="my-2 border-gray-700">
+                                <a href="#" id="logout-button" class="dropdown-item text-red-400">
                                     <i class="fas fa-sign-out-alt text-red-400 w-6"></i>
                                     Cerrar Sesión
                                 </a>
@@ -228,8 +619,8 @@
                 </div>
             </div>
             
-            <!-- Segunda fila: Navegación por pestañas -->
-            <div class="border-t border-gray-200">
+            <!-- Navegación -->
+            <div class="border-t border-gray-700">
                 <nav class="flex overflow-x-auto">
                     <a href="dashboard.html" class="banking-tab">
                         <i class="fas fa-home mr-2"></i>Resumen
@@ -262,87 +653,93 @@
     
     <!-- Contenido Principal -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="banking-content">
-            <!-- Pestaña: Soporte -->
+        <div class="glass-card">
             <div class="p-6">
                 <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Soporte y Ayuda</h2>
-                    <p class="text-gray-600">Estamos aquí para ayudarte</p>
+                    <h2 class="text-2xl font-bold text-white mb-2">Soporte y Ayuda</h2>
+                    <p class="text-gray-300">Encuentra respuestas rápidas o contacta con nuestro equipo de soporte</p>
                 </div>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Columna Principal -->
                     <div class="lg:col-span-2">
-                        <!-- Búsqueda de Ayuda -->
-                        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-                            <h3 class="text-lg font-bold text-gray-900 mb-4">¿En qué podemos ayudarte?</h3>
-                            <div class="relative">
+                        <!-- Búsqueda Rápida -->
+                        <div class="glass-card p-6 mb-6">
+                            <h3 class="text-lg font-bold text-white mb-4">¿En qué podemos ayudarte?</h3>
+                            <div class="relative mb-4">
                                 <input type="text" id="search-support" 
-                                       class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       class="search-input w-full pl-12 pr-4 py-3 rounded-lg"
                                        placeholder="Buscar en preguntas frecuentes...">
                                 <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                             </div>
-                            <div class="flex flex-wrap gap-2 mt-4">
-                                <button class="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200">Depósitos</button>
-                                <button class="px-4 py-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200">Retiros</button>
-                                <button class="px-4 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200">Inversiones</button>
-                                <button class="px-4 py-2 bg-yellow-100 text-yellow-600 rounded-lg hover:bg-yellow-200">Verificación</button>
-                                <button class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">Problemas</button>
+                            <div class="flex flex-wrap gap-2">
+                                <button class="category-btn px-4 py-2 bg-blue-900/30 text-blue-300 rounded-lg hover:bg-blue-800/50 transition" data-category="deposits">Depósitos</button>
+                                <button class="category-btn px-4 py-2 bg-green-900/30 text-green-300 rounded-lg hover:bg-green-800/50 transition" data-category="withdrawals">Retiros</button>
+                                <button class="category-btn px-4 py-2 bg-purple-900/30 text-purple-300 rounded-lg hover:bg-purple-800/50 transition" data-category="investments">Inversiones</button>
+                                <button class="category-btn px-4 py-2 bg-yellow-900/30 text-yellow-300 rounded-lg hover:bg-yellow-800/50 transition" data-category="verification">Verificación</button>
+                                <button class="category-btn px-4 py-2 bg-red-900/30 text-red-300 rounded-lg hover:bg-red-800/50 transition" data-category="security">Seguridad</button>
+                                <button class="category-btn px-4 py-2 bg-cyan-900/30 text-cyan-300 rounded-lg hover:bg-cyan-800/50 transition" data-category="cards">Tarjetas</button>
                             </div>
                         </div>
                         
                         <!-- Preguntas Frecuentes -->
-                        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-                            <h3 class="text-lg font-bold text-gray-900 mb-6">Preguntas Frecuentes</h3>
+                        <div class="glass-card p-6 mb-6">
+                            <h3 class="text-lg font-bold text-white mb-6">Preguntas Frecuentes</h3>
                             <div class="space-y-4" id="faq-container">
-                                <!-- FAQ items will be loaded here -->
+                                <!-- Las preguntas se cargan dinámicamente -->
                             </div>
                         </div>
                         
-                        <!-- Contactar Soporte -->
-                        <div class="bg-white rounded-xl border border-gray-200 p-6">
-                            <h3 class="text-lg font-bold text-gray-900 mb-6">Contactar Soporte</h3>
+                        <!-- Formulario de Contacto -->
+                        <div class="glass-card p-6">
+                            <h3 class="text-lg font-bold text-white mb-6">Contactar Soporte</h3>
                             <form id="support-form">
                                 <div class="space-y-6">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Asunto</label>
+                                        <label class="block text-sm font-medium mb-2">Asunto</label>
                                         <select id="support-category" 
-                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                                class="search-input w-full px-4 py-3 rounded-lg" required>
                                             <option value="">Seleccionar categoría</option>
                                             <option value="deposit">Problema con depósito</option>
                                             <option value="withdrawal">Consulta sobre retiro</option>
                                             <option value="investment">Pregunta sobre inversión</option>
                                             <option value="verification">Verificación de cuenta</option>
                                             <option value="technical">Error en la plataforma</option>
+                                            <option value="security">Problema de seguridad</option>
                                             <option value="other">Otro</option>
                                         </select>
                                     </div>
                                     
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                                        <label class="block text-sm font-medium mb-2">Descripción</label>
                                         <textarea id="support-message" 
-                                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                                  rows="4" placeholder="Describe tu consulta o problema..." required></textarea>
-                                        <p class="text-xs text-gray-500 mt-1">Sé lo más específico posible para una mejor atención</p>
+                                                  class="search-input w-full px-4 py-3 rounded-lg"
+                                                  rows="5" placeholder="Describe tu consulta o problema con el máximo detalle posible..." required></textarea>
+                                        <p class="text-xs text-gray-400 mt-1">Sé lo más específico posible para una mejor atención</p>
                                     </div>
                                     
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Adjuntar archivo (opcional)</label>
+                                        <label class="block text-sm font-medium mb-2">Adjuntar archivo (opcional)</label>
                                         <div class="flex items-center space-x-4">
                                             <label class="cursor-pointer">
                                                 <input type="file" id="support-file" class="hidden" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
-                                                <div class="px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:text-blue-500">
+                                                <div class="px-4 py-2 border-2 border-dashed border-gray-600 rounded-lg hover:border-blue-500 hover:text-blue-400 transition">
                                                     <i class="fas fa-paperclip mr-2"></i>Seleccionar archivo
                                                 </div>
                                             </label>
-                                            <span id="support-file-name" class="text-sm text-gray-500">Ningún archivo seleccionado</span>
+                                            <span id="support-file-name" class="text-sm text-gray-400">Ningún archivo seleccionado</span>
                                         </div>
-                                        <p class="text-xs text-gray-500 mt-1">Máximo 5MB. Formatos: JPG, PNG, PDF, DOC</p>
+                                        <p class="text-xs text-gray-400 mt-1">Máximo 5MB. Formatos: JPG, PNG, PDF, DOC</p>
                                     </div>
                                     
-                                    <div class="flex justify-end">
+                                    <div class="flex gap-4">
+                                        <button type="button" id="cancel-support" 
+                                                class="flex-1 py-3 px-6 border border-gray-600 rounded-lg hover:bg-gray-700 transition">
+                                            Cancelar
+                                        </button>
                                         <button type="submit" 
-                                                class="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-8 py-3 rounded-lg hover:opacity-90">
-                                            Enviar Solicitud
+                                                class="flex-1 py-3 px-6 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg font-bold hover:opacity-90 transition">
+                                            <i class="fas fa-paper-plane mr-2"></i>Enviar Solicitud
                                         </button>
                                     </div>
                                 </div>
@@ -350,90 +747,169 @@
                         </div>
                     </div>
                     
+                    <!-- Columna Lateral -->
                     <div>
                         <!-- Contacto Directo -->
-                        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-                            <h3 class="text-lg font-bold text-gray-900 mb-6">Contacto Directo</h3>
-                            <div class="space-y-6">
-                                <div class="flex items-center cursor-pointer hover:bg-gray-50 p-3 rounded-lg" id="live-chat">
-                                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                                        <i class="fas fa-headset text-blue-600"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium">Chat en Vivo</p>
-                                        <p class="text-sm text-gray-600">Soporte 24/7</p>
-                                        <p class="text-xs text-green-600">Disponible ahora</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex items-center">
-                                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                                        <i class="fas fa-envelope text-green-600"></i>
-                                    </div>
-                                    <div>
-                                        <p class="font-medium">Correo</p>
-                                        <p class="text-sm text-gray-600">soporte@canadacoin.com</p>
-                                        <p class="text-xs text-gray-500">Respuesta en 24h</p>
+                        <div class="glass-card p-6 mb-6">
+                            <h3 class="text-lg font-bold text-white mb-6">Contacto Directo</h3>
+                            <div class="space-y-4">
+                                <div class="contact-item p-4 rounded-lg cursor-pointer" id="live-chat-btn">
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 bg-blue-900/30 rounded-lg flex items-center justify-center mr-4">
+                                            <i class="fas fa-headset text-blue-400 text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-white">Chat en Vivo</p>
+                                            <p class="text-sm text-gray-400">Soporte 24/7</p>
+                                            <p class="text-xs text-green-400 font-bold">Disponible ahora</p>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                <div class="flex items-center">
-                                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-                                        <i class="fas fa-phone text-purple-600"></i>
+                                <div class="contact-item p-4 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 bg-green-900/30 rounded-lg flex items-center justify-center mr-4">
+                                            <i class="fas fa-envelope text-green-400 text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-white">Correo Electrónico</p>
+                                            <p class="text-sm text-gray-400">soporte@canadacoin.com</p>
+                                            <p class="text-xs text-gray-400">Respuesta en 24h</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="font-medium">Teléfono</p>
-                                        <p class="text-sm text-gray-600">+1 (800) 123-4567</p>
-                                        <p class="text-xs text-gray-500">Lun-Vie 9:00-18:00</p>
+                                </div>
+                                
+                                <div class="contact-item p-4 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 bg-purple-900/30 rounded-lg flex items-center justify-center mr-4">
+                                            <i class="fas fa-phone text-purple-400 text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-white">Teléfono</p>
+                                            <p class="text-sm text-gray-400">+1 (800) 123-4567</p>
+                                            <p class="text-xs text-gray-400">Lun-Vie 9:00-18:00 EST</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="contact-item p-4 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div class="w-12 h-12 bg-yellow-900/30 rounded-lg flex items-center justify-center mr-4">
+                                            <i class="fas fa-comments text-yellow-400 text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-white">Comunidad</p>
+                                            <p class="text-sm text-gray-400">Foro de usuarios</p>
+                                            <p class="text-xs text-blue-400">Discutir con otros usuarios</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Tickets Activos -->
-                        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-                            <h3 class="text-lg font-bold text-gray-900 mb-6">Tickets Activos</h3>
-                            <div id="active-tickets">
-                                <div class="text-center py-8">
-                                    <i class="fas fa-ticket-alt text-3xl text-gray-300 mb-4"></i>
-                                    <p class="text-gray-500">No tienes tickets activos</p>
-                                </div>
-                            </div>
-                            <button id="view-all-tickets" class="w-full text-center text-blue-600 font-medium hover:text-blue-800 mt-4">
-                                Ver todos los tickets
-                            </button>
                         </div>
                         
                         <!-- Recursos -->
-                        <div class="bg-white rounded-xl border border-gray-200 p-6">
-                            <h3 class="text-lg font-bold text-gray-900 mb-6">Recursos</h3>
-                            <div class="space-y-4">
-                                <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded-lg resource-link" data-resource="guide">
-                                    <i class="fas fa-book text-gray-400 mr-3"></i>
-                                    <span>Guía de Usuario</span>
-                                </a>
-                                <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded-lg resource-link" data-resource="terms">
-                                    <i class="fas fa-file-contract text-gray-400 mr-3"></i>
-                                    <span>Términos y Condiciones</span>
-                                </a>
-                                <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded-lg resource-link" data-resource="privacy">
-                                    <i class="fas fa-shield-alt text-gray-400 mr-3"></i>
-                                    <span>Política de Privacidad</span>
-                                </a>
-                                <a href="#" class="flex items-center p-3 hover:bg-gray-50 rounded-lg resource-link" data-resource="tutorials">
-                                    <i class="fas fa-video text-gray-400 mr-3"></i>
-                                    <span>Tutoriales en Video</span>
-                                </a>
+                        <div class="glass-card p-6 mb-6">
+                            <h3 class="text-lg font-bold text-white mb-6">Recursos</h3>
+                            <div class="space-y-3">
+                                <div class="resource-item">
+                                    <button class="resource-toggle w-full flex items-center p-3 hover:bg-gray-800/50 rounded-lg transition text-left" data-resource="guide">
+                                        <i class="fas fa-book text-blue-400 mr-3 text-lg"></i>
+                                        <div class="flex-1">
+                                            <span class="font-medium text-white">Guía de Usuario</span>
+                                            <p class="text-xs text-gray-400">Aprende a usar la plataforma</p>
+                                        </div>
+                                        <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                                    </button>
+                                    <div class="resource-content">
+                                        <div class="p-4 pt-2">
+                                            <p class="text-sm text-gray-300 mb-3">Documentación completa para usar todas las funciones de Canada Coin.</p>
+                                            <button class="view-resource w-full py-2 bg-blue-900/30 text-blue-300 rounded-lg hover:bg-blue-800/50 transition" data-resource="guide">
+                                                Ver Guía Completa
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="resource-item">
+                                    <button class="resource-toggle w-full flex items-center p-3 hover:bg-gray-800/50 rounded-lg transition text-left" data-resource="terms">
+                                        <i class="fas fa-file-contract text-green-400 mr-3 text-lg"></i>
+                                        <div class="flex-1">
+                                            <span class="font-medium text-white">Términos y Condiciones</span>
+                                            <p class="text-xs text-gray-400">Acuerdos legales de uso</p>
+                                        </div>
+                                        <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                                    </button>
+                                    <div class="resource-content">
+                                        <div class="p-4 pt-2">
+                                            <p class="text-sm text-gray-300 mb-3">Condiciones de uso de la plataforma y servicios financieros.</p>
+                                            <button class="view-resource w-full py-2 bg-green-900/30 text-green-300 rounded-lg hover:bg-green-800/50 transition" data-resource="terms">
+                                                Ver Términos
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="resource-item">
+                                    <button class="resource-toggle w-full flex items-center p-3 hover:bg-gray-800/50 rounded-lg transition text-left" data-resource="privacy">
+                                        <i class="fas fa-shield-alt text-purple-400 mr-3 text-lg"></i>
+                                        <div class="flex-1">
+                                            <span class="font-medium text-white">Política de Privacidad</span>
+                                            <p class="text-xs text-gray-400">Protección de datos</p>
+                                        </div>
+                                        <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                                    </button>
+                                    <div class="resource-content">
+                                        <div class="p-4 pt-2">
+                                            <p class="text-sm text-gray-300 mb-3">Cómo protegemos y manejamos tu información personal.</p>
+                                            <button class="view-resource w-full py-2 bg-purple-900/30 text-purple-300 rounded-lg hover:bg-purple-800/50 transition" data-resource="privacy">
+                                                Ver Política
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="resource-item">
+                                    <button class="resource-toggle w-full flex items-center p-3 hover:bg-gray-800/50 rounded-lg transition text-left" data-resource="tutorials">
+                                        <i class="fas fa-video text-yellow-400 mr-3 text-lg"></i>
+                                        <div class="flex-1">
+                                            <span class="font-medium text-white">Tutoriales en Video</span>
+                                            <p class="text-xs text-gray-400">Guías paso a paso</p>
+                                        </div>
+                                        <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                                    </button>
+                                    <div class="resource-content">
+                                        <div class="p-4 pt-2">
+                                            <p class="text-sm text-gray-300 mb-3">Videos explicativos para usar todas las funciones.</p>
+                                            <button class="view-resource w-full py-2 bg-yellow-900/30 text-yellow-300 rounded-lg hover:bg-yellow-800/50 transition" data-resource="tutorials">
+                                                Ver Tutoriales
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
-                        <!-- Centro de Aprendizaje -->
-                        <div class="bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl p-6 text-white mt-6">
-                            <h3 class="text-lg font-bold mb-4">Centro de Aprendizaje</h3>
-                            <p class="text-sm mb-6">Aprende a sacar el máximo provecho de Canada Coin.</p>
-                            <button id="learning-center" class="w-full bg-white text-blue-600 font-bold py-3 rounded-lg hover:bg-gray-100">
-                                <i class="fas fa-graduation-cap mr-2"></i>Explorar Cursos
-                            </button>
+                        <!-- Estadísticas de Soporte -->
+                        <div class="glass-card p-6">
+                            <h3 class="text-lg font-bold text-white mb-6">Estadísticas de Soporte</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-sm text-gray-300">Tiempo Respuesta Promedio</p>
+                                    <p class="text-2xl font-bold text-green-400">2.4 horas</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-300">Tickets Resueltos Hoy</p>
+                                    <p class="text-2xl font-bold text-blue-400">147</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-300">Satisfacción del Cliente</p>
+                                    <p class="text-2xl font-bold text-yellow-400">98.7%</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-300">Agentes Disponibles</p>
+                                    <p class="text-2xl font-bold">24/7</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -442,7 +918,6 @@
     </main>
 
     <script>
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBI4O0d_Mec38FDiuhirujCnX99PFKiXW4",
             authDomain: "projekt-pc.firebaseapp.com",
@@ -454,68 +929,1324 @@
             measurementId: "G-59YH8W8W1L"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // Initialize Application
+        let currentUser = null;
+        let appInitialized = false;
+        let chatConnection = null;
+        let agentAvailable = false;
+
         document.addEventListener('DOMContentLoaded', initSupport);
-        
-        function initSupport() {
-            // Check authentication
-            auth.onAuthStateChanged(user => {
-                if (!user) {
-                    window.location.href = 'index.html';
-                } else {
-                    loadUserData(user.uid);
+
+        async function initSupport() {
+            if (appInitialized) return;
+            
+            try {
+                auth.onAuthStateChanged(async (user) => {
+                    if (!user) {
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                    
+                    currentUser = user;
+                    appInitialized = true;
+                    
+                    await loadUserData();
                     setupEventListeners();
                     loadFAQ();
-                    loadActiveTickets(user.uid);
-                }
-            });
+                });
+            } catch (error) {
+                console.error('Error en initSupport:', error);
+                showNotification('Error al inicializar la aplicación', 'error');
+                appInitialized = false;
+            }
         }
-        
-        function loadUserData(userId) {
-            const userRef = db.ref('users/' + userId);
-            
-            userRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    updateUserInfo(data);
-                }
-            });
+
+        async function loadUserData() {
+            try {
+                const userRef = db.ref('users/' + currentUser.uid);
+                userRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        document.getElementById('user-name').textContent = data.name || 'Usuario';
+                        document.getElementById('dropdown-user-name').textContent = data.name || 'Usuario';
+                        document.getElementById('dropdown-user-email').textContent = data.email || 'usuario@email.com';
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
         }
-        
-        function updateUserInfo(userData) {
-            document.getElementById('user-name').textContent = userData.name || 'Usuario';
-            document.getElementById('dropdown-user-name').textContent = userData.name || 'Usuario';
-            document.getElementById('dropdown-user-email').textContent = userData.email || 'usuario@email.com';
-        }
-        
+
         function loadFAQ() {
-            // In a real application, you would load FAQ from Firebase
-            // For now, we'll use static data
             const faqData = [
                 {
                     question: "¿Cómo realizar mi primer depósito?",
-                    answer: "Para realizar tu primer depósito:<br>1. Ve a la pestaña 'Depósitos'<br>2. Haz clic en 'Nuevo Depósito'<br>3. Selecciona el método de pago<br>4. Sube el comprobante y espera verificación<br><br>Los depósitos son procesados en 1-3 horas hábiles."
+                    answer: "Para realizar tu primer depósito:<br>1. Ve a la pestaña 'Depósitos'<br>2. Haz clic en 'Nuevo Depósito'<br>3. Selecciona el método de pago (Transferencia bancaria, PayPal, Criptomonedas)<br>4. Ingresa el monto deseado<br>5. Sube el comprobante si es necesario<br>6. Espera la verificación (1-3 horas hábiles)<br><br>Una vez verificado, el dinero estará disponible en tu cuenta.",
+                    category: "deposits"
                 },
                 {
                     question: "¿Cuánto tarda un retiro?",
-                    answer: "Los tiempos de retiro varían según el método:<br>• Transferencia bancaria: 3-5 días hábiles<br>• PayPal: 24-48 horas<br>• Criptomonedas: 15-30 minutos<br><br>Los retiros están sujetos a verificación de seguridad."
+                    answer: "Los tiempos de retiro varían según el método:<br><br>• <strong>Transferencia bancaria:</strong> 3-5 días hábiles<br>• <strong>PayPal:</strong> 24-48 horas<br>• <strong>Criptomonedas:</strong> 15-30 minutos (depende de la red)<br>• <strong>Tarjeta de débito:</strong> 1-3 días hábiles<br><br>Todos los retiros están sujetos a verificación de seguridad y aprobación.",
+                    category: "withdrawals"
                 },
                 {
                     question: "¿Qué es la verificación KYC?",
-                    answer: "KYC (Know Your Customer) es un proceso obligatorio que nos ayuda a:<br>1. Verificar tu identidad<br>2. Prevenir fraudes<br>3. Cumplir con regulaciones<br><br>Requiere: documento de identificación, selfie y comprobante de domicilio."
+                    answer: "KYC (Know Your Customer) es un proceso obligatorio que nos ayuda a:<br><br>1. <strong>Verificar tu identidad</strong><br>2. <strong>Prevenir fraudes y lavado de dinero</strong><br>3. <strong>Cumplir con regulaciones internacionales</strong><br><br><strong>Documentos requeridos:</strong><br>• Documento de identificación (pasaporte, DNI, licencia)<br>• Selfie sosteniendo tu documento<br>• Comprobante de domicilio reciente (últimos 3 meses)<br><br>El proceso toma 24-48 horas hábiles.",
+                    category: "verification"
                 },
                 {
                     question: "¿Cómo funciona el programa de referidos?",
-                    answer: "Por cada amigo que invites y se registre:<br>• Recibes $25 cuando realice su primer depósito<br>• Tu amigo recibe un bono de bienvenida<br>• No hay límite de referidos<br><br>Comparte tu código único o enlace personalizado."
+                    answer: "Nuestro programa de referidos te permite ganar comisiones:<br><br><strong>Requisitos:</strong><br>• Comparte tu código único o enlace personalizado<br>• Tu referido debe registrarse y verificar su cuenta<br>• Debe realizar un depósito mínimo de $100<br><br><strong>Beneficios:</strong><br>• Recibes $25 por cada referido válido<br>• Tu amigo recibe un bono de bienvenida de $10<br>• No hay límite de referidos<br>• Pagos automáticos cada lunes",
+                    category: "investments"
                 },
                 {
                     question: "¿Qué hacer si olvidé mi contraseña?",
-                    answer: "1. En la página de login, haz clic en '¿Olvidaste tu contraseña?'<br>2. Ingresa tu correo electrónico<br>3. Sigue las instrucciones en el correo que recibirás<br>4. Crea una nueva contraseña segura<br><br>Si tienes problemas, contacta a soporte."
+                    answer: "Sigue estos pasos:<br><br>1. En la página de login, haz clic en '¿Olvidaste tu contraseña?'<br>2. Ingresa el correo electrónico asociado a tu cuenta<br>3. Revisa tu bandeja de entrada (y spam)<br>4. Haz clic en el enlace del correo<br>5. Crea una nueva contraseña segura<br><br><strong>Recomendaciones:</strong><br>• Usa al menos 8 caracteres<br>• Combina mayúsculas, minúsculas, números y símbolos<br>• No uses contraseñas anteriores<br><br>Si no recibes el correo, contacta a soporte.",
+                    category: "security"
                 },
                 {
-                    question: "
+                    question: "¿Cómo funcionan las inversiones?",
+                    answer: "Canada Coin ofrece tres planes de inversión:<br><br><strong>1. Plan Básico (4% anual)</strong><br>• Mínimo: $100<br>• Retiros mensuales disponibles<br>• Perfecto para principiantes<br><br><strong>2. Plan Premium (5% anual)</strong><br>• Mínimo: $1,000<br>• Mayor rentabilidad<br>• Retiros mensuales<br><br><strong>3. Plan VIP (6% anual)</strong><br>• Mínimo: $5,000<br>• Máxima rentabilidad<br>• Asesor personal incluido<br><br>Las ganancias se calculan diariamente y puedes reinvertirlas.",
+                    category: "investments"
+                },
+                {
+                    question: "¿Es seguro Canada Coin?",
+                    answer: "Sí, Canada Coin implementa múltiples medidas de seguridad:<br><br><strong>Seguridad de Cuenta:</strong><br>• Autenticación de dos factores (2FA)<br>• Encriptación SSL de 256-bit<br>• Monitoreo de actividad sospechosa<br><br><strong>Protección de Fondos:</strong><br>• 95% de fondos en cold storage<br>• Seguro de hasta $250,000<br>• Auditorías de seguridad trimestrales<br><br><strong>Cumplimiento:</strong><br>• Regulado por FINTRAC (Canadá)<br>• Cumplimiento AML/CFT<br>• KYC obligatorio para todas las cuentas",
+                    category: "security"
+                },
+                {
+                    question: "¿Cómo activar mi tarjeta prepagada?",
+                    answer: "Para activar tu tarjeta Canada Coin:<br><br>1. Ve a la sección 'Tarjetas'<br>2. Haz clic en 'Activar Tarjeta'<br>3. Ingresa el número de tarjeta y CVV<br>4. Establece tu PIN de 4 dígitos<br>5. Confirma la activación<br><br><strong>Características:</strong><br>• Sin cargos de mantenimiento<br>• Aceptada mundialmente<br>• Límite diario: $5,000<br>• Recarga instantánea desde tu cuenta",
+                    category: "cards"
+                },
+                {
+                    question: "¿Hay comisiones por depósitos?",
+                    answer: "Canada Coin tiene una estructura de comisiones transparente:<br><br><strong>Depósitos:</strong><br>• Transferencia bancaria: Gratis<br>• PayPal: 2.9% + $0.30<br>• Criptomonedas: Depende de la red (aprox. 0.1-1%)<br>• Tarjeta de crédito/débito: 3.5%<br><br><strong>Retiros:</strong><br>• Transferencia bancaria: $25<br>• PayPal: 3.5%<br>• Criptomonedas: Comisión de red<br><br>Las inversiones no tienen comisiones de apertura o gestión.",
+                    category: "deposits"
+                },
+                {
+                    question: "¿Cómo aumentar mis límites de transacción?",
+                    answer: "Para aumentar tus límites:<br><br>1. Completa la verificación KYC nivel 2<br>2. Proporciona información de ingresos<br>3. Mantén una actividad constante<br>4. Contacta a soporte para solicitud especial<br><br><strong>Límites por nivel:</strong><br>• Nivel 1: $10,000 mensuales<br>• Nivel 2: $50,000 mensuales<br>• Nivel 3: $100,000+ mensuales<br><br>Cada nivel requiere documentación adicional.",
+                    category: "verification"
+                }
+            ];
+
+            const container = document.getElementById('faq-container');
+            container.innerHTML = '';
+
+            faqData.forEach((faq, index) => {
+                const faqItem = document.createElement('div');
+                faqItem.className = 'faq-item support-card';
+                faqItem.dataset.category = faq.category;
+                faqItem.innerHTML = `
+                    <div class="faq-question" data-index="${index}">
+                        <div class="flex justify-between items-center">
+                            <span class="font-medium text-white">${faq.question}</span>
+                            <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                        </div>
+                    </div>
+                    <div class="faq-answer hidden" id="faq-answer-${index}">
+                        <div class="text-gray-300 leading-relaxed">${faq.answer}</div>
+                        <button class="view-detailed-faq mt-3 text-blue-400 hover:text-blue-300 text-sm" data-category="${faq.category}">
+                            <i class="fas fa-external-link-alt mr-1"></i>Ver información detallada sobre ${getCategoryName(faq.category)}
+                        </button>
+                    </div>
+                `;
+                container.appendChild(faqItem);
+            });
+
+            // Agregar event listeners a las preguntas
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.addEventListener('click', function() {
+                    const index = this.dataset.index;
+                    const answer = document.getElementById(`faq-answer-${index}`);
+                    const icon = this.querySelector('i');
+                    
+                    // Cerrar otras respuestas
+                    document.querySelectorAll('.faq-answer').forEach(ans => {
+                        if (ans.id !== `faq-answer-${index}`) {
+                            ans.classList.add('hidden');
+                            const otherIcon = ans.previousElementSibling.querySelector('i');
+                            if (otherIcon) {
+                                otherIcon.style.transform = 'rotate(0deg)';
+                            }
+                        }
+                    });
+                    
+                    // Alternar respuesta actual
+                    answer.classList.toggle('hidden');
+                    
+                    // Rotar icono
+                    if (answer.classList.contains('hidden')) {
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            // Agregar event listeners a los botones de ver detallado
+            document.querySelectorAll('.view-detailed-faq').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const category = this.dataset.category;
+                    openFaqModal(category);
+                });
+            });
+        }
+
+        function getCategoryName(category) {
+            const categories = {
+                'deposits': 'Depósitos',
+                'withdrawals': 'Retiros',
+                'investments': 'Inversiones',
+                'verification': 'Verificación',
+                'security': 'Seguridad',
+                'cards': 'Tarjetas'
+            };
+            return categories[category] || category;
+        }
+
+        function setupEventListeners() {
+            // Menú de usuario
+            const userProfileButton = document.getElementById('user-profile-button');
+            const userProfileDropdown = document.getElementById('user-profile-dropdown');
+            
+            if (userProfileButton) {
+                userProfileButton.addEventListener('click', () => {
+                    userProfileDropdown.classList.toggle('active');
+                });
+            }
+            
+            // Logout
+            const logoutBtn = document.getElementById('logout-button');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', handleLogout);
+            }
+            
+            // Cerrar menú al hacer clic fuera
+            document.addEventListener('click', (e) => {
+                if (userProfileButton && userProfileDropdown && 
+                    !userProfileButton.contains(e.target) && 
+                    !userProfileDropdown.contains(e.target)) {
+                    userProfileDropdown.classList.remove('active');
+                }
+            });
+            
+            // Botones de categoría
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const category = this.dataset.category;
+                    openFaqModal(category);
+                });
+            });
+            
+            // Chat en vivo
+            const liveChatBtn = document.getElementById('live-chat-btn');
+            if (liveChatBtn) {
+                liveChatBtn.addEventListener('click', openChatModal);
+            }
+            
+            // Formulario de soporte
+            const form = document.getElementById('support-form');
+            if (form) {
+                form.addEventListener('submit', handleSupportSubmit);
+            }
+            
+            // Cancelar soporte
+            const cancelBtn = document.getElementById('cancel-support');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    form.reset();
+                    document.getElementById('support-file-name').textContent = 'Ningún archivo seleccionado';
+                });
+            }
+            
+            // Archivo adjunto
+            const fileInput = document.getElementById('support-file');
+            if (fileInput) {
+                fileInput.addEventListener('change', function() {
+                    const fileName = this.files[0]?.name || 'Ningún archivo seleccionado';
+                    document.getElementById('support-file-name').textContent = fileName;
+                });
+            }
+            
+            // Búsqueda
+            const searchInput = document.getElementById('search-support');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase();
+                    filterFAQ(query);
+                });
+            }
+            
+            // Recursos expandibles
+            document.querySelectorAll('.resource-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('.fa-chevron-down');
+                    
+                    // Cerrar otros recursos
+                    document.querySelectorAll('.resource-content').forEach(otherContent => {
+                        if (otherContent !== content && otherContent.classList.contains('expanded')) {
+                            otherContent.classList.remove('expanded');
+                            const otherIcon = otherContent.previousElementSibling.querySelector('.fa-chevron-down');
+                            if (otherIcon) {
+                                otherIcon.style.transform = 'rotate(0deg)';
+                            }
+                        }
+                    });
+                    
+                    // Alternar recurso actual
+                    content.classList.toggle('expanded');
+                    
+                    // Rotar icono
+                    if (content.classList.contains('expanded')) {
+                        icon.style.transform = 'rotate(180deg)';
+                    } else {
+                        icon.style.transform = 'rotate(0deg)';
+                    }
+                });
+            });
+            
+            // Ver recursos completos
+            document.querySelectorAll('.view-resource').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const resource = this.dataset.resource;
+                    openResourceModal(resource);
+                });
+            });
+            
+            // Modal de FAQ
+            const closeFaqModal = document.getElementById('closeFaqModal');
+            const closeFaqModalBtn = document.getElementById('closeFaqModalBtn');
+            const faqModal = document.getElementById('faqModal');
+            
+            if (closeFaqModal) {
+                closeFaqModal.addEventListener('click', () => closeFaqModalFunc());
+            }
+            
+            if (closeFaqModalBtn) {
+                closeFaqModalBtn.addEventListener('click', () => closeFaqModalFunc());
+            }
+            
+            if (faqModal) {
+                faqModal.addEventListener('click', (e) => {
+                    if (e.target === faqModal) {
+                        closeFaqModalFunc();
+                    }
+                });
+            }
+            
+            // Modal de recursos
+            const closeResourceModal = document.getElementById('closeResourceModal');
+            const closeResourceBtn = document.getElementById('closeResourceBtn');
+            const resourceModal = document.getElementById('resourceModal');
+            
+            if (closeResourceModal) {
+                closeResourceModal.addEventListener('click', () => closeResourceModalFunc());
+            }
+            
+            if (closeResourceBtn) {
+                closeResourceBtn.addEventListener('click', () => closeResourceModalFunc());
+            }
+            
+            if (resourceModal) {
+                resourceModal.addEventListener('click', (e) => {
+                    if (e.target === resourceModal) {
+                        closeResourceModalFunc();
+                    }
+                });
+            }
+            
+            // Modal de chat
+            const closeChatModal = document.getElementById('closeChatModal');
+            const chatModal = document.getElementById('chatModal');
+            const sendMessageBtn = document.getElementById('sendMessage');
+            const chatInput = document.getElementById('chatInput');
+            
+            if (closeChatModal) {
+                closeChatModal.addEventListener('click', () => closeChatModalFunc());
+            }
+            
+            if (chatModal) {
+                chatModal.addEventListener('click', (e) => {
+                    if (e.target === chatModal) {
+                        closeChatModalFunc();
+                    }
+                });
+            }
+            
+            if (sendMessageBtn) {
+                sendMessageBtn.addEventListener('click', sendChatMessage);
+            }
+            
+            if (chatInput) {
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        sendChatMessage();
+                    }
+                });
+            }
+            
+            // Botones de acción rápida en chat
+            document.querySelectorAll('.quick-action-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const message = this.dataset.message;
+                    chatInput.value = message;
+                    sendChatMessage();
+                });
+            });
+        }
+
+        function filterFAQ(query) {
+            const faqItems = document.querySelectorAll('.faq-item');
+            let visibleCount = 0;
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question').textContent.toLowerCase();
+                const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+                
+                if (query === '' || question.includes(query) || answer.includes(query)) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            if (visibleCount === 0 && query !== '') {
+                const container = document.getElementById('faq-container');
+                if (!container.querySelector('.no-results')) {
+                    container.innerHTML += `
+                        <div class="no-results text-center py-8">
+                            <i class="fas fa-search text-4xl text-gray-600 mb-4"></i>
+                            <p class="text-gray-400">No se encontraron resultados para "${query}"</p>
+                            <p class="text-sm text-gray-500 mt-2">Intenta con otras palabras o contacta a soporte</p>
+                        </div>
+                    `;
+                }
+            } else {
+                const noResults = document.querySelector('.no-results');
+                if (noResults) {
+                    noResults.remove();
+                }
+            }
+        }
+
+        function openFaqModal(category) {
+            const modal = document.getElementById('faqModal');
+            const title = document.getElementById('faqModalTitle');
+            const content = document.getElementById('faqModalContent');
+            
+            if (!modal || !title || !content) return;
+            
+            const faqContent = getFaqContentByCategory(category);
+            
+            title.textContent = `Guía Completa: ${getCategoryName(category)}`;
+            content.innerHTML = faqContent;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function getFaqContentByCategory(category) {
+            const categories = {
+                'deposits': `
+                    <div class="category-section">
+                        <h3 class="category-title">Depósitos</h3>
+                        <p class="category-description">
+                            Los depósitos son la forma de agregar fondos a tu cuenta Canada Coin. 
+                            Ofrecemos múltiples métodos seguros y confiables para que puedas 
+                            comenzar a invertir rápidamente.
+                        </p>
+                        
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <div class="feature-title">Transferencia Bancaria</div>
+                                <div class="feature-description">
+                                    • Sin comisiones<br>
+                                    • Procesamiento: 1-3 horas hábiles<br>
+                                    • Límite mínimo: $100<br>
+                                    • Límite máximo: $50,000 por transacción
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">PayPal</div>
+                                <div class="feature-description">
+                                    • Comisión: 2.9% + $0.30<br>
+                                    • Procesamiento: Instantáneo<br>
+                                    • Límite mínimo: $50<br>
+                                    • Límite máximo: $10,000 por día
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Criptomonedas</div>
+                                <div class="feature-description">
+                                    • Bitcoin, Ethereum, USDT<br>
+                                    • Comisión de red variable<br>
+                                    • Procesamiento: 10-30 minutos<br>
+                                    • Sin límites preestablecidos
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Tarjeta de Crédito/Débito</div>
+                                <div class="feature-description">
+                                    • Comisión: 3.5%<br>
+                                    • Procesamiento: Instantáneo<br>
+                                    • Límite mínimo: $20<br>
+                                    • Límite máximo: $5,000 por día
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="important-note">
+                            <div class="note-title">⚠️ Información Importante</div>
+                            <div class="note-content">
+                                • Los depósitos deben provenir de cuentas a tu nombre<br>
+                                • Los fondos están disponibles después de la verificación<br>
+                                • Las comisiones pueden variar según el país<br>
+                                • Para depósitos mayores a $10,000, contacta a soporte
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h4 class="font-bold text-white mb-3">Proceso Paso a Paso</h4>
+                            <ol class="list-decimal pl-5 space-y-2 text-gray-300">
+                                <li>Inicia sesión en tu cuenta Canada Coin</li>
+                                <li>Ve a la sección "Depósitos" en el menú principal</li>
+                                <li>Selecciona el método de pago deseado</li>
+                                <li>Ingresa el monto a depositar</li>
+                                <li>Confirma los detalles de la transacción</li>
+                                <li>Sigue las instrucciones específicas del método seleccionado</li>
+                                <li>Espera la confirmación por correo electrónico</li>
+                            </ol>
+                        </div>
+                    </div>
+                `,
+                
+                'withdrawals': `
+                    <div class="category-section">
+                        <h3 class="category-title">Retiros</h3>
+                        <p class="category-description">
+                            Retira tus ganancias de manera segura y confiable. Ofrecemos 
+                            múltiples métodos de retiro con tiempos de procesamiento 
+                            claros y transparentes.
+                        </p>
+                        
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <div class="feature-title">Transferencia Bancaria</div>
+                                <div class="feature-description">
+                                    • Comisión: $25 por retiro<br>
+                                    • Tiempo: 3-5 días hábiles<br>
+                                    • Límite mínimo: $100<br>
+                                    • Límite máximo: $50,000 por día
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">PayPal</div>
+                                <div class="feature-description">
+                                    • Comisión: 3.5%<br>
+                                    • Tiempo: 24-48 horas<br>
+                                    • Límite mínimo: $50<br>
+                                    • Límite máximo: $10,000 por día
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Criptomonedas</div>
+                                <div class="feature-description">
+                                    • Bitcoin, Ethereum, USDT<br>
+                                    • Comisión de red variable<br>
+                                    • Tiempo: 15-30 minutos<br>
+                                    • Sin límites preestablecidos
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Tarjeta Prepagada</div>
+                                <div class="feature-description">
+                                    • Comisión: 2%<br>
+                                    • Tiempo: Instantáneo<br>
+                                    • Límite mínimo: $20<br>
+                                    • Límite máximo: $5,000 por día
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="important-note">
+                            <div class="note-title">⚠️ Información Importante</div>
+                            <div class="note-content">
+                                • Los retiros solo pueden enviarse a cuentas a tu nombre<br>
+                                • Se requiere verificación KYC completa<br>
+                                • Primer retiro puede tomar más tiempo por verificación<br>
+                                • Los fines de semana y festivos no cuentan como días hábiles
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h4 class="font-bold text-white mb-3">Proceso Paso a Paso</h4>
+                            <ol class="list-decimal pl-5 space-y-2 text-gray-300">
+                                <li>Asegúrate de tener saldo disponible para retirar</li>
+                                <li>Verifica que tu cuenta esté completamente verificada</li>
+                                <li>Ve a la sección "Retiros" en el menú principal</li>
+                                <li>Selecciona el método de retiro deseado</li>
+                                <li>Ingresa el monto a retirar y la cuenta destino</li>
+                                <li>Confirma todos los detalles de la transacción</li>
+                                <li>Espera la confirmación por correo electrónico</li>
+                                <li>Recibirás una notificación cuando el retiro sea procesado</li>
+                            </ol>
+                        </div>
+                    </div>
+                `,
+                
+                'investments': `
+                    <div class="category-section">
+                        <h3 class="category-title">Inversiones</h3>
+                        <p class="category-description">
+                            Canada Coin ofrece planes de inversión diseñados para maximizar 
+                            tus rendimientos con diferentes niveles de riesgo y rentabilidad. 
+                            Todas las inversiones están respaldadas por activos reales.
+                        </p>
+                        
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <div class="feature-title">Plan Básico</div>
+                                <div class="feature-description">
+                                    • Tasa anual: 4%<br>
+                                    • Mínimo: $100<br>
+                                    • Máximo: $999<br>
+                                    • Duración: Flexible<br>
+                                    • Retiros mensuales disponibles
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Plan Premium</div>
+                                <div class="feature-description">
+                                    • Tasa anual: 5%<br>
+                                    • Mínimo: $1,000<br>
+                                    • Máximo: $4,999<br>
+                                    • Duración: 6-12 meses<br>
+                                    • Retiros trimestrales
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Plan VIP</div>
+                                <div class="feature-description">
+                                    • Tasa anual: 6%<br>
+                                    • Mínimo: $5,000<br>
+                                    • Máximo: Sin límite<br>
+                                    • Duración: 12+ meses<br>
+                                    • Asesor personal incluido
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Inversión Automática</div>
+                                <div class="feature-description">
+                                    • Reinversión automática<br>
+                                    • DCA (Dollar Cost Averaging)<br>
+                                    • Estrategias personalizadas<br>
+                                    • Reportes detallados
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="important-note">
+                            <div class="note-title">📈 Cómo Calcular Tus Ganancias</div>
+                            <div class="note-content">
+                                • Ganancias diarias: (Inversión × Tasa anual) ÷ 365<br>
+                                • Ganancias mensuales: Inversión × (Tasa anual ÷ 12)<br>
+                                • Las ganancias se capitalizan diariamente<br>
+                                • Puedes reinvertir las ganancias automáticamente
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h4 class="font-bold text-white mb-3">Beneficios Exclusivos</h4>
+                            <ul class="list-disc pl-5 space-y-2 text-gray-300">
+                                <li><strong>Sin comisiones ocultas:</strong> Todas las tarifas son transparentes</li>
+                                <li><strong>Liquidez parcial:</strong> Puedes retirar ganancias sin cerrar la inversión</li>
+                                <li><strong>Seguro de inversión:</strong> Hasta $250,000 protegidos</li>
+                                <li><strong>Dashboard en tiempo real:</strong> Monitorea tu inversión 24/7</li>
+                                <li><strong>Alertas personalizadas:</strong> Recibe notificaciones importantes</li>
+                                <li><strong>Soporte dedicado:</strong> Asistencia especializada para inversionistas</li>
+                            </ul>
+                        </div>
+                    </div>
+                `,
+                
+                'verification': `
+                    <div class="category-section">
+                        <h3 class="category-title">Verificación KYC</h3>
+                        <p class="category-description">
+                            KYC (Know Your Customer) es un proceso de verificación de identidad 
+                            obligatorio que nos permite cumplir con regulaciones internacionales 
+                            y proteger tu cuenta contra fraudes.
+                        </p>
+                        
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <div class="feature-title">Nivel 1 - Básico</div>
+                                <div class="feature-description">
+                                    • Documento de identidad<br>
+                                    • Selfie con documento<br>
+                                    • Correo electrónico verificado<br>
+                                    • Límites: $10,000 mensuales
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Nivel 2 - Avanzado</div>
+                                <div class="feature-description">
+                                    • Comprobante de domicilio<br>
+                                    • Verificación de ingresos<br>
+                                    • Número de teléfono verificado<br>
+                                    • Límites: $50,000 mensuales
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Nivel 3 - Premium</div>
+                                <div class="feature-description">
+                                    • Declaración de impuestos<br>
+                                    • Referencias bancarias<br>
+                                    • Entrevista con agente<br>
+                                    • Límites: $100,000+ mensuales
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Documentos Aceptados</div>
+                                <div class="feature-description">
+                                    • Pasaporte (válido)<br>
+                                    • DNI o cédula<br>
+                                    • Licencia de conducir<br>
+                                    • Tarjeta de residencia
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="important-note">
+                            <div class="note-title">🔒 Seguridad de Tus Datos</div>
+                            <div class="note-content">
+                                • Todos los documentos son encriptados con tecnología bancaria<br>
+                                • Solo personal autorizado puede acceder a tu información<br>
+                                • Los documentos se eliminan automáticamente después de 5 años<br>
+                                • Cumplimos con GDPR, CCPA y regulaciones canadienses
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h4 class="font-bold text-white mb-3">Proceso de Verificación</h4>
+                            <ol class="list-decimal pl-5 space-y-2 text-gray-300">
+                                <li>Completa el registro básico con tu correo electrónico</li>
+                                <li>Sube una foto clara de tu documento de identidad por ambos lados</li>
+                                <li>Toma una selfie sosteniendo tu documento (verificación de vida)</li>
+                                <li>Proporciona un comprobante de domicilio reciente (últimos 3 meses)</li>
+                                <li>Espera la verificación (24-48 horas hábiles)</li>
+                                <li>Recibirás un correo de confirmación cuando tu cuenta esté verificada</li>
+                                <li>Para niveles superiores, contacta a nuestro equipo de soporte</li>
+                            </ol>
+                        </div>
+                    </div>
+                `,
+                
+                'security': `
+                    <div class="category-section">
+                        <h3 class="category-title">Seguridad</h3>
+                        <p class="category-description">
+                            En Canada Coin, la seguridad de tu cuenta y fondos es nuestra 
+                            máxima prioridad. Implementamos múltiples capas de protección 
+                            utilizando tecnología bancaria de última generación.
+                        </p>
+                        
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <div class="feature-title">Autenticación 2FA</div>
+                                <div class="feature-description">
+                                    • Google Authenticator<br>
+                                    • Authy<br>
+                                    • SMS backup<br>
+                                    • Llaves de seguridad físicas
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Encriptación</div>
+                                <div class="feature-description">
+                                    • SSL 256-bit<br>
+                                    • Encriptación de extremo a extremo<br>
+                                    • Cold storage para 95% de fondos<br>
+                                    • HSMs (Hardware Security Modules)
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Monitoreo</div>
+                                <div class="feature-description">
+                                    • Detección de fraude en tiempo real<br>
+                                    • Análisis de comportamiento<br>
+                                    • Alertas de actividad sospechosa<br>
+                                    • Equipo de seguridad 24/7
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Seguro y Garantías</div>
+                                <div class="feature-description">
+                                    • Seguro de $250,000 por cuenta<br>
+                                    • Fondo de garantía de $50 millones<br>
+                                    • Auditorías trimestrales independientes<br>
+                                    • Certificación ISO 27001
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="important-note">
+                            <div class="note-title">🛡️ Mejores Prácticas de Seguridad</div>
+                            <div class="note-content">
+                                • Habilita la autenticación de dos factores inmediatamente<br>
+                                • Usa contraseñas únicas y complejas (mínimo 12 caracteres)<br>
+                                • Nunca compartas tus credenciales con nadie<br>
+                                • Verifica siempre que estás en https://canadacoin.com<br>
+                                • Cierra sesión cuando uses computadoras públicas<br>
+                                • Monitorea regularmente la actividad de tu cuenta
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h4 class="font-bold text-white mb-3">En Caso de Problemas</h4>
+                            <ul class="list-disc pl-5 space-y-2 text-gray-300">
+                                <li><strong>Acceso no autorizado:</strong> Contacta a soporte inmediatamente y congela tu cuenta</li>
+                                <li><strong>Phishing detectado:</strong> Reporta el sitio falso a security@canadacoin.com</li>
+                                <li><strong>Dispositivo perdido:</strong> Revoca acceso desde la configuración de seguridad</li>
+                                <li><strong>Actividad sospechosa:</strong> Nuestro equipo te contactará automáticamente</li>
+                                <li><strong>Contraseña comprometida:</strong> Cambia tu contraseña inmediatamente y revisa actividad</li>
+                            </ul>
+                        </div>
+                    </div>
+                `,
+                
+                'cards': `
+                    <div class="category-section">
+                        <h3 class="category-title">Tarjetas Prepagadas</h3>
+                        <p class="category-description">
+                            La tarjeta prepagada Canada Coin te permite acceder a tus fondos 
+                            en cualquier lugar del mundo. Aceptada en millones de establecimientos 
+                            y cajeros automáticos internacionales.
+                        </p>
+                        
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <div class="feature-title">Tarjeta Virtual</div>
+                                <div class="feature-description">
+                                    • Instantánea y gratuita<br>
+                                    • Para compras en línea<br>
+                                    • Límite diario: $2,500<br>
+                                    • Compatible con Apple/Google Pay
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Tarjeta Física</div>
+                                <div class="feature-description">
+                                    • Envío express: $15<br>
+                                    • Chip y contacto sin contacto<br>
+                                    • Límite diario: $5,000<br>
+                                    • Retiros en cajeros: $1,000/día
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Tarjeta Metal</div>
+                                <div class="feature-description">
+                                    • Exclusiva para clientes VIP<br>
+                                    • Límites premium<br>
+                                    • Lounge access en aeropuertos<br>
+                                    • Seguro de viaje incluido
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-title">Beneficios</div>
+                                <div class="feature-description">
+                                    • Sin cargos de mantenimiento<br>
+                                    • Recarga instantánea<br>
+                                    • Conversión automática de divisas<br>
+                                    • Cashback del 1% en todas las compras
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="important-note">
+                            <div class="note-title">💳 Información Importante</div>
+                            <div class="note-content">
+                                • La tarjeta está emitida por un banco canadiense regulado<br>
+                                • Aceptada en más de 200 países<br>
+                                • Sin responsabilidad por fraude (protección cero liability)<br>
+                                • Puedes congelar/descongelar la tarjeta desde la app
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h4 class="font-bold text-white mb-3">Cómo Solicitar Tu Tarjeta</h4>
+                            <ol class="list-decimal pl-5 space-y-2 text-gray-300">
+                                <li>Verifica que tu cuenta esté en nivel KYC 2 o superior</li>
+                                <li>Ve a la sección "Tarjetas" en tu dashboard</li>
+                                <li>Selecciona el tipo de tarjeta que deseas</li>
+                                <li>Confirma tu dirección de envío (para tarjeta física)</li>
+                                <li>Paga el costo de envío si aplica</li>
+                                <li>Recibirás la tarjeta virtual inmediatamente</li>
+                                <li>Para tarjeta física: 5-10 días hábiles de entrega</li>
+                                <li>Activa tu tarjeta siguiendo las instrucciones recibidas</li>
+                            </ol>
+                        </div>
+                    </div>
+                `
+            };
+            
+            return categories[category] || '<p class="text-gray-300">Categoría no encontrada.</p>';
+        }
+
+        function closeFaqModalFunc() {
+            const modal = document.getElementById('faqModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function openChatModal() {
+            const modal = document.getElementById('chatModal');
+            if (!modal) return;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Simular conexión con agente
+            const statusIndicator = document.getElementById('agentStatusIndicator');
+            const statusText = document.getElementById('agentStatusText');
+            
+            statusIndicator.className = 'status-indicator connecting';
+            statusText.textContent = 'Conectando con agente...';
+            
+            setTimeout(() => {
+                agentAvailable = true;
+                statusIndicator.className = 'status-indicator';
+                statusText.textContent = 'Agente Carlos - Conectado';
+                
+                // Enviar mensaje de bienvenida automático
+                setTimeout(() => {
+                    addAgentMessage("¿En qué puedo ayudarte hoy? Puedes preguntarme sobre depósitos, retiros, inversiones, o cualquier otro tema.");
+                }, 500);
+            }, 2000);
+            
+            // Enfocar en el input del chat
+            setTimeout(() => {
+                document.getElementById('chatInput').focus();
+            }, 300);
+        }
+
+        function closeChatModalFunc() {
+            const modal = document.getElementById('chatModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                agentAvailable = false;
+                
+                // Limpiar mensajes excepto el primero
+                const chatMessages = document.getElementById('chatMessages');
+                if (chatMessages.children.length > 1) {
+                    while (chatMessages.children.length > 1) {
+                        chatMessages.removeChild(chatMessages.lastChild);
+                    }
+                }
+            }
+        }
+
+        function sendChatMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            
+            if (!message) return;
+            
+            if (!agentAvailable) {
+                showNotification('Esperando conexión con agente...', 'warning');
+                return;
+            }
+            
+            // Agregar mensaje del usuario
+            addUserMessage(message);
+            chatInput.value = '';
+            
+            // Simular respuesta del agente después de un delay
+            setTimeout(() => {
+                const response = getAgentResponse(message);
+                addAgentMessage(response);
+                
+                // Hacer scroll al final
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1000);
+        }
+
+        function addUserMessage(message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user-message';
+            messageDiv.innerHTML = `<p class="text-white">${message}</p>`;
+            chatMessages.appendChild(messageDiv);
+            
+            // Hacer scroll al final
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addAgentMessage(message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message agent-message';
+            messageDiv.innerHTML = `
+                <p class="font-medium text-blue-300">Agente Carlos</p>
+                <p class="text-white">${message}</p>
+            `;
+            chatMessages.appendChild(messageDiv);
+            
+            // Hacer scroll al final
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function getAgentResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Respuestas predefinidas basadas en palabras clave
+            if (lowerMessage.includes('depósito') || lowerMessage.includes('deposito')) {
+                return "Para realizar un depósito, ve a la sección 'Depósitos' en tu dashboard. Ofrecemos transferencias bancarias (sin comisión), PayPal (2.9% + $0.30), criptomonedas y tarjetas. ¿Necesitas ayuda con algún método específico?";
+            }
+            else if (lowerMessage.includes('retiro') || lowerMessage.includes('retirar')) {
+                return "Los retiros se procesan en 1-5 días hábiles dependiendo del método. Transferencia bancaria: $25 de comisión, PayPal: 3.5%, criptomonedas: comisión de red. ¿Qué método prefieres usar?";
+            }
+            else if (lowerMessage.includes('inversión') || lowerMessage.includes('inversion')) {
+                return "Tenemos tres planes: Básico (4% anual, mínimo $100), Premium (5% anual, mínimo $1,000) y VIP (6% anual, mínimo $5,000). Las ganancias se calculan diariamente. ¿Te interesa algún plan en particular?";
+            }
+            else if (lowerMessage.includes('verificación') || lowerMessage.includes('verificacion') || lowerMessage.includes('kyc')) {
+                return "La verificación KYC es obligatoria y toma 24-48 horas. Necesitas: documento de identidad, selfie con documento y comprobante de domicilio. ¿Tienes problemas con algún documento?";
+            }
+            else if (lowerMessage.includes('seguridad') || lowerMessage.includes('hack') || lowerMessage.includes('robo')) {
+                return "Tu cuenta está protegida con autenticación de dos factores, encriptación SSL 256-bit y seguro de $250,000. Si notas actividad sospechosa, contacta a security@canadacoin.com inmediatamente.";
+            }
+            else if (lowerMessage.includes('tarjeta') || lowerMessage.includes('card')) {
+                return "Ofrecemos tarjetas virtuales (gratis) y físicas ($15 de envío). Aceptadas mundialmente, sin cargos de mantenimiento y con cashback del 1%. ¿Te interesa solicitar una?";
+            }
+            else if (lowerMessage.includes('hola') || lowerMessage.includes('buenas')) {
+                return "¡Hola! Soy Carlos, agente de soporte de Canada Coin. Estoy aquí para ayudarte con cualquier consulta sobre depósitos, retiros, inversiones, verificación, seguridad o tarjetas. ¿En qué puedo asistirte?";
+            }
+            else if (lowerMessage.includes('gracias') || lowerMessage.includes('thanks')) {
+                return "¡De nada! Es un placer ayudarte. Si tienes más preguntas, no dudes en contactarnos. ¡Que tengas un excelente día!";
+            }
+            else {
+                return "Entiendo tu consulta. Para brindarte la mejor asistencia, ¿podrías ser más específico? Puedo ayudarte con temas de depósitos, retiros, inversiones, verificación, seguridad o tarjetas.";
+            }
+        }
+
+        async function handleSupportSubmit(e) {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                showNotification('Debes iniciar sesión para enviar una solicitud', 'error');
+                return;
+            }
+            
+            const category = document.getElementById('support-category').value;
+            const message = document.getElementById('support-message').value;
+            const file = document.getElementById('support-file').files[0];
+            
+            if (!category) {
+                showNotification('Por favor selecciona una categoría', 'error');
+                return;
+            }
+            
+            if (!message.trim()) {
+                showNotification('Por favor describe tu consulta', 'error');
+                return;
+            }
+            
+            try {
+                const ticketId = 'TKT-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                const ticketData = {
+                    id: ticketId,
+                    userId: currentUser.uid,
+                    category: category,
+                    message: message,
+                    status: 'open',
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                };
+                
+                await db.ref('supportTickets/' + currentUser.uid + '/' + ticketId).set(ticketData);
+                
+                // Resetear formulario
+                document.getElementById('support-form').reset();
+                document.getElementById('support-file-name').textContent = 'Ningún archivo seleccionado';
+                
+                showNotification(`¡Solicitud enviada exitosamente! ID: ${ticketId}`, 'success');
+                
+            } catch (error) {
+                console.error('Error creating support ticket:', error);
+                showNotification('Error al enviar la solicitud: ' + error.message, 'error');
+            }
+        }
+
+        function openResourceModal(resourceType) {
+            const modal = document.getElementById('resourceModal');
+            const title = document.getElementById('resourceTitle');
+            const content = document.getElementById('resourceContent');
+            
+            if (!modal || !title || !content) return;
+            
+            const resources = {
+                guide: {
+                    title: "Guía Completa de Usuario",
+                    content: `
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-white mb-3">Bienvenido a Canada Coin</h3>
+                                <p class="text-gray-300 mb-4">Esta guía te ayudará a aprovechar al máximo todas las funciones de nuestra plataforma.</p>
+                            </div>
+                            
+                            <div class="glass-card p-4">
+                                <h4 class="font-bold text-white mb-2">📱 Crear una Cuenta</h4>
+                                <ol class="list-decimal pl-5 space-y-2 text-gray-300">
+                                    <li>Regístrate con tu correo electrónico</li>
+                                    <li>Verifica tu cuenta mediante el enlace enviado a tu correo</li>
+                                    <li>Completa el proceso KYC (verificación de identidad)</li>
+                                    <li>Configura la autenticación de dos factores (2FA)</li>
+                                </ol>
+                            </div>
+                            
+                            <div class="glass-card p-4">
+                                <h4 class="font-bold text-white mb-2">💰 Realizar Depósitos</h4>
+                                <ul class="list-disc pl-5 space-y-2 text-gray-300">
+                                    <li>Ve a la sección "Depósitos"</li>
+                                    <li>Selecciona tu método de pago preferido</li>
+                                    <li>Ingresa el monto deseado (mínimo $100)</li>
+                                    <li>Sigue las instrucciones específicas del método seleccionado</li>
+                                    <li>Los fondos estarán disponibles en 1-3 horas hábiles</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="glass-card p-4">
+                                <h4 class="font-bold text-white mb-2">📈 Invertir tu Dinero</h4>
+                                <p class="text-gray-300 mb-3">Canada Coin ofrece tres planes de inversión:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
+                                    <div class="p-3 bg-blue-900/30 rounded-lg">
+                                        <p class="font-bold text-blue-300">Básico</p>
+                                        <p class="text-sm text-gray-300">4% anual<br>Mínimo: $100</p>
+                                    </div>
+                                    <div class="p-3 bg-purple-900/30 rounded-lg">
+                                        <p class="font-bold text-purple-300">Premium</p>
+                                        <p class="text-sm text-gray-300">5% anual<br>Mínimo: $1,000</p>
+                                    </div>
+                                    <div class="p-3 bg-yellow-900/30 rounded-lg">
+                                        <p class="font-bold text-yellow-300">VIP</p>
+                                        <p class="text-sm text-gray-300">6% anual<br>Mínimo: $5,000</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="glass-card p-4">
+                                <h4 class="font-bold text-white mb-2">🔄 Retirar Fondos</h4>
+                                <p class="text-gray-300 mb-2">Para retirar tus ganancias:</p>
+                                <ol class="list-decimal pl-5 space-y-2 text-gray-300">
+                                    <li>Ve a "Retiros" en el menú principal</li>
+                                    <li>Selecciona el método de retiro</li>
+                                    <li>Ingresa el monto a retirar</li>
+                                    <li>Confirma la transacción</li>
+                                    <li>Los tiempos varían según el método seleccionado</li>
+                                </ol>
+                            </div>
+                            
+                            <div class="glass-card p-4">
+                                <h4 class="font-bold text-white mb-2">👥 Programa de Referidos</h4>
+                                <p class="text-gray-300">Invita amigos y gana $25 por cada referido que realice un depósito mínimo de $100.</p>
+                                <p class="text-gray-300 mt-2">Comparte tu enlace único o código desde la sección "Referidos".</p>
+                            </div>
+                            
+                            <div class="glass-card p-4">
+                                <h4 class="font-bold text-white mb-2">🔒 Seguridad</h4>
+                                <ul class="list-disc pl-5 space-y-2 text-gray-300">
+                                    <li>Habilita la autenticación de dos factores</li>
+                                    <li>Usa contraseñas seguras y únicas</li>
+                                    <li>Nunca compartas tus credenciales</li>
+                                    <li>Verifica siempre la URL (https://canadacoin.com)</li>
+                                    <li>Reporta cualquier actividad sospechosa</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+                terms: {
+                    title: "Términos y Condiciones",
+                    content: `
+                        <div class="space-y-6">
+                            <div class="glass-card p-4">
+                                <h4 class="font-bold text-white mb-3">1. Aceptación de Términos</h4>
+                                <p class="text-gray-300">Al acceder y usar Canada Coin, aceptas cumplir con estos Términos y Condiciones. Si no estás de acuerdo con alguna parte, no uses nuestros servicios.</p>
+                            </div>
+                            
+                            <div class="glass-card p-4">
+                                <h4 class="font-bold text-white mb-3">2. Elegibilidad</h4>
+                                <p class="text-gray-300 mb-2">Para usar Canada Coin, debes:</p>
+                                <ul class="list-disc pl-5 space-y-1 text-gray-300">
+                                    <li>Tener al menos 18 años</li>
+                                    <li>Ser residente de un país donde nuestros servicios estén disponibles</li>
+                                    <li>Completar exitosamente el proceso KYC</li>
+                                    <li>No estar en listas de sanciones o ser políticamente expuesta</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                },
+                privacy: {
+                    title: "Política de Privacidad",
+                    content: `
+                        <div class="space-y-6">
+                            <div class="glass-card p-4">
+                                <h4 class="font-bold text-white mb-3">1. Información que Recopilamos</h4>
+                                <p class="text-gray-300 mb-2">Recopilamos varios tipos de información:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="font-medium text-blue-300 mb-1">Información Personal</p>
+                                        <ul class="list-disc pl-5 text-sm text-gray-300">
+                                            <li>Nombre completo</li>
+                                            <li>Dirección de correo</li>
+                                            <li>Número de teléfono</li>
+                                            <li>Fecha de nacimiento</li>
+                                            <li>Dirección física</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-blue-300 mb-1">Documentos KYC</p>
+                                        <ul class="list-disc pl-5 text-sm text-gray-300">
+                                            <li>Documento de identidad</li>
+                                            <li>Selfie de verificación</li>
+                                            <li>Comprobante de domicilio</li>
+                                            <li>Información fiscal</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                },
+                tutorials: {
+                    title: "Tutoriales en Video",
+                    content: `
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-white mb-3">Aprende con Tutoriales</h3>
+                                <p class="text-gray-300">Nuestra biblioteca de videos te guiará paso a paso en el uso de Canada Coin.</p>
+                            </div>
+                            
+                            <div class="glass-card p-4">
+                                <h4 class="font-bold text-white mb-3">🎥 Registro y Verificación</h4>
+                                <div class="bg-gray-800 rounded-lg p-4 mb-3">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-10 h-10 bg-blue-900/30 rounded-lg flex items-center justify-center mr-3">
+                                            <i class="fas fa-user-plus text-blue-400"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-white">Crear una Cuenta</p>
+                                            <p class="text-sm text-gray-400">Duración: 5:23</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-300 text-sm mb-3">Aprende a registrarte y completar la verificación KYC paso a paso.</p>
+                                    <button class="watch-video w-full py-2 bg-blue-900/30 text-blue-300 rounded-lg hover:bg-blue-800/50 transition" data-video="register">
+                                        <i class="fas fa-play mr-2"></i>Ver Tutorial
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `
+                }
+            };
+
+            if (resources[resourceType]) {
+                title.textContent = resources[resourceType].title;
+                content.innerHTML = resources[resourceType].content;
+                
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeResourceModalFunc() {
+            const modal = document.getElementById('resourceModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notification-message');
+            
+            if (!notification || !messageEl) return;
+            
+            const colors = {
+                success: '#10b981',
+                error: '#ef4444',
+                warning: '#f59e0b',
+                info: '#3b82f6'
+            };
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            notification.style.background = colors[type] || colors.info;
+            messageEl.textContent = message;
+            notification.querySelector('i').className = `fas ${icons[type] || icons.info}`;
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 5000);
+        }
+
+        function handleLogout(e) {
+            e.preventDefault();
+            
+            auth.signOut()
+                .then(() => {
+                    showNotification('Sesión cerrada correctamente', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                    showNotification('Error al cerrar sesión', 'error');
+                });
+        }
+    </script>
+</body>
+</html>

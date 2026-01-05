@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canada Coin - Profile</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #1e40af;
+            --secondary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #0ea5e9;
+            --dark: #1f2937;
+            --light: #f9fafb;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .dashboard-container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+        
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: #6b7280;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        
+        .nav-tab:hover {
+            color: var(--primary);
+            background: rgba(30, 64, 175, 0.05);
+        }
+        
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: linear-gradient(to bottom, rgba(30, 64, 175, 0.08), transparent);
+        }
+        
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .profile-card:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            color: white;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+        
+        .avatar-container {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            border: 4px solid white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .avatar-container i {
+            font-size: 3rem;
+            color: white;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 500;
+            color: #6b7280;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1;
+        }
+        
+        .badge-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-width: 400px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 0.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 50;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #374151;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            gap: 0.75rem;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f9fafb;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(30, 64, 175, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Notifications Container -->
+    <div id="notifications" class="fixed top-6 right-6 z-50"></div>
+    
+    <!-- Main Container -->
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-lg border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-coins text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-900">Canada Coin</h1>
+                            <p class="text-xs text-gray-500">Digital Banking</p>
+                        </div>
+                    </div>
+                    
+                    <!-- User Menu -->
+                    <div class="dropdown">
+                        <button id="user-menu-button" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div class="hidden md:block text-left">
+                                <p id="user-name" class="font-semibold text-gray-900">Loading...</p>
+                                <p class="text-xs text-gray-500">Account</p>
+                            </div>
+                            <i class="fas fa-chevron-down text-gray-400 text-sm"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="user-menu" class="dropdown-menu">
+                            <div class="p-4 border-b border-gray-100">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <p id="dropdown-name" class="font-bold text-gray-900">Loading...</p>
+                                        <p id="dropdown-email" class="text-sm text-gray-500 truncate">user@example.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="py-2">
+                                <a href="profile.html" class="dropdown-item">
+                                    <i class="fas fa-user text-gray-400"></i>
+                                    <span>My Profile</span>
+                                </a>
+                                <a href="settings.html" class="dropdown-item">
+                                    <i class="fas fa-cog text-gray-400"></i>
+                                    <span>Settings</span>
+                                </a>
+                                <a href="security.html" class="dropdown-item">
+                                    <i class="fas fa-shield-alt text-gray-400"></i>
+                                    <span>Security</span>
+                                </a>
+                                <div class="border-t border-gray-100 my-2"></div>
+                                <a href="#" id="logout-btn" class="dropdown-item text-red-600">
+                                    <i class="fas fa-sign-out-alt text-red-400"></i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation Tabs -->
+                <nav class="flex overflow-x-auto -mb-px">
+                    <a href="dashboard.html" class="nav-tab">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="investments.html" class="nav-tab">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Investments</span>
+                    </a>
+                    <a href="deposits.html" class="nav-tab">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Deposits</span>
+                    </a>
+                    <a href="withdrawals.html" class="nav-tab">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>Withdrawals</span>
+                    </a>
+                    <a href="transfers.html" class="nav-tab">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Transfers</span>
+                    </a>
+                    <a href="cards.html" class="nav-tab">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Cards</span>
+                    </a>
+                    <a href="referrals.html" class="nav-tab">
+                        <i class="fas fa-users"></i>
+                        <span>Referrals</span>
+                    </a>
+                    <a href="support.html" class="nav-tab">
+                        <i class="fas fa-headset"></i>
+                        <span>Support</span>
+                    </a>
+                    <a href="profile.html" class="nav-tab active">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </nav>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="dashboard-container p-6 sm:p-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">My Profile</h2>
+                    <p class="text-gray-600 mt-2">View and manage your personal information</p>
+                </div>
+                
+                <!-- Profile Header -->
+                <div class="profile-header mb-8 relative z-10">
+                    <div class="text-center">
+                        <div class="avatar-container">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3 id="profile-name" class="text-2xl font-bold mb-2">Loading...</h3>
+                        <p id="profile-email" class="text-blue-100">user@example.com</p>
+                        <div class="mt-4">
+                            <span id="kyc-status" class="badge badge-success">KYC Verified</span>
+                            <span id="account-status" class="badge badge-info ml-2">Active Account</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Information -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Personal Information -->
+                    <div class="profile-card fade-in">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">Personal Information</h3>
+                                <p class="text-gray-600">Basic account details</p>
+                            </div>
+                            <i class="fas fa-id-card text-blue-500 text-2xl"></i>
+                        </div>
+                        
+                        <div class="space-y-1">
+                            <div class="info-item">
+                                <span class="info-label">Full Name</span>
+                                <span id="full-name" class="info-value">Loading...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Email Address</span>
+                                <span id="email-address" class="info-value">Loading...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Phone Number</span>
+                                <span id="phone-number" class="info-value">Loading...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Country</span>
+                                <span id="country" class="info-value">Loading...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Account Created</span>
+                                <span id="created-at" class="info-value">Loading...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Last Login</span>
+                                <span id="last-login" class="info-value">Loading...</span>
+                            </div>
+                        </div>
+                        
+                        <button id="edit-profile" class="mt-6 w-full py-3 border border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold rounded-lg transition-all duration-300">
+                            <i class="fas fa-edit mr-2"></i>
+                            Edit Personal Information
+                        </button>
+                    </div>
+                    
+                    <!-- Account Information -->
+                    <div class="profile-card fade-in">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">Account Information</h3>
+                                <p class="text-gray-600">Financial account details</p>
+                            </div>
+                            <i class="fas fa-wallet text-green-500 text-2xl"></i>
+                        </div>
+                        
+                        <div class="space-y-1">
+                            <div class="info-item">
+                                <span class="info-label">Account Balance</span>
+                                <span id="account-balance" class="info-value font-bold text-green-600">$0.00</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Total Deposits</span>
+                                <span id="total-deposits" class="info-value">$0.00</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Total Earnings</span>
+                                <span id="total-earnings" class="info-value">$0.00</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Total Withdrawals</span>
+                                <span id="total-withdrawals" class="info-value">$0.00</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Active Cards</span>
+                                <span id="active-cards" class="info-value">0</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Referral Code</span>
+                                <div class="flex items-center">
+                                    <span id="referral-code" class="info-value font-mono">LOADING</span>
+                                    <button onclick="copyReferralCode()" class="ml-2 text-blue-600 hover:text-blue-800">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                            <p class="text-sm text-blue-800">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Some information can only be updated by contacting support for security reasons.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- KYC Status -->
+                <div class="profile-card fade-in mt-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">KYC Verification Status</h3>
+                            <p class="text-gray-600">Identity verification information</p>
+                        </div>
+                        <i class="fas fa-shield-alt text-purple-500 text-2xl"></i>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-700 font-medium">Verification Level</span>
+                            <span id="kyc-level" class="font-semibold">Standard</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="kyc-progress" class="bg-green-600 h-2.5 rounded-full" style="width: 75%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>Basic</span>
+                            <span>Standard</span>
+                            <span>Enhanced</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-medium">Document Status</span>
+                                <span id="document-status" class="badge badge-success">Verified</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Identity documents verified</p>
+                        </div>
+                        
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-medium">Address Proof</span>
+                                <span id="address-status" class="badge badge-success">Verified</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Address verification complete</p>
+                        </div>
+                    </div>
+                    
+                    <button id="kyc-upload" class="mt-6 w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-all duration-300">
+                        <i class="fas fa-upload mr-2"></i>
+                        Upload KYC Documents
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBI4O0d_Mec38FDiuhirujCnX99PFKiXW4",
+            authDomain: "projekt-pc.firebaseapp.com",
+            databaseURL: "https://projekt-pc-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "projekt-pc",
+            storageBucket: "projekt-pc.appspot.com",
+            messagingSenderId: "90098431634",
+            appId: "1:90098431634:web:7cb61800d03533c2a6984b",
+            measurementId: "G-59YH8W8W1L"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            auth.onAuthStateChanged(user => {
+                if (!user) {
+                    redirectToLogin();
+                } else {
+                    initializeProfile(user);
+                }
+            });
+        });
+
+        async function initializeProfile(user) {
+            try {
+                // Load user data
+                await loadUserData(user);
+                setupEventListeners();
+                showNotification('Profile loaded', 'success');
+            } catch (error) {
+                console.error('Profile initialization error:', error);
+                showNotification('Error loading profile', 'error');
+            }
+        }
+
+        async function loadUserData(user) {
+            const userRef = db.ref(`users/${user.uid}`);
+            
+            userRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                
+                if (data) {
+                    // Update user info
+                    const name = data.name || user.email.split('@')[0];
+                    const email = data.email || user.email;
+                    
+                    document.getElementById('user-name').textContent = name;
+                    document.getElementById('dropdown-name').textContent = name;
+                    document.getElementById('dropdown-email').textContent = email;
+                    document.getElementById('profile-name').textContent = name;
+                    document.getElementById('profile-email').textContent = email;
+                    document.getElementById('full-name').textContent = name;
+                    document.getElementById('email-address').textContent = email;
+                    
+                    // Profile information
+                    document.getElementById('phone-number').textContent = data.phone || 'Not set';
+                    document.getElementById('country').textContent = data.country || 'Not set';
+                    
+                    // Format dates
+                    const createdAt = data.createdAt ? new Date(data.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    }) : 'N/A';
+                    
+                    const lastLogin = data.lastLogin ? new Date(data.lastLogin).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) : 'N/A';
+                    
+                    document.getElementById('created-at').textContent = createdAt;
+                    document.getElementById('last-login').textContent = lastLogin;
+                    
+                    // Account information
+                    document.getElementById('account-balance').textContent = `$${formatCurrency(data.balance || 0)}`;
+                    document.getElementById('total-deposits').textContent = `$${formatCurrency(data.totalDeposits || 0)}`;
+                    document.getElementById('total-earnings').textContent = `$${formatCurrency(data.totalEarnings || 0)}`;
+                    document.getElementById('total-withdrawals').textContent = `$${formatCurrency(data.totalWithdrawals || 0)}`;
+                    document.getElementById('active-cards').textContent = data.cardCount || 0;
+                    document.getElementById('referral-code').textContent = data.referralCode || 'N/A';
+                    
+                    // KYC Status
+                    const kycStatus = data.kycStatus || 'pending';
+                    const kycBadge = document.getElementById('kyc-status');
+                    
+                    if (kycStatus === 'verified') {
+                        kycBadge.textContent = 'KYC Verified';
+                        kycBadge.className = 'badge badge-success';
+                        document.getElementById('kyc-progress').style.width = '100%';
+                        document.getElementById('kyc-level').textContent = 'Enhanced';
+                    } else if (kycStatus === 'pending') {
+                        kycBadge.textContent = 'KYC Pending';
+                        kycBadge.className = 'badge badge-warning';
+                        document.getElementById('kyc-progress').style.width = '50%';
+                        document.getElementById('kyc-level').textContent = 'Standard';
+                    } else {
+                        kycBadge.textContent = 'KYC Required';
+                        kycBadge.className = 'badge badge-danger';
+                        document.getElementById('kyc-progress').style.width = '25%';
+                        document.getElementById('kyc-level').textContent = 'Basic';
+                    }
+                    
+                    // Document status
+                    if (data.kycData && data.kycData.status === 'verified') {
+                        document.getElementById('document-status').textContent = 'Verified';
+                        document.getElementById('document-status').className = 'badge badge-success';
+                        document.getElementById('address-status').textContent = 'Verified';
+                        document.getElementById('address-status').className = 'badge badge-success';
+                    } else {
+                        document.getElementById('document-status').textContent = 'Required';
+                        document.getElementById('document-status').className = 'badge badge-danger';
+                        document.getElementById('address-status').textContent = 'Required';
+                        document.getElementById('address-status').className = 'badge badge-danger';
+                    }
+                }
+            });
+        }
+
+        function formatCurrency(amount) {
+            if (typeof amount !== 'number') {
+                amount = parseFloat(amount) || 0;
+            }
+            return amount.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function setupEventListeners() {
+            const userMenuButton = document.getElementById('user-menu-button');
+            const userMenu = document.getElementById('user-menu');
+            
+            userMenuButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userMenu.classList.toggle('show');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!userMenu.contains(e.target) && !userMenuButton.contains(e.target)) {
+                    userMenu.classList.remove('show');
+                }
+            });
+            
+            document.getElementById('logout-btn').addEventListener('click', handleLogout);
+            
+            // Edit profile button
+            document.getElementById('edit-profile').addEventListener('click', editProfile);
+            
+            // KYC upload button
+            document.getElementById('kyc-upload').addEventListener('click', uploadKYC);
+        }
+
+        function editProfile() {
+            showNotification('Profile editing feature coming soon', 'info');
+        }
+
+        function uploadKYC() {
+            showNotification('KYC upload feature coming soon', 'info');
+        }
+
+        function copyReferralCode() {
+            const referralCode = document.getElementById('referral-code').textContent;
+            if (referralCode && referralCode !== 'N/A' && referralCode !== 'LOADING') {
+                navigator.clipboard.writeText(referralCode).then(() => {
+                    showNotification('Referral code copied to clipboard!', 'success');
+                }).catch(err => {
+                    console.error('Failed to copy:', err);
+                    showNotification('Failed to copy referral code', 'error');
+                });
+            }
+        }
+
+        function handleLogout(e) {
+            e.preventDefault();
+            
+            showNotification('Logging out...', 'info');
+            
+            auth.signOut().then(() => {
+                showNotification('Successfully logged out', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            }).catch(error => {
+                console.error('Logout error:', error);
+                showNotification('Error logging out', 'error');
+            });
+        }
+
+        function redirectToLogin() {
+            window.location.href = 'index.html';
+        }
+
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notifications');
+            const notificationId = 'notification-' + Date.now();
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            const colors = {
+                success: 'bg-green-100 text-green-800 border-green-200',
+                error: 'bg-red-100 text-red-800 border-red-200',
+                warning: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                info: 'bg-blue-100 text-blue-800 border-blue-200'
+            };
+            
+            const iconColors = {
+                success: 'bg-green-500 text-white',
+                error: 'bg-red-500 text-white',
+                warning: 'bg-yellow-500 text-white',
+                info: 'bg-blue-500 text-white'
+            };
+            
+            const notification = document.createElement('div');
+            notification.id = notificationId;
+            notification.className = `notification ${colors[type]}`;
+            notification.innerHTML = `
+                <div class="notification-icon ${iconColors[type]}">
+                    <i class="fas ${icons[type]}"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="font-medium">${message}</p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600" onclick="closeNotification('${notificationId}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 10);
+            
+            setTimeout(() => closeNotification(notificationId), 5000);
+        }
+
+        function closeNotification(id) {
+            const notification = document.getElementById(id);
+            if (notification) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }
+        }
+
+        window.closeNotification = closeNotification;
+    </script>
+</body>
+</html>
